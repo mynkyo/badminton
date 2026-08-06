@@ -192,7 +192,7 @@
         <table class="w-full text-sm border-collapse text-center">
           <thead>
             <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
-              <th class="py-4 px-2 text-gray-500 font-semibold w-24 text-left">Giờ</th>
+              <th class="sticky left-0 bg-white z-20 py-4 px-2 text-gray-500 font-semibold w-24 text-left shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>
               <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
               <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
               <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
@@ -701,7 +701,7 @@
     // Table headers
     const headerRow = document.getElementById('uiTableHeaderRow');
     if (headerRow) {
-      let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-24 flex-shrink-0">Giờ</th>`;
+      let hHtml = `<th class="sticky left-0 bg-white z-20 py-3 px-4 text-left text-slate-500 font-bold min-w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>`;
       (CONFIG.courts || []).forEach(cName => {
         hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
       });
@@ -1040,7 +1040,7 @@
       }
 
       const timeLabel = `${String(h).padStart(2,'0')}:00`;
-      let rowCells = `<td class="py-2 px-4 border-b border-gray-100 text-xs text-gray-500 font-medium whitespace-nowrap">
+      let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-4 border-b border-gray-100 text-xs text-slate-600 font-bold whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
         ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
       </td>`;
 
