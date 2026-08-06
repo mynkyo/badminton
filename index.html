@@ -217,13 +217,14 @@
         <a href="#pricing" class="nav-link text-gray-500 hover:text-primary pb-1">Bảng giá</a>
         <a href="#contact" class="nav-link text-gray-500 hover:text-primary pb-1">Liên hệ</a>
       </div>
-      <!-- Action Buttons (Mobile & Desktop) -->
+      <!-- Action Buttons (Mobile & Desktop)  -->
       <div class="flex items-center gap-2.5">
         <button id="navUserBtn" onclick="handleUserClick()" title="Tài khoản"
           class="relative w-10 h-10 bg-blue-50 text-primary hover:bg-blue-100 border border-blue-200/80 rounded-xl text-sm font-semibold transition-all flex items-center justify-center flex-shrink-0 shadow-2xs active:scale-95 overflow-hidden">
           <i class="fa-solid fa-user text-base" id="userIcon"></i>
           <img src="" id="userAvatar" class="w-full h-full object-cover hidden">
-          <span id="userLoggedInBadge" class="hidden absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
+          <span id="userLoggedInBadge"
+            class="hidden absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
         </button>
         <button id="navCartBtn" onclick="openCartDrawer()" title="Giỏ hàng"
           class="relative w-10 h-10 bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-all flex items-center justify-center flex-shrink-0 shadow-2xs active:scale-95">
@@ -748,18 +749,26 @@
           </div>
           <!-- Zalo Option -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fa-brands fa-square-whatsapp mr-1.5 text-[#0068ff]"></i>Zalo liên hệ <span class="text-gray-400 font-normal text-xs">(không bắt buộc)</span></label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2"><i
+                class="fa-brands fa-square-whatsapp mr-1.5 text-[#0068ff]"></i>Zalo liên hệ <span
+                class="text-gray-400 font-normal text-xs">(không bắt buộc)</span></label>
             <div class="grid grid-cols-3 gap-1.5 mb-2">
-              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
-                <input type="radio" name="zaloOption" value="same" class="w-3.5 h-3.5 text-[#0068ff]" checked onchange="handleZaloOption(this.value)" />
+              <label
+                class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
+                <input type="radio" name="zaloOption" value="same" class="w-3.5 h-3.5 text-[#0068ff]" checked
+                  onchange="handleZaloOption(this.value)" />
                 <span>Giống SĐT</span>
               </label>
-              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
-                <input type="radio" name="zaloOption" value="other" class="w-3.5 h-3.5 text-[#0068ff]" onchange="handleZaloOption(this.value)" />
+              <label
+                class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
+                <input type="radio" name="zaloOption" value="other" class="w-3.5 h-3.5 text-[#0068ff]"
+                  onchange="handleZaloOption(this.value)" />
                 <span>Số khác</span>
               </label>
-              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-red-200 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-500">
-                <input type="radio" name="zaloOption" value="none" class="w-3.5 h-3.5 text-gray-400" onchange="handleZaloOption(this.value)" />
+              <label
+                class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-red-200 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-500">
+                <input type="radio" name="zaloOption" value="none" class="w-3.5 h-3.5 text-gray-400"
+                  onchange="handleZaloOption(this.value)" />
                 <span>Không dùng</span>
               </label>
             </div>
@@ -853,11 +862,11 @@
           bookingsHtml = `
             <div class="max-h-60 overflow-y-auto space-y-2 text-left pr-1 my-3 scroll-smooth">
               ${bookings.map(b => {
-                let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
-                let badgeText = 'Chờ xác nhận';
-                if (b.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
-                if (b.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
-                return `
+            let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
+            let badgeText = 'Chờ xác nhận';
+            if (b.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
+            if (b.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
+            return `
                   <div class="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs flex items-center justify-between gap-2 shadow-2xs">
                     <div>
                       <div class="font-bold text-navy">${(CONFIG.courts && CONFIG.courts[b.court]) || ('Sân ' + (b.court + 1))} · ${String(b.hour).padStart(2, '0')}:00–${String(b.hour + 1).padStart(2, '0')}:00</div>
@@ -869,7 +878,7 @@
                     </div>
                   </div>
                 `;
-              }).join('')}
+          }).join('')}
             </div>
           `;
         }
@@ -1337,7 +1346,7 @@
       </div>`).join('');
     }
 
-    window.removeFromBookingModal = function(key) {
+    window.removeFromBookingModal = function (key) {
       removeFromCart(key);
       if (cart.length === 0) {
         closeBookingModal();
@@ -1482,7 +1491,7 @@
       }
     };
 
-    window.handleZaloOption = function(val) {
+    window.handleZaloOption = function (val) {
       const row = document.getElementById('zaloCustomRow');
       if (val === 'other') {
         row.classList.remove('hidden');
@@ -1492,7 +1501,7 @@
       }
     };
 
-    window.syncZaloIfSame = function() {
+    window.syncZaloIfSame = function () {
       const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
       if (zaloOptionEl && zaloOptionEl.value === 'same') {
         const phone = document.getElementById('guestPhone').value;
