@@ -258,16 +258,30 @@
                   <p class="text-[11px] text-gray-400 mt-1">Giới hạn tối đa 30 ký tự để hiển thị vừa vặn 1 dòng trên thanh menu.</p>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại / Zalo <span class="text-red-500">*</span></label>
-                  <input id="cfgPhone" type="text" value="0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
-                </div>
-                <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Email liên hệ</label>
                   <input id="cfgEmail" type="email" value="contact@vietdangbadminton.com" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Link Facebook Fanpage</label>
-                  <input id="cfgFacebook" type="text" value="https://facebook.com/sancauvietdang" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại Hotline <span class="text-red-500">*</span></label>
+                  <input id="cfgPhone" type="text" value="0901 234 567" oninput="onPhoneInput(this.value)" placeholder="Ví dụ: 0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                  <p id="cfgPhoneErr" class="text-[11px] text-red-500 mt-1 hidden"></p>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-gray-700">Số Zalo liên hệ</label>
+                    <label class="inline-flex items-center cursor-pointer text-xs text-primary font-semibold">
+                      <input type="checkbox" id="cfgSameAsPhone" class="mr-1 rounded text-primary focus:ring-primary" onchange="toggleSameAsPhone(this.checked)"> Dùng chung SĐT Hotline
+                    </label>
+                  </div>
+                  <input id="cfgZalo" type="text" value="0901 234 567" placeholder="Ví dụ: 0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Tên Fanpage Facebook</label>
+                  <input id="cfgFacebookName" type="text" value="Sân Cầu Việt Đảng" placeholder="Ví dụ: Sân Cầu Lông Việt Đảng" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Đường dẫn Link Facebook</label>
+                  <input id="cfgFacebook" type="text" value="https://facebook.com/sancauvietdang" placeholder="Ví dụ: https://facebook.com/sancauvietdang" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
               </div>
 
@@ -551,11 +565,52 @@
   function applyConfigUI() {
     document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name;
     
+    const VN_PHONE_PREFIXES = ['032','033','034','035','036','037','038','039','086','096','097','098','070','076','077','078','079','089','090','093','081','082','083','084','085','088','091','094','052','056','058','092','059','099','055','069'];
+    window.validateVNPhone = function(raw) {
+      let c = (raw || '').replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
+      if (!/^0\d{9}$/.test(c)) return false;
+      return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
+    };
+
+    window.toggleSameAsPhone = function(checked) {
+      const phoneInput = document.getElementById('cfgPhone');
+      const zaloInput = document.getElementById('cfgZalo');
+      if (checked) {
+        zaloInput.value = phoneInput.value;
+        zaloInput.disabled = true;
+        zaloInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+      } else {
+        zaloInput.disabled = false;
+        zaloInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+      }
+    };
+
+    window.onPhoneInput = function(val) {
+      const errEl = document.getElementById('cfgPhoneErr');
+      if (val.trim() && !validateVNPhone(val)) {
+        if (errEl) {
+          errEl.textContent = 'Số điện thoại không hợp lệ (cần 10 chữ số chuẩn Việt Nam).';
+          errEl.classList.remove('hidden');
+        }
+      } else {
+        if (errEl) errEl.classList.add('hidden');
+      }
+
+      if (document.getElementById('cfgSameAsPhone').checked) {
+        document.getElementById('cfgZalo').value = val;
+      }
+    };
+
     // Fill Settings form
     document.getElementById('cfgName').value = CONFIG.name;
     if (document.getElementById('sidebarCourtBrandName')) document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name || 'Sân Cầu Việt Đảng';
-    document.getElementById('cfgPhone').value = CONFIG.phone;
+    document.getElementById('cfgPhone').value = CONFIG.phone || '';
+    document.getElementById('cfgZalo').value = CONFIG.zalo || CONFIG.phone || '';
+    const sameAs = CONFIG.sameAsPhone ?? (CONFIG.zalo === CONFIG.phone || !CONFIG.zalo);
+    document.getElementById('cfgSameAsPhone').checked = sameAs;
+    toggleSameAsPhone(sameAs);
     document.getElementById('cfgEmail').value = CONFIG.email || '';
+    document.getElementById('cfgFacebookName').value = CONFIG.facebookName || '';
     document.getElementById('cfgFacebook').value = CONFIG.facebook || '';
     document.getElementById('cfgAddress').value = CONFIG.address || '';
     document.getElementById('cfgGoogleMaps').value = CONFIG.googleMaps || '';
@@ -760,10 +815,29 @@
 
       const servicesRaw = document.getElementById('cfgServices').value.split(',').map(s => s.trim()).filter(Boolean);
 
+      const phoneVal = document.getElementById('cfgPhone').value.trim();
+      const zaloVal = document.getElementById('cfgZalo').value.trim();
+      const sameAsPhone = document.getElementById('cfgSameAsPhone').checked;
+
+      if (!validateVNPhone(phoneVal)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Số điện thoại không hợp lệ',
+          text: 'Vui lòng kiểm tra lại Số điện thoại hotline (cần 10 chữ số đúng định dạng Việt Nam)!',
+          confirmButtonColor: '#1d4ed8'
+        });
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu cấu hình';
+        return;
+      }
+
       const newConfig = {
         name: document.getElementById('cfgName').value.trim(),
-        phone: document.getElementById('cfgPhone').value.trim(),
+        phone: phoneVal,
+        zalo: sameAsPhone ? phoneVal : zaloVal,
+        sameAsPhone: sameAsPhone,
         email: document.getElementById('cfgEmail').value.trim(),
+        facebookName: document.getElementById('cfgFacebookName').value.trim(),
         facebook: document.getElementById('cfgFacebook').value.trim(),
         address: document.getElementById('cfgAddress').value.trim(),
         googleMaps: document.getElementById('cfgGoogleMaps').value.trim(),
