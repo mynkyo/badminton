@@ -629,38 +629,36 @@
     </div>
   </footer>
 
-  <!-- ===== CART BAR (sticky bottom) ===== -->
-  <div id="cartBar" class="cart-hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
-    <div class="bg-white/90 backdrop-blur-md border-t border-white/20 shadow-[0_-4px_25px_-5px_rgba(0,0,0,0.1)]">
-      <div class="h-1 bg-primary" id="cartProgressBar" style="width:0%"></div>
-      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-sm font-bold text-gray-800">
-              <span id="cartCountLabel" class="text-primary">0</span> slot đã chọn
-            </span>
-            <span class="text-gray-300">·</span>
-            <span class="text-sm font-bold text-primary" id="cartTotalLabel">0đ</span>
-          </div>
-          <div id="cartTagsRow" class="flex gap-1.5 mt-1 flex-wrap max-h-10 overflow-hidden"></div>
+  <!-- ===== CART BAR (Floating dark card matching manager style) ===== -->
+  <div id="cartBar" class="cart-hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-navy text-white rounded-2xl shadow-2xl p-3 sm:p-4 max-w-xl w-[92%] border border-white/20 transition-all duration-300 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 shadow-xs">
+        <span id="cartCountLabel">0</span>
+      </div>
+      <div class="min-w-0">
+        <div class="text-xs text-blue-200 font-semibold truncate">
+          Đã chọn <span id="cartCountSubLabel">0</span> khung giờ
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <button onclick="clearCart()"
-            class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa tất cả">
-            <i class="fa-solid fa-trash-can text-sm"></i>
-          </button>
-          <button onclick="openCartDrawer()"
-            class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-all">
-            <i class="fa-solid fa-list-ul"></i>
-            <span class="hidden sm:inline">Xem giỏ</span>
-          </button>
-          <button onclick="openBookingModal()"
-            class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg">
-            <i class="fa-solid fa-calendar-check"></i>
-            <span>Đặt ngay</span>
-          </button>
+        <div class="text-base font-extrabold text-white" id="cartTotalLabel">
+          0đ
         </div>
       </div>
+    </div>
+
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <button onclick="clearCart()" title="Bỏ chọn tất cả"
+        class="px-3 py-2 text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+        Hủy
+      </button>
+      <button onclick="openCartDrawer()" title="Xem chi tiết giỏ hàng"
+        class="p-2.5 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all flex items-center justify-center">
+        <i class="fa-solid fa-list-ul text-sm"></i>
+      </button>
+      <button onclick="openBookingModal()"
+        class="bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-1.5">
+        <i class="fa-solid fa-calendar-check"></i>
+        <span>Đặt ngay</span>
+      </button>
     </div>
   </div>
 
@@ -1099,10 +1097,14 @@
       const count = cart.length;
       const total = cartTotal();
       const bar = document.getElementById('cartBar');
+      const floatContainer = document.getElementById('uiFloatContactContainer');
 
       if (count === 0) {
         bar.classList.add('cart-hidden');
         document.getElementById('navCartCount').classList.add('hidden');
+        if (floatContainer) {
+          floatContainer.style.bottom = '1.5rem';
+        }
         return;
       }
 
@@ -1110,16 +1112,14 @@
       document.getElementById('navCartCount').classList.remove('hidden');
       document.getElementById('navCartCount').textContent = count;
       document.getElementById('cartCountLabel').textContent = count;
+      if (document.getElementById('cartCountSubLabel')) {
+        document.getElementById('cartCountSubLabel').textContent = count;
+      }
       document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
-      document.getElementById('cartProgressBar').style.width = Math.min(100, count * 10) + '%';
 
-      const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-      const tagsRow = document.getElementById('cartTagsRow');
-      tagsRow.innerHTML = sorted.slice(0, 6).map(s => `
-      <span class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">
-        ${CONFIG.courts[s.court]} ${String(s.hour).padStart(2, '0')}:00 ${fmtDateVN(s.date)}
-        <button onclick="removeFromCart('${s.key}')" class="hover:text-red-500 transition-colors ml-0.5">×</button>
-      </span>`).join('') + (cart.length > 6 ? `<span class="text-xs text-gray-400 py-0.5">+${cart.length - 6} nữa</span>` : '');
+      if (floatContainer) {
+        floatContainer.style.bottom = '6.5rem';
+      }
     }
 
     window.openCartDrawer = function () {
@@ -1513,7 +1513,7 @@
     initScrollSpy();
   </script>
   <!-- Floating Quick Contact Buttons (Bottom Right) -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end">
+  <div id="uiFloatContactContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end transition-all duration-300">
     <!-- Zalo Floating Button -->
     <a id="uiFloatZaloBtn" href="#" target="_blank" title="Chat Zalo"
       class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-[#0068ff] hover:bg-[#0052cc] text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
