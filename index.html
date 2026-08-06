@@ -24,7 +24,9 @@
     }
   </script>
   <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
     * { font-family: 'Outfit', sans-serif; }
+    input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; -webkit-appearance: none; }
 
     /* Slot states */
     .slot-cell { transition: all .18s; cursor: pointer; user-select: none; }
@@ -80,7 +82,6 @@
       <a href="#home" class="nav-link border-b-2 border-primary text-primary pb-1">Trang chủ</a>
       <a href="#schedule" class="nav-link text-gray-500 hover:text-primary pb-1">Lịch sân</a>
       <a href="#pricing" class="nav-link text-gray-500 hover:text-primary pb-1">Bảng giá</a>
-      <a href="#about" class="nav-link text-gray-500 hover:text-primary pb-1">Giới thiệu</a>
       <a href="#contact" class="nav-link text-gray-500 hover:text-primary pb-1">Liên hệ</a>
     </div>
     <!-- Right side buttons -->
@@ -135,20 +136,27 @@
 </section>
 
 <!-- ===== SCHEDULE ===== -->
-<section id="schedule" class="max-w-6xl mx-auto px-4 -mt-20 relative z-20 mb-20">
+<section id="schedule" class="max-w-6xl mx-auto px-4 -mt-20 relative z-20 mb-20 scroll-mt-28">
   <div class="bg-white rounded-3xl p-6 lg:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100">
     
     <!-- Header of Card -->
     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-      <h2 class="text-xl font-bold text-navy flex items-center gap-2">
-        <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
-      </h2>
+      <div>
+        <h2 class="text-xl font-bold text-navy flex items-center gap-2">
+          <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
+        </h2>
+        <!-- Price info moved to top -->
+        <div class="mt-1.5 flex flex-wrap gap-4 text-xs font-medium text-gray-500">
+          <div class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-primary"></i>Giá thường: <span id="uiStatPriceNormal" class="font-semibold text-gray-700">80.000đ/h</span></div>
+          <div class="text-red-500 font-medium">Giá cao điểm (17:00 - 20:00): <span id="uiLegendPeakPrice" class="font-semibold">120.000đ/h</span></div>
+        </div>
+      </div>
       
       <!-- Date Picker -->
       <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm p-1">
         <button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all text-gray-500" onclick="changeDay(-1)"><i class="fa-solid fa-chevron-left"></i></button>
         <div class="relative flex items-center">
-          <input type="date" id="datePicker" class="w-[140px] border-none font-semibold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10" onclick="this.showPicker()" />
+          <input type="date" id="datePicker" class="w-[110px] border-none font-semibold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10" onclick="this.showPicker()" />
         </div>
         <button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all text-gray-500" onclick="changeDay(1)"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
@@ -173,18 +181,11 @@
         </thead>
       <tbody id="scheduleBody"></tbody>
     </table>
-    
-    <!-- Footer info of schedule -->
-    <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-6 text-sm text-gray-500 font-medium">
-      <div class="flex items-center gap-2"><i class="fa-solid fa-circle-info text-primary"></i>Giá thường: <span id="uiStatPriceNormal">80.000đ/h</span></div>
-      <div class="text-red-500">Giá cao điểm (17:00 - 20:00): <span id="uiLegendPeakPrice">120.000đ/h</span></div>
-    </div>
-
   </div>
 </section>
 
 <!-- ===== PRICING ===== -->
-<section id="pricing" class="bg-white py-10">
+<section id="pricing" class="bg-white py-10 scroll-mt-20">
   <div class="max-w-6xl mx-auto px-4">
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-2"><i class="fa-solid fa-tag text-primary mr-2"></i>Bảng Giá</h2>
     <p class="text-center text-gray-500 text-sm mb-8">Giá đã bao gồm ánh sáng, không phát sinh thêm</p>
@@ -217,7 +218,7 @@
 </section>
 
 <!-- ===== CONTACT ===== -->
-<section id="contact" class="py-10 bg-slate-50">
+<section id="contact" class="py-10 bg-slate-50 scroll-mt-20">
   <div class="max-w-6xl mx-auto px-4">
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-8"><i class="fa-solid fa-phone text-primary mr-2"></i>Liên Hệ &amp; Địa Chỉ</h2>
     <div class="grid md:grid-cols-2 gap-8">
@@ -917,6 +918,47 @@
     fetchBookingsAndRender();
     updateCartUI();
   });
+
+  // ScrollSpy for navbar active state
+  function initScrollSpy() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+    if (!sections.length || !navLinks.length) return;
+
+    function onScroll() {
+      const scrollPos = window.scrollY + 160;
+      let currentId = '';
+
+      sections.forEach(sec => {
+        const top = sec.offsetTop;
+        const height = sec.offsetHeight;
+        if (scrollPos >= top && scrollPos < top + height) {
+          currentId = sec.getAttribute('id');
+        }
+      });
+
+      if (!currentId && window.scrollY < 200) {
+        currentId = 'home';
+      }
+
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === `#${currentId}`) {
+          link.classList.add('border-b-2', 'border-primary', 'text-primary');
+          link.classList.remove('text-gray-500');
+        } else {
+          link.classList.remove('border-b-2', 'border-primary', 'text-primary');
+          link.classList.add('text-gray-500');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('load', onScroll);
+    onScroll();
+  }
+
+  initScrollSpy();
 </script>
 </body>
 </html>
