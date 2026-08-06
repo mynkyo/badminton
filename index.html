@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="assets/theme.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -22,8 +23,18 @@
         extend: {
           fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
           colors: {
-            primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
-            navy: { DEFAULT: '#0b1a36', light: '#1e3a8a', dark: '#020617' }
+            primary: {
+              DEFAULT: 'var(--color-primary)',
+              light: 'var(--color-primary-light)',
+              dark: 'var(--color-primary-dark)',
+              50: 'var(--color-primary-50)',
+              100: 'var(--color-primary-100)'
+            },
+            navy: {
+              DEFAULT: 'var(--color-navy)',
+              light: 'var(--color-navy-light)',
+              dark: 'var(--color-navy-dark)'
+            }
           }
         }
       }
@@ -131,7 +142,7 @@
     }
 
     .nav-link:hover {
-      color: #1d4ed8;
+      color: var(--color-primary);
     }
 
     ::-webkit-scrollbar {
@@ -144,7 +155,7 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #1d4ed8;
+      background: var(--color-primary);
       border-radius: 4px;
     }
 
@@ -158,12 +169,12 @@
     }
 
     #uiScheduleTableWrapper::-webkit-scrollbar-thumb {
-      background: #1d4ed8;
+      background: var(--color-primary);
       border-radius: 6px;
     }
 
     #uiScheduleTableWrapper::-webkit-scrollbar-thumb:hover {
-      background: #1e40af;
+      background: var(--color-primary-dark);
     }
 
     @keyframes selectPop {
@@ -732,7 +743,7 @@
 
   <!-- Import Firebase Module -->
   <script type="module">
-    import { getBookingsByDate, addBookings, getSettings } from "./firebase.js";
+    import { getBookingsByDate, addBookings, getSettings, onSettingsChange } from "./firebase.js";
 
     let CONFIG = {
       name: 'Sân Cầu Việt Đảng',
@@ -748,7 +759,8 @@
       email: 'contact@vietdangbadminton.com',
       facebook: 'https://facebook.com/sancauvietdang',
       googleMaps: '',
-      notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
+      notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!',
+      theme: 'default'
     };
 
     async function loadConfig() {
@@ -757,6 +769,14 @@
         CONFIG = { ...CONFIG, ...remote };
       }
       applyConfigUI();
+
+      // Listen for real-time config updates (theme, logo, prices, etc.)
+      onSettingsChange((realtimeConfig) => {
+        if (realtimeConfig) {
+          CONFIG = { ...CONFIG, ...realtimeConfig };
+          applyConfigUI();
+        }
+      });
     }
 
     function formatPhoneVN(raw) {
@@ -963,6 +983,11 @@
           hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
         });
         headerRow.innerHTML = hHtml;
+      }
+
+      // Apply Dynamic Theme
+      if (CONFIG.theme) {
+        applyTheme(CONFIG.theme);
       }
     }
 

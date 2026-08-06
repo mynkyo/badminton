@@ -83,6 +83,15 @@ export async function getSettings() {
   }
 }
 
+/** Lắng nghe thay đổi cấu hình thời gian thực */
+export function onSettingsChange(callback) {
+  return onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data());
+    }
+  });
+}
+
 /** Lưu cấu hình sân vào Firestore document settings/config */
 export async function saveSettings(data) {
   const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");

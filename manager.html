@@ -13,6 +13,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="assets/theme.js"></script>
   <script>
     if (!sessionStorage.getItem('isLoggedIn')) window.location.href = 'login.html';
     tailwind.config = {
@@ -20,8 +21,18 @@
         extend: {
           fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
           colors: {
-            primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
-            navy: { DEFAULT: '#0b1a36' }
+            primary: {
+              DEFAULT: 'var(--color-primary)',
+              light: 'var(--color-primary-light)',
+              dark: 'var(--color-primary-dark)',
+              50: 'var(--color-primary-50)',
+              100: 'var(--color-primary-100)'
+            },
+            navy: {
+              DEFAULT: 'var(--color-navy)',
+              light: 'var(--color-navy-light)',
+              dark: 'var(--color-navy-dark)'
+            }
           }
         }
       }
@@ -41,12 +52,13 @@
     @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 3px; }
     .stat-card { transition: all .2s; }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
     .nav-item { transition: all .2s; border-radius: .75rem; }
     .nav-item:hover { background: rgba(255,255,255,0.1); }
-    .nav-item.active { background: #1d4ed8; color: white; }
+    .nav-item.active { background: var(--color-primary); color: white; }
+    .bk-status-tab.active { background: white; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 700; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -203,15 +215,121 @@
       </section>
 
       <!-- ======= BOOKINGS LIST ======= -->
-      <section id="section-bookings" class="hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="font-bold text-gray-800"><i class="fa-solid fa-list-check text-primary mr-2"></i>Tất cả đơn đặt sân</h3>
-            <button onclick="openAddModal(null,null,null)" class="bg-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-primary-dark transition-all">
-              <i class="fa-solid fa-plus mr-1"></i>Thêm đơn mới
-            </button>
+      <section id="section-bookings" class="hidden space-y-6">
+        
+        <!-- Summary KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Tổng đơn -->
+          <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-primary flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tổng đơn hàng</div>
+              <div class="text-2xl font-extrabold text-gray-800" id="bkStatTotalOrders">0</div>
+            </div>
           </div>
+
+          <!-- Card 2: Chờ xác nhận -->
+          <div class="bg-white rounded-2xl p-4 border border-amber-100 shadow-2xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div>
+              <div class="text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center gap-1">
+                <span>Chờ xác nhận</span>
+                <span id="bkStatPendingBadge" class="hidden bg-amber-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+              </div>
+              <div class="text-2xl font-extrabold text-amber-700" id="bkStatPendingOrders">0</div>
+            </div>
+          </div>
+
+          <!-- Card 3: Đã xác nhận -->
+          <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-2xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+              <div class="text-xs text-emerald-600 font-bold uppercase tracking-wider">Đã xác nhận</div>
+              <div class="text-2xl font-extrabold text-emerald-700" id="bkStatConfirmedOrders">0</div>
+            </div>
+          </div>
+
+          <!-- Card 4: Tổng doanh thu -->
+          <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tổng doanh thu</div>
+              <div class="text-xl font-extrabold text-navy" id="bkStatTotalRevenue">0đ</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Card Container -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          
+          <!-- Header & Toolbar -->
+          <div class="p-5 border-b border-gray-100 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                  <i class="fa-solid fa-list-check text-primary"></i>Danh sách đơn đặt sân
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">Quản lý và tra cứu toàn bộ lịch đặt sân của khách hàng</p>
+              </div>
+              
+              <button onclick="openAddModal(null,null,null)"
+                class="bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-primary-dark transition-all shadow-xs flex items-center justify-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-plus"></i>Tạo đơn mới
+              </button>
+            </div>
+
+            <!-- Filter Controls Bar -->
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2">
+              
+              <!-- Search Bar -->
+              <div class="relative flex-1 max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" id="bkSearchInput" oninput="filterBookings()" placeholder="Tìm theo tên khách, SĐT, hoặc tên sân..."
+                  class="w-full pl-9 pr-8 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all bg-gray-50/50 focus:bg-white" />
+                <button onclick="clearBkSearch()" id="bkClearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Filter Options -->
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Status Filter Tabs -->
+                <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-semibold text-gray-600">
+                  <button type="button" onclick="setBkStatusFilter('all')" id="bkTab-all" class="bk-status-tab active px-3 py-1.5 rounded-lg transition-all">Tất cả</button>
+                  <button type="button" onclick="setBkStatusFilter('pending')" id="bkTab-pending" class="bk-status-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                    <span>⏳ Chờ xác nhận</span>
+                    <span id="bkTabPendingBadge" class="hidden bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+                  </button>
+                  <button type="button" onclick="setBkStatusFilter('confirmed')" id="bkTab-confirmed" class="bk-status-tab px-3 py-1.5 rounded-lg transition-all">✅ Đã xác nhận</button>
+                </div>
+
+                <!-- Date Filter Selector -->
+                <select id="bkDateFilter" onchange="filterBookings()" class="text-xs font-semibold border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
+                  <option value="all">📅 Tất cả thời gian</option>
+                  <option value="today">Hôm nay</option>
+                  <option value="upcoming">7 ngày tới</option>
+                  <option value="thisMonth">Tháng này</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- List Container -->
           <div id="allBookingList"></div>
+
+          <!-- Footer Count -->
+          <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex items-center justify-between">
+            <span id="bkListCountText">Hiển thị 0 đơn hàng</span>
+            <span class="text-[11px] text-gray-400">Tự động đồng bộ từ Database</span>
+          </div>
         </div>
       </section>
 
@@ -246,6 +364,9 @@
             </button>
             <button type="button" onclick="switchSettingsTab('media')" id="tabBtn-media" class="set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2">
               <i class="fa-solid fa-image"></i> Logo &amp; Banner
+            </button>
+            <button type="button" onclick="switchSettingsTab('theme')" id="tabBtn-theme" class="set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2">
+              <i class="fa-solid fa-palette"></i> Giao diện (Themes)
             </button>
           </div>
 
@@ -411,6 +532,21 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Tab 6: Quản lý Chủ đề (Themes) -->
+            <div id="setTab-theme" class="set-tab-pane space-y-4 hidden">
+              <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 text-xs text-blue-700 flex items-start gap-3">
+                <i class="fa-solid fa-palette text-base mt-0.5 text-primary"></i>
+                <div>
+                  <div class="font-bold mb-0.5">Tùy chỉnh Giao diện Màu sắc (Mới)</div>
+                  <p class="text-slate-600">Lựa chọn 1 trong 5 bảng màu cao cấp được thiết kế riêng. Màu sắc sẽ lập tức được áp dụng cho cả trang khách và trang quản lý.</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="themeSelectionGrid">
+                <!-- Javascript will populate this grid -->
               </div>
             </div>
 
@@ -735,10 +871,45 @@
     for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
       selHour.innerHTML += `<option value="${h}">${String(h).padStart(2,'0')}:00</option>`;
     }
+
+    // Build Theme Grid
+    const themeGrid = document.getElementById('themeSelectionGrid');
+    if (themeGrid && window.THEMES) {
+      themeGrid.innerHTML = window.THEMES.map(t => {
+        const bgColors = `background: linear-gradient(135deg, ${t.colors['--color-primary']} 0%, ${t.colors['--color-navy']} 100%);`;
+        return `
+          <label class="relative cursor-pointer group">
+            <input type="radio" name="cfgTheme" value="${t.id}" class="peer sr-only" ${CONFIG.theme === t.id || (!CONFIG.theme && t.id === 'default') ? 'checked' : ''} onchange="applyTheme('${t.id}')" />
+            <div class="p-4 border-2 rounded-2xl transition-all peer-checked:border-primary peer-checked:bg-blue-50/30 border-gray-100 hover:border-gray-200 bg-white shadow-sm flex flex-col gap-3">
+              <div class="w-full h-16 rounded-xl overflow-hidden shadow-inner flex items-center justify-center text-white font-bold tracking-wider" style="${bgColors}">
+                <div class="flex gap-2">
+                  <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                  <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                  <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-gray-800">${t.name}</span>
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center text-white transition-all opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100">
+                  <i class="fa-solid fa-check text-[10px]"></i>
+                </div>
+              </div>
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    if (CONFIG.theme) {
+      applyTheme(CONFIG.theme);
+      // Select the theme radio if it exists
+      const themeRadio = document.querySelector(`input[name="cfgTheme"][value="${CONFIG.theme}"]`);
+      if (themeRadio) themeRadio.checked = true;
+    }
   }
 
   window.switchSettingsTab = function(tabName) {
-    const tabs = ['general', 'schedule', 'pricing', 'notice', 'media'];
+    const tabs = ['general', 'schedule', 'pricing', 'notice', 'media', 'theme'];
     tabs.forEach(t => {
       const pane = document.getElementById('setTab-' + t);
       const btn = document.getElementById('tabBtn-' + t);
@@ -855,7 +1026,8 @@
         useDefaultLogo,
         useDefaultBg,
         logoBase64,
-        bgBase64
+        bgBase64,
+        theme: document.querySelector('input[name="cfgTheme"]:checked')?.value || 'default'
       };
 
       await saveSettings(newConfig);
@@ -1140,48 +1312,231 @@
     tbody.innerHTML = html;
   }
 
+  function formatOrderDate(order) {
+    let d = null;
+    if (order.createdAt) {
+      if (typeof order.createdAt.toDate === 'function') {
+        d = dayjs(order.createdAt.toDate());
+      } else if (typeof order.createdAt === 'string' || typeof order.createdAt === 'number') {
+        d = dayjs(order.createdAt);
+      }
+    }
+    if (!d || !d.isValid()) {
+      if (order.items && order.items[0] && order.items[0].date) {
+        d = dayjs(order.items[0].date);
+      }
+    }
+    if (!d || !d.isValid()) d = dayjs();
+    return {
+      day: d.format('DD'),
+      monthYear: d.format('MM/YY'),
+      full: d.format('DD/MM/YYYY HH:mm')
+    };
+  }
+
+  let bkCurrentStatusFilter = 'all';
+
+  window.setBkStatusFilter = function(status) {
+    bkCurrentStatusFilter = status;
+    document.querySelectorAll('.bk-status-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.id === `bkTab-${status}`);
+    });
+    filterBookings();
+  };
+
+  window.clearBkSearch = function() {
+    const input = document.getElementById('bkSearchInput');
+    if (input) input.value = '';
+    const btn = document.getElementById('bkClearSearchBtn');
+    if (btn) btn.classList.add('hidden');
+    filterBookings();
+  };
+
+  window.quickApproveOrder = async function(batchId) {
+    const orderItems = allBookingsList.filter(b => (b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`) === batchId);
+    if (!orderItems.length) return;
+    try {
+      for (const item of orderItems) {
+        await updateBooking(item.id, { status: 'confirmed' });
+      }
+      Swal.fire({ icon: 'success', title: 'Đã duyệt đơn hàng thành công!', timer: 1200, showConfirmButton: false, toast: true, position: 'top-end' });
+      renderAllBookings();
+      renderDashboard();
+    } catch(e) {
+      console.error(e);
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể duyệt đơn hàng' });
+    }
+  };
+
   async function renderAllBookings() {
     await loadData();
-    const el = document.getElementById('allBookingList');
     const orders = groupOrders(allBookingsList);
 
-    if (orders.length === 0) {
-      el.innerHTML = `<div class="py-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-4xl mb-3 block"></i>Chưa có đơn đặt sân nào trong hệ thống</div>`;
+    // Calculate Summary Statistics
+    const totalOrdersCount = orders.length;
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    const confirmedOrders = orders.filter(o => o.status === 'confirmed');
+    const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    if (document.getElementById('bkStatTotalOrders')) document.getElementById('bkStatTotalOrders').textContent = totalOrdersCount;
+    if (document.getElementById('bkStatPendingOrders')) document.getElementById('bkStatPendingOrders').textContent = pendingOrders.length;
+    if (document.getElementById('bkStatConfirmedOrders')) document.getElementById('bkStatConfirmedOrders').textContent = confirmedOrders.length;
+    if (document.getElementById('bkStatTotalRevenue')) document.getElementById('bkStatTotalRevenue').textContent = formatMoney(totalRevenue);
+
+    // Badges in tabs
+    const pBadge = document.getElementById('bkStatPendingBadge');
+    const tabPBadge = document.getElementById('bkTabPendingBadge');
+    if (pendingOrders.length > 0) {
+      if (pBadge) { pBadge.textContent = pendingOrders.length; pBadge.classList.remove('hidden'); }
+      if (tabPBadge) { tabPBadge.textContent = pendingOrders.length; tabPBadge.classList.remove('hidden'); }
+    } else {
+      if (pBadge) pBadge.classList.add('hidden');
+      if (tabPBadge) tabPBadge.classList.add('hidden');
+    }
+
+    filterBookings(orders);
+  }
+
+  window.filterBookings = function(sourceOrders = null) {
+    const orders = sourceOrders || groupOrders(allBookingsList);
+    const queryStr = (document.getElementById('bkSearchInput')?.value || '').toLowerCase().trim();
+    const dateFilter = document.getElementById('bkDateFilter')?.value || 'all';
+
+    const clearBtn = document.getElementById('bkClearSearchBtn');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !queryStr);
+
+    const todayStr = dayjs().format('YYYY-MM-DD');
+    const next7DaysStr = dayjs().add(7, 'day').format('YYYY-MM-DD');
+    const thisMonthStr = dayjs().format('YYYY-MM');
+
+    let filtered = orders.filter(order => {
+      // 1. Status Filter
+      if (bkCurrentStatusFilter === 'pending' && order.status !== 'pending') return false;
+      if (bkCurrentStatusFilter === 'confirmed' && order.status !== 'confirmed') return false;
+
+      // 2. Date Filter
+      if (dateFilter === 'today') {
+        const hasToday = order.items.some(s => s.date === todayStr);
+        if (!hasToday) return false;
+      } else if (dateFilter === 'upcoming') {
+        const hasUpcoming = order.items.some(s => s.date >= todayStr && s.date <= next7DaysStr);
+        if (!hasUpcoming) return false;
+      } else if (dateFilter === 'thisMonth') {
+        const hasThisMonth = order.items.some(s => (s.date || '').startsWith(thisMonthStr));
+        if (!hasThisMonth) return false;
+      }
+
+      // 3. Search Query
+      if (queryStr) {
+        const nameMatch = (order.name || '').toLowerCase().includes(queryStr);
+        const phoneMatch = (order.phone || '').toLowerCase().includes(queryStr);
+        const courtMatch = order.items.some(s => {
+          const cName = (CONFIG.courts[s.court] || ('Sân ' + (s.court + 1))).toLowerCase();
+          return cName.includes(queryStr);
+        });
+        if (!nameMatch && !phoneMatch && !courtMatch) return false;
+      }
+
+      return true;
+    });
+
+    // Sort by latest createdAt or first slot date
+    filtered.sort((a, b) => (b.createdAt || b.items[0]?.date || '').localeCompare(a.createdAt || a.items[0]?.date || ''));
+
+    const countText = document.getElementById('bkListCountText');
+    if (countText) countText.textContent = `Hiển thị ${filtered.length} / ${orders.length} đơn hàng`;
+
+    const el = document.getElementById('allBookingList');
+    if (!el) return;
+
+    if (filtered.length === 0) {
+      el.innerHTML = `
+        <div class="py-16 text-center text-gray-400 space-y-3">
+          <i class="fa-solid fa-folder-open text-4xl text-gray-300 block"></i>
+          <p class="font-medium text-sm text-gray-500">Không tìm thấy đơn đặt sân nào phù hợp</p>
+          <p class="text-xs text-gray-400">Thử thay đổi từ khóa tìm kiếm hoặc bỏ chọn bộ lọc</p>
+        </div>
+      `;
       return;
     }
 
-    orders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    el.innerHTML = filtered.map(order => {
+      const dateInfo = formatOrderDate(order);
+      const isPending = order.status === 'pending';
 
-    el.innerHTML = orders.map(order => {
-      const slotsDetail = order.items.map(s => `${CONFIG.courts[s.court] || ('Sân ' + (s.court+1))} ${dayjs(s.date).format('DD/MM')} (${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00)`).join('<br/>');
-      return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100" onclick="openOrderModal('${order.batchId}')">
-        <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs flex-shrink-0 text-center leading-tight mt-0.5">
-            <div>${dayjs(order.createdAt || order.items[0]?.date).format('DD')}<br/><span class="font-normal text-[10px]">${dayjs(order.createdAt || order.items[0]?.date).format('MM/YY')}</span></div>
-          </div>
-          <div>
-            <div class="font-bold text-gray-800 text-sm flex items-center gap-2">
-              <span>${order.name}</span>
-              <span class="text-xs font-semibold text-gray-500">(${order.phone})</span>
+      const slotsBadgeHtml = order.items.map(s => {
+        const cName = CONFIG.courts[s.court] || ('Sân ' + (s.court + 1));
+        const dateFormatted = dayjs(s.date).format('DD/MM');
+        const timeFormatted = `${String(s.hour).padStart(2, '0')}:00 – ${String(s.hour + (s.duration || 1)).padStart(2, '0')}:00`;
+        return `
+          <span class="inline-flex items-center gap-1.5 bg-slate-100/80 border border-slate-200/60 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700">
+            <i class="fa-solid fa-shuttlecock text-primary text-[10px]"></i>
+            <span>${cName}</span>
+            <span class="text-gray-400 font-normal">|</span>
+            <span class="text-primary font-bold">${dateFormatted}</span>
+            <span class="text-gray-500">(${timeFormatted})</span>
+          </span>
+        `;
+      }).join(' ');
+
+      return `
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 hover:bg-slate-50/80 transition-all border-b border-gray-100 cursor-pointer ${isPending ? 'bg-amber-50/30' : ''}" onclick="openOrderModal('${order.batchId}')">
+          <!-- Left Info: Date Badge + Customer Name + Slots -->
+          <div class="flex items-start gap-4 flex-1">
+            <div class="w-12 h-12 rounded-2xl ${isPending ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600 border border-slate-200/80'} flex flex-col items-center justify-center font-extrabold text-xs flex-shrink-0 leading-none shadow-2xs">
+              <span class="text-sm">${dateInfo.day}</span>
+              <span class="text-[10px] font-semibold text-gray-500 mt-0.5">${dateInfo.monthYear}</span>
             </div>
-            <div class="text-xs text-gray-600 mt-1 font-normal leading-relaxed">
-              ${slotsDetail}
+            
+            <div class="space-y-1.5 flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-extrabold text-navy text-base hover:text-primary transition-colors">${order.name}</span>
+                <a href="tel:${order.phone}" onclick="event.stopPropagation()" class="text-xs font-bold text-slate-500 bg-slate-100 hover:bg-primary hover:text-white px-2 py-0.5 rounded-md transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-phone text-[10px]"></i>${order.phone}
+                </a>
+                <a href="https://zalo.me/${order.phone.replace(/[\s\-.()]/g,'')}" target="_blank" onclick="event.stopPropagation()" class="text-[11px] font-semibold text-blue-600 hover:underline">
+                  Zalo
+                </a>
+              </div>
+
+              <!-- Slots details badges -->
+              <div class="flex flex-wrap gap-1.5 pt-0.5">
+                ${slotsBadgeHtml}
+              </div>
+
+              ${order.note ? `<div class="text-xs text-gray-500 italic flex items-center gap-1 pt-1"><i class="fa-regular fa-note-sticky text-amber-500"></i> ${order.note}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Right Info: Amount + Status + Action Buttons -->
+          <div class="flex items-center justify-between lg:justify-end gap-4 pt-3 lg:pt-0 border-t lg:border-t-0 border-gray-100 flex-shrink-0">
+            <div class="text-left lg:text-right">
+              <div class="text-base font-extrabold text-primary">${formatMoney(order.totalAmount)}</div>
+              <div class="text-[11px] text-gray-400 font-medium">${order.items.length} slot đã chọn</div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              ${statusBadge(order.status)}
+
+              <!-- Quick Approve Button (if pending) -->
+              ${isPending ? `
+                <button type="button" onclick="event.stopPropagation(); quickApproveOrder('${order.batchId}')"
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-2xs flex items-center gap-1" title="Duyệt đơn này">
+                  <i class="fa-solid fa-check"></i>Duyệt
+                </button>
+              ` : ''}
+
+              <!-- Delete Button -->
+              <button type="button" onclick="event.stopPropagation(); confirmDeleteOrder('${order.batchId}')"
+                class="w-8 h-8 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all flex items-center justify-center border border-gray-100 hover:border-red-200" title="Xóa đơn hàng">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-between sm:justify-end gap-4 pl-14 sm:pl-0">
-          <div class="text-right">
-            <div class="text-sm font-bold text-primary">${formatMoney(order.totalAmount)}</div>
-            <div class="text-xs text-gray-400">${order.items.length} slot đã chọn</div>
-          </div>
-          <div class="flex items-center gap-2">
-            ${statusBadge(order.status)}
-            <button onclick="event.stopPropagation(); confirmDeleteOrder('${order.batchId}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Xóa đơn"><i class="fa-solid fa-trash text-xs"></i></button>
-          </div>
-        </div>
-      </div>`;
+      `;
     }).join('');
-  }
+  };
 
   let editingBatchId = null;
   let editingOrderItems = [];
