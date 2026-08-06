@@ -481,6 +481,23 @@
                 </div>
               </div>
 
+              <!-- Quick Court Generator -->
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2">
+                <label class="block text-xs font-bold text-navy flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>Tạo danh sách sân nhanh
+                </label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="cfgQuickCourtCount" min="1" max="50" placeholder="Nhập số lượng sân (vd: 10)" class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white" />
+                  <button type="button" onclick="generateQuickCourts()" class="bg-navy hover:bg-navy-dark text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 flex-shrink-0">
+                    <i class="fa-solid fa-plus"></i>Tạo nhanh
+                  </button>
+                </div>
+                <p class="text-[11px] text-gray-500">
+                  • <strong>≤ 5 sân:</strong> Tự động đặt tên <em>"Sân 1, Sân 2..."</em><br>
+                  • <strong>≥ 6 sân:</strong> Tự động đặt tên rút gọn <em>"S1, S2, S3..."</em>
+                </p>
+              </div>
+
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Danh sách sân (Phân cách bằng dấu phẩy)</label>
                 <input id="cfgCourts" type="text" placeholder="Sân 1, Sân 2, Sân 3, Sân 4" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
@@ -1011,6 +1028,30 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
       selHour.innerHTML += `<option value="${h}">${String(h).padStart(2,'0')}:00</option>`;
     }
+
+    window.generateQuickCourts = function() {
+      const countInput = document.getElementById('cfgQuickCourtCount');
+      const count = parseInt(countInput ? countInput.value : 0);
+      if (!count || count <= 0) {
+        Swal.fire({ icon: 'warning', title: 'Số lượng không hợp lệ', text: 'Vui lòng nhập số lượng sân lớn hơn 0!', confirmButtonColor: '#1d4ed8' });
+        return;
+      }
+      const prefix = count <= 5 ? 'Sân ' : 'S';
+      const courts = [];
+      for (let i = 1; i <= count; i++) {
+        courts.push(`${prefix}${i}`);
+      }
+      document.getElementById('cfgCourts').value = courts.join(', ');
+      Swal.fire({
+        icon: 'success',
+        title: `Đã tạo ${count} sân!`,
+        text: `Danh sách: ${courts.join(', ')}`,
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    };
 
     // Build Theme Grid
     const themeGrid = document.getElementById('themeSelectionGrid');
