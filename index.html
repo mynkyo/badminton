@@ -247,28 +247,44 @@
         Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm
       </p>
 
-      <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-2">
+      <!-- Hero Feature Badges (Responsive 2x2 Grid on Mobile, Flex on Desktop) -->
+      <div class="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 sm:gap-3.5 max-w-md sm:max-w-none mx-auto mb-2">
+        <!-- Badge 1: Số sân -->
         <div
-          class="flex items-center gap-1.5 bg-white/15 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-xs">
+          class="flex items-center justify-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-2xs">
           <div
-            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs">
+            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
             <i class="fa-solid fa-check"></i>
           </div>
           <span id="uiBadgeCourtCount">3 Sân đạt chuẩn</span>
         </div>
+
+        <!-- Badge 2: Giờ mở cửa -->
         <div
-          class="flex items-center gap-1.5 bg-white/15 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-xs">
+          class="flex items-center justify-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-2xs">
           <div
-            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs">
-            <i class="fa-solid fa-money-bill"></i>
+            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
+            <i class="fa-regular fa-clock"></i>
+          </div>
+          <span id="uiBadgeOpenHours">05:00 - 22:00</span>
+        </div>
+
+        <!-- Badge 3: Giá hợp lý -->
+        <div
+          class="flex items-center justify-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-2xs">
+          <div
+            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
+            <i class="fa-solid fa-tag"></i>
           </div>
           <span>Giá hợp lý</span>
         </div>
+
+        <!-- Badge 4: Phục vụ tận tâm -->
         <div
-          class="flex items-center gap-1.5 bg-white/15 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-xs">
+          class="flex items-center justify-center gap-1.5 bg-white/15 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/20 text-xs sm:text-sm font-semibold text-white shadow-2xs">
           <div
-            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs">
-            <i class="fa-solid fa-shield-heart"></i>
+            class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
+            <i class="fa-solid fa-heart"></i>
           </div>
           <span>Phục vụ tận tâm</span>
         </div>
@@ -763,18 +779,33 @@
       theme: 'default'
     };
 
+    function sanitizeConfig() {
+      CONFIG.startHour = parseInt(CONFIG.startHour) || 5;
+      CONFIG.endHour = parseInt(CONFIG.endHour) || 22;
+      CONFIG.peakStart = parseInt(CONFIG.peakStart) || 17;
+      CONFIG.peakEnd = parseInt(CONFIG.peakEnd) || 20;
+      CONFIG.priceNormal = parseInt(CONFIG.priceNormal) || 80000;
+      CONFIG.pricePeak = parseInt(CONFIG.pricePeak) || 120000;
+      if (!Array.isArray(CONFIG.courts) || CONFIG.courts.length === 0) {
+        CONFIG.courts = ['Sân 1', 'Sân 2', 'Sân 3'];
+      }
+    }
+
     async function loadConfig() {
       const remote = await getSettings();
       if (remote) {
         CONFIG = { ...CONFIG, ...remote };
       }
+      sanitizeConfig();
       applyConfigUI();
 
       // Listen for real-time config updates (theme, logo, prices, etc.)
       onSettingsChange((realtimeConfig) => {
         if (realtimeConfig) {
           CONFIG = { ...CONFIG, ...realtimeConfig };
+          sanitizeConfig();
           applyConfigUI();
+          renderSchedule();
         }
       });
     }
@@ -803,6 +834,14 @@
       if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = courtName;
       if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').textContent = courtName;
       if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts || []).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
+
+      // Hero Badges
+      if (document.getElementById('uiBadgeCourtCount')) {
+        document.getElementById('uiBadgeCourtCount').textContent = `${(CONFIG.courts || []).length} Sân đạt chuẩn`;
+      }
+      if (document.getElementById('uiBadgeOpenHours')) {
+        document.getElementById('uiBadgeOpenHours').textContent = `Mở cửa ${String(CONFIG.startHour).padStart(2,'0')}:00 - ${String(CONFIG.endHour).padStart(2,'0')}:00`;
+      }
 
       // Call Button & Floating Call Button
       if (document.getElementById('uiHeroCallBtn')) {
@@ -1313,7 +1352,10 @@
         }
       }
 
-      for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+      const startH = parseInt(CONFIG.startHour) || 5;
+      const endH = parseInt(CONFIG.endHour) || 22;
+
+      for (let h = startH; h < endH; h++) {
         const peak = isPeak(h);
         const isPast = isToday && h < nowHour;
 
@@ -1326,7 +1368,7 @@
         ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
       </td>`;
 
-        for (let c = 0; c < CONFIG.courts.length; c++) {
+        for (let c = 0; c < (CONFIG.courts || []).length; c++) {
           const booking = findBooking(dateStr, c, h);
           const selected = isInCart(c, h, dateStr);
 
@@ -1374,6 +1416,32 @@
         }
         html += `<tr class="${isPast ? 'opacity-50' : ''}">${rowCells}</tr>`;
       }
+
+      if (!html) {
+        html = `
+          <tr>
+            <td colspan="${totalCols}" class="py-10 px-4 text-center bg-slate-50/50">
+              <div class="max-w-md mx-auto space-y-3">
+                <div class="w-11 h-11 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-lg mx-auto shadow-2xs">
+                  <i class="fa-solid fa-moon"></i>
+                </div>
+                <div class="font-extrabold text-navy text-sm">Đã hết khung giờ hoạt động hôm nay (${String(startH).padStart(2,'0')}:00 - ${String(endH).padStart(2,'0')}:00)</div>
+                <p class="text-xs text-slate-500 leading-relaxed">Bạn có thể chọn sang ngày mai để đặt sân trước, hoặc bấm bên dưới để hiển thị lại các khung giờ đã qua hôm nay.</p>
+                <div class="pt-1 flex items-center justify-center gap-2 flex-wrap">
+                  <button onclick="changeDay(1)" class="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-2xs flex items-center gap-1.5 active:scale-95">
+                    <span>Xem ngày mai (${dayjs().add(1, 'day').format('DD/MM')})</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  </button>
+                  <button onclick="toggleShowPast()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-2 rounded-xl transition-all shadow-2xs active:scale-95">
+                    <i class="fa-solid fa-eye mr-1 text-slate-400"></i>Xem lại lịch hôm nay
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
       tbody.innerHTML = html;
     }
 
@@ -1381,6 +1449,9 @@
     datePicker.value = fmtDate(currentDate);
     datePicker.min = fmtDate(dayjs());
     datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
+
+    // Immediately render default schedule table so it is never blank while waiting for network
+    renderSchedule();
 
     loadConfig().then(() => {
       fetchBookingsAndRender();
