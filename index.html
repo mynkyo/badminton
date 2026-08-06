@@ -392,7 +392,7 @@
 
         <!-- Table Container -->
         <div id="uiScheduleTableWrapper" class="overflow-x-auto scroll-smooth pb-2">
-          <table class="w-full text-sm border-collapse text-center">
+          <table class="w-full text-sm border-collapse text-center table-fixed">
             <thead>
               <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
                 <th
@@ -1010,9 +1010,9 @@
       // Table headers
       const headerRow = document.getElementById('uiTableHeaderRow');
       if (headerRow) {
-        let hHtml = `<th class="sticky left-0 bg-white z-20 py-3 px-4 text-left text-slate-500 font-bold min-w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>`;
+        let hHtml = `<th class="sticky left-0 bg-white z-20 py-3 px-2 text-left text-slate-500 font-bold w-16 min-w-16 max-w-16 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>`;
         (CONFIG.courts || []).forEach(cName => {
-          hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
+          hHtml += `<th class="py-3 px-2 text-center text-gray-700 font-semibold w-28 min-w-28 max-w-28 truncate whitespace-nowrap">🏸 ${cName}</th>`;
         });
         headerRow.innerHTML = hHtml;
       }
@@ -1359,7 +1359,7 @@
         }
 
         const timeLabel = `${String(h).padStart(2, '0')}:00`;
-        let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-4 border-b border-gray-100 text-xs text-slate-600 font-bold whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
+        let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-2 border-b border-gray-100 text-xs text-slate-600 font-bold w-16 min-w-16 max-w-16 whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
         ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
       </td>`;
 
@@ -1370,41 +1370,41 @@
           if (booking) {
             const isStart = booking.hour === h;
             if (isStart) {
-              rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs">
-                <div class="font-semibold text-red-600"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
-                <div class="text-red-400 mt-0.5">Đã đặt</div>
+              rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[50px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
+                <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
+                <div class="text-red-400 mt-0.5 text-[10px]">Đã đặt</div>
               </div>
             </td>`;
             } else {
-              rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-3 text-xs text-red-200 flex items-center justify-center">
+              rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg h-[50px] text-xs text-red-200 flex items-center justify-center">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
             }
           } else if (isPast) {
-            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-400 flex items-center justify-center gap-1">
+            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+            <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg h-[50px] text-xs text-gray-400 flex items-center justify-center gap-1">
               <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
             </div>
           </td>`;
           } else if (selected) {
-            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-cell slot-selected bg-indigo-100 border-2 border-indigo-500 rounded-lg py-2 px-2 text-xs shadow-sm"
+            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+            <div class="slot-cell slot-selected bg-indigo-100 border-2 border-indigo-500 rounded-lg h-[50px] py-1 px-1 text-xs shadow-sm flex flex-col items-center justify-center"
               onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
-              <div class="font-bold text-indigo-700"><i class="fa-solid fa-circle-check mr-1"></i>Đã chọn</div>
-              <div class="text-indigo-500 mt-0.5 font-medium">${fmtMoney(slotPrice(h))}</div>
+              <div class="font-bold text-indigo-700 text-xs truncate"><i class="fa-solid fa-circle-check mr-1"></i>Đã chọn</div>
+              <div class="text-indigo-500 mt-0.5 font-medium text-[11px]">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
           } else {
-            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-cell slot-available ${peak ? 'bg-amber-50 border border-amber-200 hover:!bg-amber-100 hover:!border-amber-500' : 'bg-green-50 border border-green-200 hover:!bg-green-100 hover:!border-green-500'} rounded-lg py-2 px-2 text-xs"
+            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+            <div class="slot-cell slot-available ${peak ? 'bg-amber-50 border border-amber-200 hover:!bg-amber-100 hover:!border-amber-500' : 'bg-green-50 border border-green-200 hover:!bg-green-100 hover:!border-green-500'} rounded-lg h-[50px] py-1 px-1 text-xs flex flex-col items-center justify-center"
               onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
-              <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'}">
+              <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'} text-xs">
                 <i class="fa-regular fa-circle-dot mr-1 text-[10px]"></i>Trống
               </div>
-              <div class="${peak ? 'text-amber-500/80' : 'text-green-600/70'} mt-0.5">${fmtMoney(slotPrice(h))}</div>
+              <div class="${peak ? 'text-amber-500/80' : 'text-green-600/70'} mt-0.5 text-[11px]">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
           }
