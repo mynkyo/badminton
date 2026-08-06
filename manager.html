@@ -700,7 +700,7 @@
     <!-- Exactly 2 Bottom Action Buttons: Cancel (40%) and Save Changes (60%) -->
     <div class="px-6 pb-5 pt-3 border-t border-gray-100 flex gap-3 flex-shrink-0 w-full">
       <button type="button" onclick="closeModal()" class="w-[40%] border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all text-center">
-        Huỷ
+        Đóng
       </button>
       
       <button type="button" id="saveBtn" onclick="saveBooking()" class="w-[60%] bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md flex items-center justify-center gap-1.5">
@@ -1550,6 +1550,11 @@
   window.quickApproveOrder = async function(batchId) {
     const orderItems = allBookingsList.filter(b => (b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`) === batchId);
     if (!orderItems.length) return;
+    const firstDate = orderItems[0].date;
+    if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
+      Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể duyệt hay chỉnh sửa!' });
+      return;
+    }
     try {
       for (const item of orderItems) {
         await updateBooking(item.id, { status: 'confirmed' });
@@ -1800,6 +1805,14 @@
     editingBatchId = null;
     editingOrderItems = [];
 
+    // Ensure modal fields are unlocked for creating new bookings
+    document.getElementById('fieldName').disabled = false;
+    document.getElementById('fieldPhone').disabled = false;
+    document.getElementById('fieldNote').disabled = false;
+    document.getElementById('fieldAmount').disabled = false;
+    document.querySelectorAll('input[name="orderActionStatus"]').forEach(r => r.disabled = false);
+    document.getElementById('saveBtn').classList.remove('hidden');
+
     document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-calendar-plus mr-2"></i>Thêm Đơn Đặt Sân';
     document.getElementById('durationSection').classList.add('hidden');
     document.getElementById('orderSlotsContainer').classList.add('hidden');
@@ -1841,8 +1854,13 @@
     editingOrderItems = order.items;
     pendingSlot = null;
 
-    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt';
-    document.getElementById('modalSlotInfo').textContent = `Đơn gồm ${order.items.length} slot`;
+    const firstItemDate = order.items && order.items[0] && order.items[0].date;
+    const isPastOrder = firstItemDate ? dayjs(firstItemDate).isBefore(dayjs().startOf('day')) : false;
+
+    document.getElementById('modalTitle').innerHTML = isPastOrder 
+      ? '<i class="fa-solid fa-lock text-amber-500 mr-2"></i>Chi Tiết Đơn Đặt (Quá khứ - Chỉ xem)' 
+      : '<i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt';
+    document.getElementById('modalSlotInfo').textContent = `Đơn gồm ${order.items.length} slot ${isPastOrder ? '· 🔒 Không thể sửa/xóa' : ''}`;
 
     document.getElementById('slotSelectors').classList.add('hidden');
     document.getElementById('durationSection').classList.add('hidden');
@@ -1861,7 +1879,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="font-semibold text-gray-700">${formatMoney(s.amount)}</span>
-          ${order.items.length > 1 ? `<button onclick="deleteSingleItemInOrder('${s.id}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>` : ''}
+          ${(!isPastOrder && order.items.length > 1) ? `<button onclick="deleteSingleItemInOrder('${s.id}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
       </div>
     `).join('');
@@ -1872,11 +1890,42 @@
     setRadioStatus(order.status || 'pending');
     document.getElementById('fieldAmount').value = order.totalAmount;
 
+    // Lock controls if past order
+    const fieldName = document.getElementById('fieldName');
+    const fieldPhone = document.getElementById('fieldPhone');
+    const fieldNote = document.getElementById('fieldNote');
+    const fieldAmount = document.getElementById('fieldAmount');
+    const saveBtn = document.getElementById('saveBtn');
+    const radios = document.querySelectorAll('input[name="orderActionStatus"]');
+
+    if (isPastOrder) {
+      fieldName.disabled = true;
+      fieldPhone.disabled = true;
+      fieldNote.disabled = true;
+      fieldAmount.disabled = true;
+      radios.forEach(r => r.disabled = true);
+      saveBtn.classList.add('hidden');
+    } else {
+      fieldName.disabled = false;
+      fieldPhone.disabled = false;
+      fieldNote.disabled = false;
+      fieldAmount.disabled = false;
+      radios.forEach(r => r.disabled = false);
+      saveBtn.classList.remove('hidden');
+    }
+
     document.getElementById('bookingModal').classList.remove('hidden');
     document.getElementById('bookingModal').classList.add('flex');
   };
 
   window.deleteSingleItemInOrder = async function(id) {
+    if (editingOrderItems && editingOrderItems.length > 0) {
+      const firstDate = editingOrderItems[0].date;
+      if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
+        Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể xóa slot!' });
+        return;
+      }
+    }
     try {
       await deleteBooking(id);
       editingOrderItems = editingOrderItems.filter(x => x.id !== id);
@@ -1903,6 +1952,15 @@
   document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
   window.saveBooking = async function() {
+    if (editingOrderItems && editingOrderItems.length > 0) {
+      const firstDate = editingOrderItems[0].date;
+      if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
+        Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể thay đổi thông tin!' });
+        closeModal();
+        return;
+      }
+    }
+
     const selectedAction = getRadioStatus();
 
     if (selectedAction === 'delete') {
