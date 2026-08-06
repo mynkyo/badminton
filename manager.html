@@ -675,7 +675,7 @@
             <span class="text-xs font-semibold text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Xác nhận</span>
           </label>
 
-          <label class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl cursor-pointer transition-all">
+          <label class="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 p-2.5 rounded-xl cursor-pointer transition-all">
             <input type="radio" name="orderActionStatus" value="paid" class="w-4 h-4 text-blue-600 focus:ring-blue-500" />
             <span class="text-xs font-semibold text-blue-700"><i class="fa-solid fa-credit-card mr-1"></i>Đã thanh toán</span>
           </label>
@@ -684,6 +684,41 @@
             <input type="radio" name="orderActionStatus" value="delete" class="w-4 h-4 text-red-600 focus:ring-red-500" />
             <span class="text-xs font-semibold text-red-700"><i class="fa-solid fa-trash-can mr-1"></i>Xóa đơn này</span>
           </label>
+        </div>
+
+        <!-- Payment Detail Panel (visible only when 'paid' selected) -->
+        <div id="paymentDetailPanel" class="hidden mt-3 bg-blue-50 border border-blue-200 rounded-xl p-3 space-y-3">
+          <p class="text-xs font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-wallet"></i>Chi tiết thanh toán</p>
+
+          <!-- Payment type toggle -->
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 bg-white border border-blue-200 p-2 rounded-lg cursor-pointer transition-all hover:border-blue-400">
+              <input type="radio" name="paymentType" value="deposit" class="w-3.5 h-3.5 text-blue-600" />
+              <span class="text-xs font-semibold text-blue-800"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>Đặt cọc / Trả trước</span>
+            </label>
+            <label class="flex items-center gap-2 bg-white border border-blue-200 p-2 rounded-lg cursor-pointer transition-all hover:border-blue-400">
+              <input type="radio" name="paymentType" value="full" class="w-3.5 h-3.5 text-blue-600" checked />
+              <span class="text-xs font-semibold text-blue-800"><i class="fa-solid fa-circle-check mr-1 text-emerald-500"></i>Toàn bộ</span>
+            </label>
+          </div>
+
+          <!-- Paid amount input (only for deposit) -->
+          <div id="depositAmountRow" class="hidden">
+            <label class="block text-xs font-semibold text-blue-700 mb-1">Số tiền đã nhận (VND)</label>
+            <div class="flex items-center gap-2">
+              <input id="fieldPaidAmount" type="number" step="10000" placeholder="VD: 50000" 
+                class="flex-1 border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all bg-white" 
+                oninput="updateRemainingBalance()" />
+              <button type="button" onclick="setDepositHalf()" 
+                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-2.5 py-2 rounded-lg transition-all whitespace-nowrap">
+                50%
+              </button>
+            </div>
+            <div id="remainingBalanceRow" class="hidden mt-1.5 flex items-center justify-between text-xs">
+              <span class="text-blue-600">Còn lại:</span>
+              <span id="remainingBalance" class="font-bold text-red-600"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1129,22 +1164,26 @@
     if (errEl) errEl.classList.add('hidden');
   };
 
-  function statusBadge(s) {
-    const map = {
+  function statusBadge(order) {
+    const s = (typeof order === 'string') ? order : (order && order.status);
+    const isPaid = order && order.isPaid;
+    const statusMap = {
       confirmed: '<span class="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-circle-check text-xs"></i> Đã xác nhận</span>',
       pending:   '<span class="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-clock text-xs"></i> Chờ xác nhận</span>',
-      paid:      '<span class="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-money-bill-wave text-xs"></i> Đã TT</span>',
     };
-    return map[s] || map.pending;
+    const paidBadge = isPaid ? '<span class="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-money-bill-wave text-xs"></i> Đã TT</span>' : '';
+    return (statusMap[s] || statusMap.pending) + paidBadge;
   }
 
-  function compactStatusBadge(s) {
-    const map = {
+  function compactStatusBadge(order) {
+    const s = (typeof order === 'string') ? order : (order && order.status);
+    const isPaid = order && order.isPaid;
+    const statusMap = {
       confirmed: '<span class="inline-flex items-center gap-0.5 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.2 rounded-full font-medium whitespace-nowrap"><i class="fa-solid fa-circle-check text-[9px]"></i> Đã duyệt</span>',
       pending:   '<span class="inline-flex items-center gap-0.5 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.2 rounded-full font-medium whitespace-nowrap"><i class="fa-solid fa-clock text-[9px]"></i> Chờ duyệt</span>',
-      paid:      '<span class="inline-flex items-center gap-0.5 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.2 rounded-full font-medium whitespace-nowrap"><i class="fa-solid fa-money-bill-wave text-[9px]"></i> Đã TT</span>',
     };
-    return map[s] || map.pending;
+    const paidBadge = isPaid ? '<span class="inline-flex items-center gap-0.5 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.2 rounded-full font-medium whitespace-nowrap"><i class="fa-solid fa-money-bill-wave text-[9px]"></i> Đã TT</span>' : '';
+    return (statusMap[s] || statusMap.pending) + paidBadge;
   }
 
   function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
@@ -1232,12 +1271,15 @@
           name: item.name,
           phone: item.phone,
           status: item.status,
+          isPaid: item.isPaid || false,
           note: item.note,
           createdAt: item.createdAt,
           items: [],
           totalAmount: 0
         };
       }
+      // If any item in the group is paid, mark the order as paid
+      if (item.isPaid) groups[key].isPaid = true;
       groups[key].items.push(item);
       groups[key].totalAmount += (item.amount || calcPrice(item.hour, item.duration || 1));
     });
@@ -1316,7 +1358,7 @@
             <div class="text-xs font-bold text-gray-800">${formatMoney(order.totalAmount)}</div>
             <div class="text-[10px] text-gray-400">${order.items.length} slot</div>
           </div>
-          ${statusBadge(order.status)}
+          ${statusBadge(order)}
         </div>
       </div>`;
     }).join('');
@@ -1481,7 +1523,7 @@
               <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs cursor-pointer hover:shadow-xs transition-all overflow-hidden flex flex-col justify-center items-center" onclick="openOrderModal('${batchId}')">
                 <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-user mr-1 text-[10px]"></i>${booking.name}</div>
                 <div class="flex items-center justify-center gap-1 mt-0.5">
-                  ${compactStatusBadge(booking.status)}
+                  ${compactStatusBadge(booking)}
                   ${dur > 1 ? `<span class="text-[10px] text-red-400 font-bold">${dur}h</span>` : ''}
                 </div>
               </div>
@@ -1730,7 +1772,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              ${statusBadge(order.status)}
+              ${statusBadge(order)}
 
               <!-- Quick Approve Button (if pending) -->
               ${isPending ? `
@@ -1800,12 +1842,63 @@
     document.getElementById('fieldAmount').value = price;
   }
 
+  function togglePaymentPanel(isPaid) {
+    const panel = document.getElementById('paymentDetailPanel');
+    if (!panel) return;
+    if (isPaid) {
+      panel.classList.remove('hidden');
+    } else {
+      panel.classList.add('hidden');
+      document.getElementById('depositAmountRow').classList.add('hidden');
+      document.getElementById('remainingBalanceRow').classList.add('hidden');
+    }
+  }
+
   function setRadioStatus(statusVal) {
     const radios = document.getElementsByName('orderActionStatus');
     radios.forEach(r => {
       r.checked = (r.value === (statusVal || 'pending'));
     });
+    togglePaymentPanel(statusVal === 'paid');
+    // Also wire up onChange for future clicks
+    radios.forEach(r => {
+      r.onchange = () => togglePaymentPanel(r.value === 'paid');
+    });
+    // Wire paymentType radios
+    document.getElementsByName('paymentType').forEach(r => {
+      r.onchange = () => {
+        const depositRow = document.getElementById('depositAmountRow');
+        if (r.value === 'deposit') {
+          depositRow.classList.remove('hidden');
+          updateRemainingBalance();
+        } else {
+          depositRow.classList.add('hidden');
+          document.getElementById('remainingBalanceRow').classList.add('hidden');
+        }
+      };
+    });
   }
+
+  window.updateRemainingBalance = function() {
+    const total = parseInt(document.getElementById('fieldAmount').value) || 0;
+    const paid = parseInt(document.getElementById('fieldPaidAmount').value) || 0;
+    const remaining = total - paid;
+    const row = document.getElementById('remainingBalanceRow');
+    const el = document.getElementById('remainingBalance');
+    if (paid > 0 && total > 0) {
+      row.classList.remove('hidden');
+      el.textContent = remaining > 0 ? formatMoney(remaining) : '✅ Đã đủ';
+      el.className = remaining > 0 ? 'font-bold text-red-600' : 'font-bold text-emerald-600';
+    } else {
+      row.classList.add('hidden');
+    }
+  };
+
+  window.setDepositHalf = function() {
+    const total = parseInt(document.getElementById('fieldAmount').value) || 0;
+    document.getElementById('fieldPaidAmount').value = Math.round(total / 2);
+    updateRemainingBalance();
+  };
 
   function getRadioStatus() {
     const radios = document.getElementsByName('orderActionStatus');
@@ -1901,7 +1994,7 @@
     document.getElementById('fieldName').value = order.name;
     document.getElementById('fieldPhone').value = order.phone;
     document.getElementById('fieldNote').value = order.note || '';
-    setRadioStatus(order.status || 'pending');
+    setRadioStatus(order.isPaid ? 'paid' : (order.status || 'pending'));
     document.getElementById('fieldAmount').value = order.totalAmount;
 
     // Lock controls if past order
@@ -2015,13 +2108,31 @@
     try {
       const amount = parseInt(document.getElementById('fieldAmount').value) || 0;
       const note = document.getElementById('fieldNote').value.trim();
-      const status = selectedAction;
+      // When 'paid' is selected: order is confirmed + payment marked as paid
+      const isPaid = (selectedAction === 'paid');
+      const status = isPaid ? 'confirmed' : selectedAction;
+
+      // Payment details
+      let paidAmount = 0;
+      let paymentType = 'full';
+      if (isPaid) {
+        const paymentTypeRadio = document.querySelector('input[name="paymentType"]:checked');
+        paymentType = paymentTypeRadio ? paymentTypeRadio.value : 'full';
+        if (paymentType === 'deposit') {
+          paidAmount = parseInt(document.getElementById('fieldPaidAmount').value) || 0;
+        } else {
+          paidAmount = amount; // full payment
+        }
+      }
+
+      const paymentExtra = isPaid ? { isPaid: true, paidAmount, paymentType } : {};
 
       if (editingBatchId && editingOrderItems.length > 0) {
         const perItemAmount = Math.round(amount / editingOrderItems.length);
         for (const item of editingOrderItems) {
           await updateBooking(item.id, {
             name, phone, note, status,
+            ...paymentExtra,
             amount: perItemAmount
           });
         }
@@ -2040,6 +2151,7 @@
             hour: s.hour,
             duration: 1,
             name, phone, note, status,
+            ...paymentExtra,
             amount: itemAmount
           };
         });
@@ -2061,7 +2173,9 @@
           batchId: String(Date.now()),
           date: slot.date, court: slot.courtIdx, hour: slot.hour,
           duration: adminSelectedDuration,
-          name, phone, note, status, amount
+          name, phone, note, status,
+          ...paymentExtra,
+          amount
         }]);
       }
 
