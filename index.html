@@ -167,6 +167,8 @@
         <span>Giá cao điểm (<span id="uiHeaderPeakHours" class="font-bold">17:00 - 20:00</span>): <b id="uiLegendPeakPrice" class="font-extrabold text-base">120.000đ/h</b></span>
       </div>
     </div>
+    <!-- Toggle Past Hours Button Container (Centered outside scrollable table) -->
+    <div id="uiPastToggleContainer" class="mb-4 text-center"></div>
 
     <!-- Table -->
     <div class="overflow-x-auto">
@@ -984,33 +986,24 @@
 
     const totalCols = (CONFIG.courts || []).length + 1;
 
-    if (pastHoursCount > 0 && !showPastState) {
-      html += `
-        <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
-          <td colspan="${totalCols}" class="p-0 text-center">
-            <div class="sticky left-0 w-full flex justify-center py-3 px-4">
-              <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-white border border-slate-200 hover:border-primary px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95">
-                <i class="fa-solid fa-clock-rotate-left text-primary"></i>
-                <span>Xem ${pastHoursCount} khung giờ đã qua hôm nay</span>
-                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
-              </button>
-            </div>
-          </td>
-        </tr>`;
-    }
-
-    if (pastHoursCount > 0 && showPastState) {
-      html += `
-        <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
-          <td colspan="${totalCols}" class="p-0 text-center">
-            <div class="sticky left-0 w-full flex justify-center py-2.5 px-4">
-              <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-white border border-slate-200 hover:border-primary px-3.5 py-1.5 rounded-xl transition-all shadow-sm active:scale-95">
-                <i class="fa-solid fa-eye-slash text-slate-400"></i>
-                <span>Ẩn các khung giờ đã qua</span>
-              </button>
-            </div>
-          </td>
-        </tr>`;
+    const pastContainer = document.getElementById('uiPastToggleContainer');
+    if (pastContainer) {
+      if (pastHoursCount > 0 && !showPastState) {
+        pastContainer.innerHTML = `
+          <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-slate-50 border border-slate-200/80 hover:border-primary px-4 py-2 rounded-xl transition-all shadow-xs active:scale-95">
+            <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+            <span>Xem ${pastHoursCount} khung giờ đã qua hôm nay</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+          </button>`;
+      } else if (pastHoursCount > 0 && showPastState) {
+        pastContainer.innerHTML = `
+          <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-slate-50 border border-slate-200/80 hover:border-primary px-3.5 py-1.5 rounded-xl transition-all shadow-xs active:scale-95">
+            <i class="fa-solid fa-eye-slash text-slate-400"></i>
+            <span>Ẩn các khung giờ đã qua</span>
+          </button>`;
+      } else {
+        pastContainer.innerHTML = '';
+      }
     }
 
     for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
