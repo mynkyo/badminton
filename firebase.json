@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "dat-san-cau-long",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
