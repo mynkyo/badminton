@@ -148,10 +148,10 @@
 
   <!-- Table -->
   <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
-    <table class="min-w-full text-sm border-collapse">
+    <table class="w-full text-sm border-collapse table-fixed">
       <thead>
         <tr id="uiTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
-          <th class="py-3 px-4 text-left text-gray-500 font-semibold w-28">Giờ</th>
+          <th class="py-3 px-4 text-left text-gray-500 font-semibold w-24">Giờ</th>
           <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 1</th>
           <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 2</th>
           <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 3</th>
@@ -440,7 +440,8 @@
     // Table headers
     const headerRow = document.getElementById('uiTableHeaderRow');
     if (headerRow) {
-      let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-28">Giờ</th>`;
+      const courtCount = (CONFIG.courts || []).length;
+      let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-24 flex-shrink-0">Giờ</th>`;
       (CONFIG.courts || []).forEach(cName => {
         hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 ${cName}</th>`;
       });
@@ -737,10 +738,12 @@
 
     const pastHoursCount = (isToday && nowHour > CONFIG.startHour) ? Math.min(nowHour, CONFIG.endHour) - CONFIG.startHour : 0;
 
+    const totalCols = (CONFIG.courts || []).length + 1;
+
     if (pastHoursCount > 0 && !showPastState) {
       html += `
         <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
-          <td colspan="4" class="py-3 px-4 text-center">
+          <td colspan="${totalCols}" class="py-3 px-4 text-center">
             <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-primary bg-white border border-gray-200 hover:border-primary px-4 py-2 rounded-xl transition-all shadow-sm">
               <i class="fa-solid fa-clock-rotate-left text-primary"></i>
               <span>Xem ${pastHoursCount} khung giờ đã qua hôm nay</span>
@@ -753,7 +756,7 @@
     if (pastHoursCount > 0 && showPastState) {
       html += `
         <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
-          <td colspan="4" class="py-2.5 px-4 text-center">
+          <td colspan="${totalCols}" class="py-2.5 px-4 text-center">
             <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-primary bg-white border border-gray-200 hover:border-primary px-3 py-1.5 rounded-xl transition-all shadow-sm">
               <i class="fa-solid fa-eye-slash text-gray-400"></i>
               <span>Ẩn các khung giờ đã qua</span>
