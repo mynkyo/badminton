@@ -307,7 +307,7 @@
             <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
           </h2>
 
-          <!-- Right: Status Legend (4 states: Trống, Cao điểm, Đã chọn, Đã đặt) -->
+          <!-- Right: Status Legend (5 states) -->
           <div
             class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold w-full sm:w-auto">
             <div
@@ -326,9 +326,14 @@
               <span>Đã chọn</span>
             </div>
             <div
+              class="flex items-center justify-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
+              <i class="fa-solid fa-clock text-amber-500 text-[9px]"></i>
+              <span>Chờ xác nhận</span>
+            </div>
+            <div
               class="flex items-center justify-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
-              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300/60"></span>
-              <span>Đã đặt</span>
+              <i class="fa-solid fa-lock text-rose-500 text-[9px]"></i>
+              <span>Đã xác nhận</span>
             </div>
           </div>
         </div>
@@ -1526,16 +1531,29 @@
 
           if (booking) {
             const isStart = Number(booking.hour) === h;
+            const isPending = booking.status === 'pending';
             if (isStart) {
-              rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
-                <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
-                <div class="text-red-400 mt-0.5 text-[10px]">Đã đặt</div>
+              if (isPending) {
+                rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="slot-booked bg-amber-50 border border-amber-300 rounded-lg h-[60px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
+                <div class="font-semibold text-amber-700 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-clock mr-1 text-[10px]"></i>${booking.name}</div>
+                <div class="text-amber-500 mt-0.5 text-[10px] font-medium">Chờ xác nhận</div>
               </div>
             </td>`;
+              } else {
+                rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
+                <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
+                <div class="text-red-400 mt-0.5 text-[10px] font-medium">Đã xác nhận</div>
+              </div>
+            </td>`;
+              }
             } else {
+              const contColor = isPending
+                ? 'bg-amber-50/60 border-amber-200 text-amber-300'
+                : 'bg-red-50/50 border-red-100 text-red-200';
               rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg h-[60px] text-xs text-red-200 flex items-center justify-center">
+              <div class="slot-cont ${contColor} border rounded-lg h-[60px] text-xs flex items-center justify-center">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
