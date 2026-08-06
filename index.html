@@ -270,54 +270,48 @@
     <div class="bg-white rounded-3xl p-6 lg:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100">
 
       <!-- Header of Card -->
-      <!-- Top Bar: Title - Centered Date Picker - Legend -->
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-100">
-        <!-- Left: Title -->
-        <h2 class="text-xl font-extrabold uppercase text-navy flex items-center gap-2.5">
-          <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
-        </h2>
+      <div class="mb-5 space-y-4 pb-4 border-b border-gray-100">
+        <!-- Top Row: Title and Status Legend -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <!-- Left: Title -->
+          <h2 class="text-xl font-extrabold uppercase text-navy flex items-center justify-center md:justify-start gap-2.5">
+            <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
+          </h2>
 
-        <!-- Center: Date Picker -->
-        <div class="flex items-center bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
-            onclick="changeDay(-1)">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-          </button>
-          <div class="relative flex items-center px-1">
-            <input type="date" id="datePicker"
-              class="w-[120px] border-none font-bold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10"
-              onclick="this.showPicker()" />
+          <!-- Right: Status Legend (4 states: Trống, Cao điểm, Đã chọn, Đã đặt) -->
+          <div
+            class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold w-full sm:w-auto">
+            <div class="flex items-center justify-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
+              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-300/60"></span>
+              <span>Trống</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
+              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-300/60"></span>
+              <span>Cao điểm ⚡</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
+              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-indigo-500 ring-2 ring-indigo-300/60"></span>
+              <span>Đã chọn</span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
+              <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300/60"></span>
+              <span>Đã đặt</span>
+            </div>
           </div>
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
-            onclick="changeDay(1)">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
         </div>
 
-        <!-- Right: Status Legend (4 states: Trống, Cao điểm, Đã chọn, Đã đặt) -->
-        <div
-          class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center sm:justify-end gap-1.5 text-[11px] sm:text-xs font-bold w-full sm:w-auto">
-          <div
-            class="flex items-center justify-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
-            <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-300/60"></span>
-            <span>Trống</span>
-          </div>
-          <div
-            class="flex items-center justify-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
-            <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-300/60"></span>
-            <span>Cao điểm ⚡</span>
-          </div>
-          <div
-            class="flex items-center justify-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
-            <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-indigo-500 ring-2 ring-indigo-300/60"></span>
-            <span>Đã chọn</span>
-          </div>
-          <div
-            class="flex items-center justify-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 px-2 sm:px-2.5 py-1 rounded-full shadow-2xs">
-            <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300/60"></span>
-            <span>Đã đặt</span>
+        <!-- Bottom Row: Centered Date Picker -->
+        <div class="flex justify-center mt-2">
+          <div class="flex items-center bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
+            <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600" onclick="changeDay(-1)">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <div class="relative flex items-center px-1">
+              <input type="date" id="datePicker" class="w-[120px] border-none font-bold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10" onclick="this.showPicker()" />
+            </div>
+            <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600" onclick="changeDay(1)">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
           </div>
         </div>
       </div>
