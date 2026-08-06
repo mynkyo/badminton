@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quản Lý Sân — Sân Cầu Việt Đảng</title>
   <meta name="robots" content="noindex" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -15,16 +15,17 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
           colors: {
-            primary: { DEFAULT: '#16a34a', light: '#22c55e', dark: '#15803d', 50: '#f0fdf4', 100: '#dcfce7' }
+            primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
+            navy: { DEFAULT: '#0b1a36' }
           }
         }
       }
     }
   </script>
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Outfit', sans-serif; }
     .slot-available { cursor: pointer; transition: all .2s; }
     .slot-available:hover { background: #dcfce7 !important; border-color: #16a34a !important; transform: scale(1.03); }
     .slot-booked { cursor: pointer; transition: all .2s; }
@@ -42,7 +43,7 @@
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
     .nav-item { transition: all .2s; border-radius: .75rem; }
     .nav-item:hover { background: rgba(255,255,255,0.1); }
-    .nav-item.active { background: rgba(22,163,74,0.3); color: #86efac; }
+    .nav-item.active { background: #1d4ed8; color: white; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -50,15 +51,12 @@
 <div class="flex min-h-screen">
 
   <!-- ===== SIDEBAR ===== -->
-  <aside id="sidebar" class="w-64 bg-gray-900 text-white flex flex-col fixed inset-y-0 left-0 z-30 transition-transform lg:translate-x-0 -translate-x-full">
+  <aside id="sidebar" class="w-64 bg-navy text-slate-300 flex flex-col fixed inset-y-0 left-0 z-30 transition-transform lg:translate-x-0 -translate-x-full">
     <div class="px-5 py-5 border-b border-white/10">
       <a href="index.html" target="_blank" class="flex items-center gap-3 group">
-        <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover" />
+        <div class="text-white text-3xl group-hover:text-blue-400 transition-colors"><i class="fa-solid fa-shuttlecock"></i></div>
         <div>
-          <div id="sidebarCourtBrandName" class="font-bold text-sm text-white leading-tight group-hover:text-green-400 transition-colors">Sân Cầu Việt Đảng</div>
-          <div class="text-xs text-gray-400 flex items-center gap-1">
-            <span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span> Đang hoạt động
-          </div>
+          <div id="sidebarCourtBrandName" class="font-bold text-sm text-white leading-tight uppercase group-hover:text-blue-400 transition-colors">Sân Cầu Lông<br>THÀNH CÔNG</div>
         </div>
       </a>
     </div>
@@ -100,21 +98,22 @@
   <!-- ===== MAIN ===== -->
   <main class="flex-1 lg:ml-64 flex flex-col">
 
-    <header class="bg-white border-b border-gray-200 px-4 lg:px-6 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+    <header class="bg-white border-b border-gray-200 px-4 lg:px-6 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
       <div class="flex items-center gap-3">
         <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
           <i class="fa-solid fa-bars text-gray-600"></i>
         </button>
         <div>
-          <h1 id="pageTitle" class="font-bold text-gray-800">Tổng quan</h1>
-          <p class="text-xs text-gray-400">Hôm nay, <span id="todayDate"></span></p>
+          <h1 id="pageTitle" class="font-bold text-xl text-navy">Xin chào, Admin 👋</h1>
+          <p class="text-xs text-gray-500 mt-0.5">Chào mừng bạn quay trở lại!</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="hidden md:flex items-center gap-1.5 bg-green-50 text-primary px-3 py-1.5 rounded-full text-xs font-semibold border border-green-200">
-          <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Đang kết nối
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="todayDate"></span>
         </div>
-        <div id="topbarAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-sm font-bold">
+        <div id="topbarAvatarContainer" class="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-sm font-bold shadow-sm">
           <span id="topbarAvatarText">A</span>
         </div>
       </div>
@@ -125,37 +124,32 @@
       <!-- ======= DASHBOARD ======= -->
       <section id="section-dashboard">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-xs text-gray-500 font-medium">Đã đặt hôm nay</div>
-              <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fa-regular fa-calendar-check text-blue-500"></i></div>
+          <div class="stat-card bg-white rounded-xl p-5 shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+            <div class="text-xs text-gray-500 font-medium mb-1">Tổng slot hôm nay</div>
+            <div class="flex items-end gap-2 mb-2">
+              <div class="text-2xl font-extrabold text-navy" id="statBookedSlots">0</div>
+              <div class="text-sm font-bold text-gray-400 pb-0.5">/ <span id="statTotalSlots">0</span></div>
             </div>
-            <div class="text-3xl font-extrabold text-gray-800" id="statBooked">0</div>
-            <div class="text-xs text-gray-400 mt-1"><span id="statBookedSlots">0</span> slot sân</div>
+            <div class="text-xs text-green-500 font-bold" id="statPercent">0%</div>
+            <div class="absolute bottom-4 right-4 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fa-regular fa-calendar-check text-blue-500 text-lg"></i></div>
           </div>
-          <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-xs text-gray-500 font-medium">Doanh thu hôm nay</div>
-              <div class="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center"><i class="fa-solid fa-money-bill text-primary"></i></div>
-            </div>
-            <div class="text-2xl font-extrabold text-primary" id="statRevenue">0đ</div>
-            <div class="text-xs text-gray-400 mt-1">Ước tính</div>
+          <div class="stat-card bg-white rounded-xl p-5 shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+            <div class="text-xs text-gray-500 font-medium mb-1">Đã đặt</div>
+            <div class="text-2xl font-extrabold text-navy mb-2" id="statBooked">0</div>
+            <div class="text-xs text-amber-500 font-bold">Hoạt động</div>
+            <div class="absolute bottom-4 right-4 w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center"><i class="fa-solid fa-chart-simple text-amber-500 text-lg"></i></div>
           </div>
-          <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-xs text-gray-500 font-medium">Slot còn trống</div>
-              <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center"><i class="fa-solid fa-circle-check text-amber-500"></i></div>
-            </div>
-            <div class="text-3xl font-extrabold text-amber-500" id="statFree">0</div>
-            <div class="text-xs text-gray-400 mt-1">Từ bây giờ</div>
+          <div class="stat-card bg-white rounded-xl p-5 shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+            <div class="text-xs text-gray-500 font-medium mb-1">Doanh thu ước tính</div>
+            <div class="text-2xl font-extrabold text-purple-600 mb-2" id="statRevenue">0đ</div>
+            <div class="text-xs text-transparent">.</div>
+            <div class="absolute bottom-4 right-4 w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center"><i class="fa-solid fa-money-bill text-purple-500 text-lg"></i></div>
           </div>
-          <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="text-xs text-gray-500 font-medium">Tổng đơn hệ thống</div>
-              <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fa-solid fa-receipt text-purple-500"></i></div>
-            </div>
-            <div class="text-3xl font-extrabold text-purple-500" id="statTotalFirestore">0</div>
-            <div class="text-xs text-gray-400 mt-1">Toàn bộ đơn</div>
+          <div class="stat-card bg-white rounded-xl p-5 shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+            <div class="text-xs text-gray-500 font-medium mb-1">Đơn đặt mới</div>
+            <div class="text-2xl font-extrabold text-navy mb-2" id="statTotalFirestore">0</div>
+            <div class="text-xs text-green-500 font-bold">Hôm nay</div>
+            <div class="absolute bottom-4 right-4 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center"><i class="fa-solid fa-user-plus text-green-500 text-lg"></i></div>
           </div>
         </div>
 
@@ -188,7 +182,7 @@
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse table-fixed">
+            <table class="w-full text-sm border-collapse">
               <thead>
                 <tr id="adminTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
                   <th class="py-3 px-4 text-left text-gray-500 font-semibold w-32">Giờ</th>
@@ -503,9 +497,9 @@
 
     // Rebuild schedule table header
     const headerRow = document.getElementById('adminTableHeaderRow');
-    let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-24 flex-shrink-0">Giờ</th>`;
+    let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-32 flex-shrink-0">Giờ</th>`;
     (CONFIG.courts || []).forEach(cName => {
-      hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 ${cName}</th>`;
+      hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
     });
     headerRow.innerHTML = hHtml;
 
@@ -741,9 +735,10 @@
 
     document.getElementById('statBooked').textContent = todayOrders.length;
     document.getElementById('statBookedSlots').textContent = todayBookings.length;
+    document.getElementById('statTotalSlots').textContent = totalSlots;
+    document.getElementById('statPercent').textContent = Math.round((todayBookings.length / (totalSlots || 1)) * 100) + '%';
     document.getElementById('statRevenue').textContent = formatMoney(revenue);
-    document.getElementById('statFree').textContent = Math.max(0, futureSlots - futureBookedHours);
-    document.getElementById('statTotalFirestore').textContent = allOrders.length;
+    document.getElementById('statTotalFirestore').textContent = todayOrders.length;
     document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
 
     const el = document.getElementById('todayBookingList');

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sân Cầu Việt Đảng — Đặt Sân Online</title>
   <meta name="description" content="Đặt sân cầu lông nhanh chóng tại Sân Cầu Việt Đảng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -14,16 +14,17 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
           colors: {
-            primary: { DEFAULT: '#16a34a', light: '#22c55e', dark: '#15803d', 50: '#f0fdf4', 100: '#dcfce7' },
+            primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
+            navy: { DEFAULT: '#0b1a36', light: '#1e3a8a', dark: '#020617' }
           }
         }
       }
     }
   </script>
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Outfit', sans-serif; }
 
     /* Slot states */
     .slot-cell { transition: all .18s; cursor: pointer; user-select: none; }
@@ -33,7 +34,7 @@
     .slot-past    { cursor: default; }
 
     /* Hero */
-    .hero-bg { background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.65)), url('assets/hero-bg.jpg'); background-size: cover; background-position: center; }
+    .hero-bg { background-image: linear-gradient(135deg, rgba(239,246,255,0.9) 0%, rgba(219,234,254,0.7) 100%), url('assets/hero-bg.jpg'); background-size: cover; background-position: center; }
 
     /* Cart bar */
     #cartBar { transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .25s; }
@@ -51,114 +52,134 @@
 
     /* Nav */
     .nav-link { transition: color .2s; }
-    .nav-link:hover { color: #16a34a; }
+    .nav-link:hover { color: #1d4ed8; }
 
     ::-webkit-scrollbar { height: 5px; width: 5px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 3px; }
 
     @keyframes selectPop { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
     .slot-pop { animation: selectPop .2s ease; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-slate-50 text-gray-800">
 
 <!-- ===== NAVBAR ===== -->
-<nav class="bg-white shadow-md sticky top-0 z-40">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-40 transition-all">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <!-- Logo -->
     <a href="index.html" class="flex items-center gap-3">
-      <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-full object-cover" />
+      <div class="text-primary text-3xl"><i class="fa-solid fa-shuttlecock"></i></div>
       <div>
-        <div id="uiCourtNameTitle" class="font-bold text-lg text-primary leading-tight">Sân Cầu</div>
-        <div id="uiCourtNameSub" class="text-xs text-gray-500 leading-tight font-semibold">Việt Đảng</div>
+        <div id="uiCourtNameTitle" class="font-bold text-xl text-navy leading-tight">Sân Cầu Lông</div>
+        <div id="uiCourtNameSub" class="text-lg text-primary leading-tight font-bold uppercase">THÀNH CÔNG</div>
       </div>
     </a>
-    <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
-      <a href="#schedule" class="nav-link"><i class="fa-regular fa-calendar mr-1"></i>Lịch sân</a>
-      <a href="#pricing" class="nav-link"><i class="fa-solid fa-tag mr-1"></i>Giá thuê</a>
-      <a href="#contact" class="nav-link"><i class="fa-solid fa-phone mr-1"></i>Liên hệ</a>
+    <!-- Links -->
+    <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy">
+      <a href="#home" class="nav-link border-b-2 border-primary text-primary pb-1">Trang chủ</a>
+      <a href="#schedule" class="nav-link text-gray-500 hover:text-primary pb-1">Lịch sân</a>
+      <a href="#pricing" class="nav-link text-gray-500 hover:text-primary pb-1">Bảng giá</a>
+      <a href="#about" class="nav-link text-gray-500 hover:text-primary pb-1">Giới thiệu</a>
+      <a href="#contact" class="nav-link text-gray-500 hover:text-primary pb-1">Liên hệ</a>
     </div>
-    <!-- Cart button in nav -->
-    <button id="navCartBtn" onclick="openCartDrawer()" class="relative bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
-      <i class="fa-solid fa-cart-shopping mr-1.5"></i>Giỏ đặt
-      <span id="navCartCount" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">0</span>
-    </button>
+    <!-- Right side buttons -->
+    <div class="flex items-center gap-3">
+      <a id="uiHeroCallBtn" href="tel:0965123456" class="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-md">
+        <i class="fa-solid fa-phone"></i><span class="hidden sm:inline">0965 123 456</span>
+      </a>
+      <button id="navCartBtn" onclick="openCartDrawer()" class="relative bg-gray-100 text-gray-700 p-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="navCartCount" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
+      </button>
+    </div>
   </div>
 </nav>
 
 <!-- ===== HERO ===== -->
-<section class="hero-bg min-h-[420px] flex items-center justify-center text-white text-center px-4">
-  <div>
-    <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-4">
-      <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-      Đang mở cửa · <span id="uiOpenHours">05:00 – 22:00</span>
-    </div>
-    <h1 id="uiHeroTitle" class="text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-lg">Sân Cầu<br /><span class="text-green-400">Việt Đảng</span></h1>
-    <p id="uiHeroSub" class="text-lg text-gray-200 mb-6 max-w-xl mx-auto">3 sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng</p>
-    <div class="flex flex-wrap gap-3 justify-center">
-      <a href="#schedule" class="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-        <i class="fa-regular fa-calendar-check mr-2"></i>Chọn giờ ngay
-      </a>
-      <a id="uiHeroCallBtn" href="tel:0901234567" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-white/30">
-        <i class="fa-solid fa-phone mr-2"></i>Gọi ngay
-      </a>
+<section id="home" class="relative overflow-hidden bg-gradient-to-br from-white to-blue-50 pt-16 pb-32">
+  <div class="absolute right-0 top-0 w-2/3 h-full bg-gradient-to-l from-blue-100/50 to-transparent skew-x-12 translate-x-32"></div>
+  <div class="max-w-6xl mx-auto px-4 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Left side: Text -->
+      <div>
+        <h1 class="text-5xl lg:text-6xl font-extrabold text-navy leading-[1.15] mb-5">Đặt sân dễ dàng<br/>Trải nghiệm trọn vẹn</h1>
+        <p class="text-lg text-slate-500 font-medium mb-8">Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm</p>
+        
+        <div class="flex flex-wrap gap-4 mb-8">
+          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></div>
+            3 Sân đạt chuẩn
+          </div>
+          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-money-bill"></i></div>
+            Giá hợp lý
+          </div>
+          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-shield-heart"></i></div>
+            Phục vụ tận tâm
+          </div>
+        </div>
+      </div>
+      <!-- Right side: Illustration -->
+      <div class="relative flex justify-center lg:justify-end">
+        <div class="w-[300px] h-[300px] lg:w-[450px] lg:h-[450px] rounded-full bg-blue-100/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl -z-10"></div>
+        <div class="text-[200px] lg:text-[250px] text-primary rotate-12 drop-shadow-2xl opacity-90 relative" style="filter: drop-shadow(10px 20px 20px rgba(0,0,0,0.15))">
+          <!-- Placeholder using icons -->
+          <i class="fa-solid fa-shuttlecock absolute -bottom-10 -left-20 text-[100px] lg:text-[130px] -rotate-45 drop-shadow-xl opacity-90 text-navy"></i>
+          <i class="fa-solid fa-table-tennis-paddle-ball text-gray-300"></i>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ===== STATS ===== -->
-<div class="bg-primary text-white">
-  <div class="max-w-6xl mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-    <div><div class="text-2xl font-bold" id="uiStatCourtsCount">3</div><div class="text-xs opacity-80">Sân chuẩn</div></div>
-    <div><div class="text-2xl font-bold" id="uiStatPriceNormal">80K</div><div class="text-xs opacity-80" id="uiStatPriceNormalLabel">Từ 80.000đ/h</div></div>
-    <div><div class="text-2xl font-bold" id="uiStatHoursTotal">17</div><div class="text-xs opacity-80">Giờ mở cửa/ngày</div></div>
-    <div><div class="text-2xl font-bold">⭐ 4.9</div><div class="text-xs opacity-80">Đánh giá khách hàng</div></div>
-  </div>
-</div>
-
 <!-- ===== SCHEDULE ===== -->
-<section id="schedule" class="max-w-6xl mx-auto px-4 py-10">
-  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800"><i class="fa-regular fa-calendar text-primary mr-2"></i>Lịch Sân</h2>
-      <p class="text-sm text-gray-500 mt-1">
-        <i class="fa-solid fa-hand-pointer text-primary mr-1"></i>
-        Click slot để chọn/bỏ chọn · Chọn nhiều sân, nhiều giờ, nhiều ngày rồi đặt một lần
-      </p>
-    </div>
-    <div class="flex items-center gap-3">
-      <button class="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition-all" onclick="changeDay(-1)">
-        <i class="fa-solid fa-chevron-left text-gray-600"></i>
-      </button>
-      <input type="date" id="datePicker" class="border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
-      <button class="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition-all" onclick="changeDay(1)">
-        <i class="fa-solid fa-chevron-right text-gray-600"></i>
-      </button>
-      <button onclick="goToday()" class="text-sm text-primary font-semibold hover:underline">Hôm nay</button>
-    </div>
-  </div>
+<section id="schedule" class="max-w-6xl mx-auto px-4 -mt-20 relative z-20 mb-20">
+  <div class="bg-white rounded-3xl p-6 lg:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100">
+    
+    <!-- Header of Card -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+      <h2 class="text-xl font-bold text-navy flex items-center gap-2">
+        <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
+      </h2>
+      
+      <!-- Date Picker -->
+      <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm p-1">
+        <button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all text-gray-500" onclick="changeDay(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="relative flex items-center">
+          <input type="date" id="datePicker" class="w-[140px] border-none font-semibold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10" onclick="this.showPicker()" />
+        </div>
+        <button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all text-gray-500" onclick="changeDay(1)"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
 
-  <!-- Legend -->
-  <div class="flex flex-wrap gap-3 mb-4 text-xs text-gray-600">
-    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-green-100 border border-green-400 inline-block"></span> Trống</div>
-    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-indigo-100 border-2 border-indigo-500 inline-block"></span> Đã chọn</div>
-    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-red-100 border border-red-300 inline-block"></span> Đã đặt</div>
-    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-amber-100 border border-amber-400 inline-block"></span> Cao điểm (<span id="uiLegendPeakPrice">120K</span>/h)</div>
-  </div>
+      <!-- Legend -->
+      <div class="flex items-center gap-6 text-sm font-medium">
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span class="text-gray-600">Trống</span></div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-gray-600">Đã đặt</span></div>
+      </div>
+    </div>
 
-  <!-- Table -->
-  <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
-    <table class="w-full text-sm border-collapse table-fixed">
-      <thead>
-        <tr id="uiTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
-          <th class="py-3 px-4 text-left text-gray-500 font-semibold w-24">Giờ</th>
-          <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 1</th>
-          <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 2</th>
-          <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 3</th>
-        </tr>
-      </thead>
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border-collapse text-center">
+        <thead>
+          <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
+            <th class="py-4 px-2 text-gray-500 font-semibold w-24 text-left">Giờ</th>
+            <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
+            <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
+            <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
+          </tr>
+        </thead>
       <tbody id="scheduleBody"></tbody>
     </table>
+    
+    <!-- Footer info of schedule -->
+    <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-6 text-sm text-gray-500 font-medium">
+      <div class="flex items-center gap-2"><i class="fa-solid fa-circle-info text-primary"></i>Giá thường: <span id="uiStatPriceNormal">80.000đ/h</span></div>
+      <div class="text-red-500">Giá cao điểm (17:00 - 20:00): <span id="uiLegendPeakPrice">120.000đ/h</span></div>
+    </div>
+
   </div>
 </section>
 
@@ -168,14 +189,14 @@
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-2"><i class="fa-solid fa-tag text-primary mr-2"></i>Bảng Giá</h2>
     <p class="text-center text-gray-500 text-sm mb-8">Giá đã bao gồm ánh sáng, không phát sinh thêm</p>
     <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-      <div class="border-2 border-gray-200 rounded-2xl p-6 text-center hover:border-primary transition-all hover:shadow-lg">
+      <div class="bg-white border-2 border-gray-100 rounded-3xl p-6 text-center hover:border-primary transition-all hover:shadow-xl hover:-translate-y-1">
         <div class="text-4xl mb-2 text-amber-500"><i class="fa-solid fa-sun"></i></div>
         <div class="font-bold text-lg text-gray-800 mb-1">Giờ Thường</div>
         <div id="uiPriceNormalHours" class="text-xs text-gray-500 mb-4">05:00 – 17:00 &nbsp;|&nbsp; 20:00 – 22:00</div>
         <div id="uiPriceNormalVal" class="text-4xl font-extrabold text-primary">80K</div>
         <div class="text-sm text-gray-500">/ tiếng / sân</div>
       </div>
-      <div class="border-2 border-amber-400 rounded-2xl p-6 text-center bg-amber-50 relative overflow-hidden">
+      <div class="border-2 border-amber-300 rounded-3xl p-6 text-center bg-gradient-to-b from-amber-50 to-white relative overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all">
         <div class="absolute top-3 right-3 text-xs bg-amber-400 text-white px-2 py-0.5 rounded-full font-semibold">Cao điểm</div>
         <div class="text-4xl mb-2 text-amber-600"><i class="fa-solid fa-bolt"></i></div>
         <div class="font-bold text-lg text-gray-800 mb-1">Giờ Cao Điểm</div>
@@ -196,7 +217,7 @@
 </section>
 
 <!-- ===== CONTACT ===== -->
-<section id="contact" class="py-10 bg-gray-50">
+<section id="contact" class="py-10 bg-slate-50">
   <div class="max-w-6xl mx-auto px-4">
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-8"><i class="fa-solid fa-phone text-primary mr-2"></i>Liên Hệ &amp; Địa Chỉ</h2>
     <div class="grid md:grid-cols-2 gap-8">
@@ -229,19 +250,67 @@
 </section>
 
 <!-- ===== FOOTER ===== -->
-<footer class="bg-gray-900 text-gray-400 py-8 text-sm">
-  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-    <div><span id="uiFooterBrandName" class="font-bold text-white">Sân Cầu Việt Đảng</span> · © 2024</div>
-    <div class="flex gap-4">
-      <a id="uiFooterFacebook" href="#" target="_blank" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook text-lg"></i></a>
-      <a href="login.html" class="opacity-20 hover:opacity-60 transition-opacity" title="Quản lý"><i class="fa-solid fa-user-shield text-lg"></i></a>
+<footer class="bg-navy text-slate-300 pt-16 pb-8 text-sm border-t border-navy-light mt-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+      <!-- Cột 1: Logo và tên -->
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="text-white text-3xl"><i class="fa-solid fa-shuttlecock"></i></div>
+          <div>
+            <div id="uiFooterBrandTitle" class="font-bold text-lg text-white leading-tight">Sân Cầu Lông</div>
+            <div id="uiFooterBrandName" class="text-base text-white font-bold leading-tight uppercase">THÀNH CÔNG</div>
+          </div>
+        </div>
+        <p class="text-slate-400 mb-6 max-w-xs text-sm">Mang đến không gian thể thao chất lượng, năng động và chuyên nghiệp cho mọi lứa tuổi.</p>
+        <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông Thành Công. All rights reserved.</p>
+      </div>
+      
+      <!-- Cột 2: Liên hệ -->
+      <div>
+        <h3 class="text-white font-bold text-base mb-6">Liên hệ</h3>
+        <ul class="space-y-4">
+          <li class="flex items-center gap-3">
+            <i class="fa-solid fa-phone w-5 text-center text-slate-400"></i>
+            <a id="uiFooterPhone" href="tel:0965123456" class="hover:text-white transition-colors">0965 123 456</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <i class="fa-solid fa-comment-sms w-5 text-center text-slate-400"></i>
+            <span>Zalo: 0965 123 456</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot w-5 text-center text-slate-400 mt-1"></i>
+            <span id="uiFooterAddress">123 Đường ABC, P. Thanh Mỹ,<br>Q. Liên Chiểu, TP. Đà Nẵng</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Cột 3: Bản đồ -->
+      <div>
+        <h3 class="text-white font-bold text-base mb-6">Bản đồ</h3>
+        <div id="uiGoogleMapsContainer" class="w-full h-32 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative group cursor-pointer">
+          <!-- Giả lập ảnh bản đồ -->
+          <div class="absolute inset-0 opacity-40 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=Da+Nang&zoom=14&size=400x150&maptype=roadmap')] bg-cover bg-center transition-opacity group-hover:opacity-60"></div>
+          <div class="relative z-10 flex flex-col items-center">
+            <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-1"></i>
+            <span class="text-xs font-semibold text-white drop-shadow-md bg-black/30 px-2 py-0.5 rounded">Sân Cầu Lông<br>Thành Công</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dòng admin góc dưới -->
+    <div class="border-t border-slate-800 pt-6 flex justify-end">
+      <a href="login.html" class="flex items-center gap-2 text-xs text-slate-500 hover:text-white transition-colors" title="Quản lý">
+        <i class="fa-solid fa-lock"></i> Đăng nhập quản lý
+      </a>
     </div>
   </div>
 </footer>
 
 <!-- ===== CART BAR (sticky bottom) ===== -->
 <div id="cartBar" class="cart-hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
-  <div class="bg-white border-t border-gray-200 shadow-2xl">
+  <div class="bg-white/90 backdrop-blur-md border-t border-white/20 shadow-[0_-4px_25px_-5px_rgba(0,0,0,0.1)]">
     <div class="h-1 bg-primary" id="cartProgressBar" style="width:0%"></div>
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <div class="flex-1 min-w-0">
@@ -273,7 +342,7 @@
 
 <!-- ===== CART DRAWER (slide up) ===== -->
 <div id="cartDrawerOverlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="closeCartDrawer()"></div>
-<div id="cartDrawer" class="drawer-hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[75vh] flex flex-col">
+<div id="cartDrawer" class="drawer-hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[75vh] flex flex-col">
   <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
     <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-cart-shopping text-primary mr-2"></i>Giỏ Đặt Sân</h3>
     <button onclick="closeCartDrawer()" class="p-2 hover:bg-gray-100 rounded-xl transition-all"><i class="fa-solid fa-xmark text-gray-500"></i></button>
@@ -291,8 +360,8 @@
 </div>
 
 <!-- ===== BOOKING MODAL ===== -->
-<div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col">
+<div id="bookingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
+  <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col border border-white/40">
     <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between flex-shrink-0">
       <div>
         <h3 class="font-bold text-lg"><i class="fa-solid fa-calendar-check mr-2"></i>Xác Nhận Đặt Sân</h3>
@@ -443,7 +512,7 @@
       const courtCount = (CONFIG.courts || []).length;
       let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-24 flex-shrink-0">Giờ</th>`;
       (CONFIG.courts || []).forEach(cName => {
-        hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 ${cName}</th>`;
+        hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
       });
       headerRow.innerHTML = hHtml;
     }
@@ -697,6 +766,10 @@
   const datePicker = document.getElementById('datePicker');
   
   window.setDate = function(d) {
+    const today = dayjs().startOf('day');
+    if (d.startOf('day').isBefore(today)) {
+      d = today; // Prevent past dates
+    }
     currentDate = d;
     datePicker.value = fmtDate(d);
     fetchBookingsAndRender();
@@ -788,7 +861,7 @@
             rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
               <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs">
                 <div class="font-semibold text-red-600"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
-                <div class="text-gray-400 mt-0.5">Đã đặt</div>
+                <div class="text-red-400 mt-0.5">Đã đặt</div>
               </div>
             </td>`;
           } else {
@@ -819,7 +892,7 @@
               <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'}">
                 <i class="fa-regular fa-circle-dot mr-1 text-[10px]"></i>Trống
               </div>
-              <div class="text-gray-500 mt-0.5">${fmtMoney(slotPrice(h))}</div>
+              <div class="${peak ? 'text-amber-500/80' : 'text-green-600/70'} mt-0.5">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
         }
