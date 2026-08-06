@@ -542,9 +542,9 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
               <!-- Logo Upload Card -->
               <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <div class="bg-gray-50 px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+                <div class="bg-gray-50 px-4 sm:px-5 py-3.5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <div class="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                       <i class="fa-solid fa-shuttlecock text-primary text-sm"></i>
                     </div>
                     <div>
@@ -552,18 +552,20 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                       <div class="text-[11px] text-gray-400">Hiển thị trên thanh menu và trang chủ</div>
                     </div>
                   </div>
-                  <label class="inline-flex items-center gap-2 cursor-pointer flex-shrink-0">
-                    <span class="text-xs font-semibold text-gray-500">Dùng mặc định</span>
-                    <input type="checkbox" id="cfgUseDefaultLogo" class="sr-only peer" onchange="onLogoDefaultToggle(this.checked)">
-                    <div class="relative w-10 h-5.5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                  </label>
+                  <div class="flex items-center justify-between sm:justify-end pt-2 sm:pt-0 border-t border-gray-200/60 sm:border-0 w-full sm:w-auto">
+                    <label class="inline-flex items-center justify-between w-full sm:w-auto gap-2.5 cursor-pointer">
+                      <span class="text-xs font-semibold text-gray-700">Dùng mặc định</span>
+                      <input type="checkbox" id="cfgUseDefaultLogo" class="sr-only peer" onchange="onLogoDefaultToggle(this.checked)">
+                      <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                  </div>
                 </div>
-                <div class="p-5">
-                  <div class="flex items-start gap-5">
+                <div class="p-4 sm:p-5">
+                  <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
                     <div id="logoPreviewContainer" class="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center text-primary text-3xl border-2 border-slate-200 flex-shrink-0 shadow-sm">
                       <img src="assets/logo.png" alt="Logo" class="w-full h-full object-cover" />
                     </div>
-                    <div id="logoUploadBox" class="flex-1">
+                    <div id="logoUploadBox" class="flex-1 w-full">
                       <p class="text-xs text-gray-600 font-medium mb-3 leading-relaxed">Tải ảnh logo riêng (<code class="bg-gray-100 px-1 rounded">.png</code>, <code class="bg-gray-100 px-1 rounded">.jpg</code>). Nên chọn hình vuông hoặc tròn để hiển thị đẹp.</p>
                       <label for="cfgLogoFile" class="inline-flex items-center gap-2 bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl cursor-pointer hover:bg-primary-dark transition-all shadow-sm">
                         <i class="fa-solid fa-upload"></i>Chọn tệp
@@ -577,9 +579,9 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
               <!-- Background Upload Card -->
               <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <div class="bg-gray-50 px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+                <div class="bg-gray-50 px-4 sm:px-5 py-3.5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center">
+                    <div class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
                       <i class="fa-regular fa-image text-emerald-500 text-sm"></i>
                     </div>
                     <div>
@@ -587,13 +589,15 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                       <div class="text-[11px] text-gray-400">Hiển thị ở phần giới thiệu trên trang chủ</div>
                     </div>
                   </div>
-                  <label class="inline-flex items-center gap-2 cursor-pointer flex-shrink-0">
-                    <span class="text-xs font-semibold text-gray-500">Dùng mặc định</span>
-                    <input type="checkbox" id="cfgUseDefaultBg" class="sr-only peer" onchange="onBgDefaultToggle(this.checked)">
-                    <div class="relative w-10 h-5.5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                  </label>
+                  <div class="flex items-center justify-between sm:justify-end pt-2 sm:pt-0 border-t border-gray-200/60 sm:border-0 w-full sm:w-auto">
+                    <label class="inline-flex items-center justify-between w-full sm:w-auto gap-2.5 cursor-pointer">
+                      <span class="text-xs font-semibold text-gray-700">Dùng mặc định</span>
+                      <input type="checkbox" id="cfgUseDefaultBg" class="sr-only peer" onchange="onBgDefaultToggle(this.checked)">
+                      <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                  </div>
                 </div>
-                <div class="p-5">
+                <div class="p-4 sm:p-5">
                   <div id="bgPreviewContainer" class="w-full h-36 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200 shadow-sm mb-4">
                     <img src="assets/hero-bg.jpg" alt="Banner" class="w-full h-full object-cover" />
                   </div>
