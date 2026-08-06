@@ -59,7 +59,7 @@
           <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
         </div>
         <div>
-          <div id="sidebarCourtBrandName" class="font-bold text-sm text-white leading-tight uppercase group-hover:text-blue-400 transition-colors">Sân Cầu Lông<br>THÀNH CÔNG</div>
+          <div id="sidebarCourtBrandName" class="font-extrabold text-sm text-white tracking-tight truncate max-w-[160px] group-hover:text-blue-400 transition-colors">Sân Cầu Việt Đảng</div>
         </div>
       </a>
     </div>
@@ -254,7 +254,8 @@
               <div class="grid md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Tên sân cầu <span class="text-red-500">*</span></label>
-                  <input id="cfgName" type="text" value="Sân Cầu Việt Đảng" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                  <input id="cfgName" type="text" maxlength="30" value="Sân Cầu Việt Đảng" placeholder="Nhập tên sân (tối đa 30 ký tự)" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                  <p class="text-[11px] text-gray-400 mt-1">Giới hạn tối đa 30 ký tự để hiển thị vừa vặn 1 dòng trên thanh menu.</p>
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại / Zalo <span class="text-red-500">*</span></label>
@@ -552,6 +553,7 @@
     
     // Fill Settings form
     document.getElementById('cfgName').value = CONFIG.name;
+    if (document.getElementById('sidebarCourtBrandName')) document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name || 'Sân Cầu Việt Đảng';
     document.getElementById('cfgPhone').value = CONFIG.phone;
     document.getElementById('cfgEmail').value = CONFIG.email || '';
     document.getElementById('cfgFacebook').value = CONFIG.facebook || '';

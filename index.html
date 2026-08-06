@@ -75,10 +75,7 @@
       <div id="uiHeaderLogoContainer" class="flex-shrink-0">
         <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
       </div>
-      <div>
-        <div id="uiCourtNameTitle" class="font-bold text-xl text-navy leading-tight">Sân Cầu Lông</div>
-        <div id="uiCourtNameSub" class="text-lg text-primary leading-tight font-bold uppercase">THÀNH CÔNG</div>
-      </div>
+      <div id="uiHeaderBrandName" class="font-extrabold text-lg text-navy tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] sm:max-w-[320px]">Sân Cầu Việt Đảng</div>
     </a>
     <!-- Links -->
     <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy">
@@ -113,7 +110,7 @@
     <div class="flex flex-wrap justify-center gap-4 mb-4">
       <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
         <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></div>
-        3 Sân đạt chuẩn
+        <span id="uiBadgeCourtCount">3 Sân đạt chuẩn</span>
       </div>
       <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
         <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-money-bill"></i></div>
@@ -245,30 +242,41 @@
 </section>
 
 <!-- ===== CONTACT ===== -->
-<section id="contact" class="py-10 bg-slate-50 scroll-mt-20">
+<section id="contact" class="py-16 bg-slate-50 scroll-mt-20">
   <div class="max-w-6xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8"><i class="fa-solid fa-phone text-primary mr-2"></i>Liên Hệ &amp; Địa Chỉ</h2>
-    <div class="grid md:grid-cols-2 gap-8">
-      <div class="space-y-4">
-        <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-primary text-xl flex-shrink-0"><i class="fa-solid fa-phone"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Điện thoại / Zalo</div><a id="uiContactPhone" href="tel:0901234567" class="font-bold text-gray-800 hover:text-primary transition-colors text-lg">0901 234 567</a></div>
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-extrabold text-navy flex items-center justify-center gap-3 mb-2">
+        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-primary text-lg">
+          <i class="fa-solid fa-phone"></i>
         </div>
-        <div id="uiContactFacebookRow" class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 text-xl flex-shrink-0"><i class="fa-brands fa-facebook"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Facebook</div><a id="uiContactFacebook" href="#" target="_blank" class="font-semibold text-gray-800 hover:text-primary transition-colors">Sân Cầu Việt Đảng</a></div>
+        Liên Hệ &amp; Địa Chỉ
+      </h2>
+      <p class="text-slate-500 text-sm font-medium">Chúng tôi luôn sẵn sàng hỗ trợ và phục vụ quý khách</p>
+    </div>
+
+    <div id="uiContactContainer" class="grid md:grid-cols-2 gap-8">
+      <div id="uiContactItems" class="space-y-4">
+        <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+          <div class="w-12 h-12 bg-green-100/80 rounded-2xl flex items-center justify-center text-primary text-xl flex-shrink-0"><i class="fa-solid fa-phone"></i></div>
+          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Điện thoại / Zalo</div><a id="uiContactPhone" href="tel:0901234567" class="font-bold text-navy hover:text-primary transition-colors text-lg">0901 234 567</a></div>
         </div>
-        <div class="flex items-start gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500 text-xl flex-shrink-0"><i class="fa-solid fa-location-dot"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Địa chỉ</div><div id="uiContactAddress" class="font-semibold text-gray-800">123 Đường Việt Đảng<br />Phường XX, Quận XX, TP.HCM</div></div>
+        <div id="uiContactFacebookRow" class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+          <div class="w-12 h-12 bg-blue-100/80 rounded-2xl flex items-center justify-center text-blue-500 text-xl flex-shrink-0"><i class="fa-brands fa-facebook"></i></div>
+          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Facebook</div><a id="uiContactFacebook" href="#" target="_blank" class="font-bold text-navy hover:text-primary transition-colors text-base">Sân Cầu Việt Đảng</a></div>
         </div>
-        <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 text-xl flex-shrink-0"><i class="fa-regular fa-clock"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Giờ mở cửa</div><div id="uiContactOpenHours" class="font-semibold text-gray-800">05:00 – 22:00 · Tất cả các ngày</div></div>
+        <div class="flex items-start gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+          <div class="w-12 h-12 bg-red-100/80 rounded-2xl flex items-center justify-center text-red-500 text-xl flex-shrink-0 mt-0.5"><i class="fa-solid fa-location-dot"></i></div>
+          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Địa chỉ</div><div id="uiContactAddress" class="font-bold text-navy text-sm leading-snug">123 Đường Việt Đảng<br />Phường XX, Quận XX, TP.HCM</div></div>
+        </div>
+        <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+          <div class="w-12 h-12 bg-amber-100/80 rounded-2xl flex items-center justify-center text-amber-500 text-xl flex-shrink-0"><i class="fa-regular fa-clock"></i></div>
+          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Giờ mở cửa</div><div id="uiContactOpenHours" class="font-bold text-navy text-sm">05:00 – 22:00 · Tất cả các ngày</div></div>
         </div>
       </div>
-      <div id="uiGoogleMapsContainer" class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm min-h-[280px] bg-gray-200 flex items-center justify-center">
-        <div class="text-center text-gray-400">
+
+      <div id="uiGoogleMapsContainer" class="rounded-3xl overflow-hidden border border-slate-200 shadow-sm min-h-[300px] bg-slate-200 flex items-center justify-center">
+        <div class="text-center text-slate-400">
           <i class="fa-solid fa-map text-5xl mb-3"></i>
           <p class="text-sm">Bản đồ vị trí sân</p>
         </div>
@@ -287,10 +295,7 @@
           <div id="uiFooterLogoContainer" class="flex-shrink-0">
             <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
           </div>
-          <div>
-            <div id="uiFooterBrandTitle" class="font-bold text-lg text-white leading-tight">Sân Cầu Lông</div>
-            <div id="uiFooterBrandName" class="text-base text-white font-bold leading-tight uppercase">THÀNH CÔNG</div>
-          </div>
+          <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight">Sân Cầu Việt Đảng</div>
         </div>
         <p class="text-slate-400 mb-6 max-w-xs text-sm">Mang đến không gian thể thao chất lượng, năng động và chuyên nghiệp cho mọi lứa tuổi.</p>
         <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông Thành Công. All rights reserved.</p>
@@ -316,9 +321,9 @@
       </div>
 
       <!-- Cột 3: Bản đồ -->
-      <div>
+      <div id="uiFooterMapCol">
         <h3 class="text-white font-bold text-base mb-6">Bản đồ</h3>
-        <div id="uiGoogleMapsContainer" class="w-full h-32 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative group cursor-pointer">
+        <div id="uiFooterMapContainer" class="w-full h-32 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative group cursor-pointer">
           <!-- Giả lập ảnh bản đồ -->
           <div class="absolute inset-0 opacity-40 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=Da+Nang&zoom=14&size=400x150&maptype=roadmap')] bg-cover bg-center transition-opacity group-hover:opacity-60"></div>
           <div class="relative z-10 flex flex-col items-center">
@@ -467,15 +472,34 @@
   }
 
   function applyConfigUI() {
-    const parts = CONFIG.name.split(' ');
-    const firstWord = parts.slice(0, Math.max(1, parts.length - 1)).join(' ');
-    const lastWord = parts.length > 1 ? parts[parts.length - 1] : '';
+    const courtName = CONFIG.name || 'Sân Cầu Việt Đảng';
+    const phoneFormatted = CONFIG.phone || '0901 234 567';
+    const phoneClean = phoneFormatted.replace(/[\s.-]/g, '');
 
-    if (document.getElementById('uiCourtNameTitle')) document.getElementById('uiCourtNameTitle').textContent = firstWord || CONFIG.name;
-    if (document.getElementById('uiCourtNameSub')) document.getElementById('uiCourtNameSub').textContent = lastWord;
+    if (document.getElementById('uiHeaderBrandName')) document.getElementById('uiHeaderBrandName').textContent = courtName;
+    if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = courtName;
 
-    if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').innerHTML = `${firstWord}<br/><span class="text-green-400">${lastWord}</span>`;
+    if (document.getElementById('uiCourtNameTitle')) document.getElementById('uiCourtNameTitle').textContent = courtName;
+    if (document.getElementById('uiCourtNameSub')) document.getElementById('uiCourtNameSub').textContent = '';
+
+    if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').innerHTML = courtName;
     if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts||[]).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
+    
+    if (document.getElementById('uiHeroCallBtn')) {
+      const callBtn = document.getElementById('uiHeroCallBtn');
+      callBtn.href = `tel:${phoneClean}`;
+      callBtn.innerHTML = `<i class="fa-solid fa-phone"></i><span class="hidden sm:inline">${phoneFormatted}</span>`;
+    }
+
+    if (document.getElementById('uiContactPhone')) {
+      const contactPhone = document.getElementById('uiContactPhone');
+      contactPhone.href = `tel:${phoneClean}`;
+      contactPhone.textContent = phoneFormatted;
+    }
+
+    if (document.getElementById('uiBadgeCourtCount')) {
+      document.getElementById('uiBadgeCourtCount').textContent = `${(CONFIG.courts||[]).length} Sân đạt chuẩn`;
+    }
     
     const openHoursStr = `${String(CONFIG.startHour).padStart(2,'0')}:00 – ${String(CONFIG.endHour).padStart(2,'0')}:00`;
     if (document.getElementById('uiOpenHours')) document.getElementById('uiOpenHours').textContent = openHoursStr;
@@ -503,29 +527,49 @@
       }
     }
 
-    if (document.getElementById('uiGoogleMapsContainer')) {
-      const mapBox = document.getElementById('uiGoogleMapsContainer');
-      if (CONFIG.googleMaps && CONFIG.googleMaps.includes('<iframe')) {
-        mapBox.innerHTML = CONFIG.googleMaps;
+    // Google Maps validation & rendering
+    const rawMap = (CONFIG.googleMaps || '').trim();
+    const isValidMap = rawMap.includes('<iframe') && rawMap.includes('src=') && !rawMap.includes('<iframe src=...>');
+
+    const mapBox = document.getElementById('uiGoogleMapsContainer');
+    const contactContainer = document.getElementById('uiContactContainer');
+    const contactItems = document.getElementById('uiContactItems');
+    const footerMapCol = document.getElementById('uiFooterMapCol');
+
+    if (mapBox) {
+      if (isValidMap) {
+        mapBox.style.display = 'block';
+        mapBox.innerHTML = rawMap;
         const iframe = mapBox.querySelector('iframe');
         if (iframe) {
-          iframe.className = 'w-full h-full min-h-[280px] border-0 rounded-2xl';
+          iframe.className = 'w-full h-full min-h-[300px] border-0 rounded-3xl';
           iframe.style.width = '100%';
           iframe.style.height = '100%';
         }
+        if (contactContainer) contactContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-8';
+        if (contactItems) contactItems.className = 'space-y-4';
+      } else {
+        mapBox.style.display = 'none';
+        if (contactContainer) contactContainer.className = 'block';
+        if (contactItems) contactItems.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto';
       }
     }
 
-    if (document.getElementById('uiFooterMapContainer')) {
-      const mapBox2 = document.getElementById('uiFooterMapContainer');
-      if (CONFIG.googleMaps && CONFIG.googleMaps.includes('<iframe')) {
-        mapBox2.innerHTML = CONFIG.googleMaps;
-        const iframe = mapBox2.querySelector('iframe');
-        if (iframe) {
-          iframe.className = 'w-full h-full border-0';
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
+    if (footerMapCol) {
+      if (isValidMap) {
+        footerMapCol.style.display = 'block';
+        const mapBox2 = document.getElementById('uiFooterMapContainer');
+        if (mapBox2) {
+          mapBox2.innerHTML = rawMap;
+          const iframe2 = mapBox2.querySelector('iframe');
+          if (iframe2) {
+            iframe2.className = 'w-full h-full border-0';
+            iframe2.style.width = '100%';
+            iframe2.style.height = '100%';
+          }
         }
+      } else {
+        footerMapCol.style.display = 'none';
       }
     }
 
@@ -988,22 +1032,7 @@
     const sections = document.querySelectorAll('section[id]');
     if (!sections.length || !navLinks.length) return;
 
-    function onScroll() {
-      const scrollPos = window.scrollY + 160;
-      let currentId = '';
-
-      sections.forEach(sec => {
-        const top = sec.offsetTop;
-        const height = sec.offsetHeight;
-        if (scrollPos >= top && scrollPos < top + height) {
-          currentId = sec.getAttribute('id');
-        }
-      });
-
-      if (!currentId && window.scrollY < 200) {
-        currentId = 'home';
-      }
-
+    function setActive(currentId) {
       navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (href === `#${currentId}`) {
@@ -1015,6 +1044,39 @@
         }
       });
     }
+
+    function onScroll() {
+      const isAtBottom = (window.innerHeight + Math.ceil(window.scrollY)) >= (document.documentElement.scrollHeight - 60);
+      let currentId = '';
+
+      if (isAtBottom) {
+        currentId = 'contact';
+      } else {
+        const scrollPos = window.scrollY + 200;
+        sections.forEach(sec => {
+          const top = sec.offsetTop;
+          const height = sec.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            currentId = sec.getAttribute('id');
+          }
+        });
+      }
+
+      if (!currentId && window.scrollY < 200) {
+        currentId = 'home';
+      }
+
+      if (currentId) setActive(currentId);
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        const targetId = this.getAttribute('href')?.replace('#', '');
+        if (targetId) {
+          setActive(targetId);
+        }
+      });
+    });
 
     window.addEventListener('scroll', onScroll);
     window.addEventListener('load', onScroll);
