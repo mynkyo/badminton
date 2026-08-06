@@ -808,12 +808,12 @@
 
       try {
         let bookings = [];
-        if (currentUser && currentUser.uid) {
-          try {
+        try {
+          if (currentUser && currentUser.uid) {
             bookings = await getUserBookings(currentUser.uid);
-          } catch (e) {
-            console.warn('Cannot fetch user bookings:', e);
           }
+        } catch (e) {
+          console.warn('Cannot fetch user bookings:', e);
         }
         const isAnon = currentUser ? currentUser.isAnonymous : true;
         const userEmail = (currentUser && currentUser.email) ? currentUser.email : 'Tài khoản Ẩn danh';
@@ -939,7 +939,8 @@
           CONFIG = { ...CONFIG, ...realtimeConfig };
           sanitizeConfig();
           applyConfigUI();
-          renderSchedule();
+          // Re-fetch and render so booked slots aren't lost
+          fetchBookingsAndRender();
         }
       });
     }
@@ -1164,7 +1165,12 @@
       }
 
       // Re-render schedule table to reflect new startHour/endHour
-      renderSchedule();
+      // Use fetchBookingsAndRender if bookings are already available, otherwise just render
+      if (typeof fetchBookingsAndRender === 'function') {
+        fetchBookingsAndRender();
+      } else {
+        renderSchedule();
+      }
     }
 
     const VN_PHONE_PREFIXES = ['032', '033', '034', '035', '036', '037', '038', '039', '086', '096', '097', '098', '070', '076', '077', '078', '079', '089', '090', '093', '081', '082', '083', '084', '085', '088', '091', '094', '052', '056', '058', '092', '059', '099', '055', '069'];
@@ -1310,8 +1316,8 @@
       const total = cartTotal();
       document.getElementById('modalSlotCount').textContent = count;
       document.getElementById('modalTotal').textContent = fmtMoney(total);
-      document.getElementById('guestName').value = '';
-      document.getElementById('guestPhone').value = '';
+      document.getElementById('guestName').value = localStorage.getItem('userName') || '';
+      document.getElementById('guestPhone').value = localStorage.getItem('userPhoneRaw') || '';
       document.getElementById('guestNote').value = '';
 
       const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
@@ -1359,6 +1365,10 @@
         clearFieldError('guestPhone', 'guestPhoneErr');
       }
       if (hasError) return;
+
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userPhone', phone);
+      localStorage.setItem('userPhoneRaw', phoneRaw);
 
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
@@ -1442,8 +1452,10 @@
 
     function findBooking(date, court, hour) {
       return currentBookings.find(b =>
-        b.date === date && b.court === court &&
-        hour >= b.hour && hour < b.hour + (b.duration || 1)
+        b.date === date &&
+        Number(b.court) === Number(court) &&
+        hour >= Number(b.hour) &&
+        hour < Number(b.hour) + (Number(b.duration) || 1)
       );
     }
 
@@ -1492,8 +1504,8 @@
         }
       }
 
-      const startH = parseInt(CONFIG.startHour) || 5;
-      const endH = parseInt(CONFIG.endHour) || 22;
+      const startH = parseInt(CONFIG.startHour) || 7;
+      const endH = parseInt(CONFIG.endHour) || 24;
 
       for (let h = startH; h < endH; h++) {
         const peak = isPeak(h);
@@ -1513,24 +1525,24 @@
           const selected = isInCart(c, h, dateStr);
 
           if (booking) {
-            const isStart = booking.hour === h;
+            const isStart = Number(booking.hour) === h;
             if (isStart) {
               rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[50px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
+              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs overflow-hidden flex flex-col items-center justify-center">
                 <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
                 <div class="text-red-400 mt-0.5 text-[10px]">Đã đặt</div>
               </div>
             </td>`;
             } else {
               rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg h-[50px] text-xs text-red-200 flex items-center justify-center">
+              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg h-[60px] text-xs text-red-200 flex items-center justify-center">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
             }
           } else if (isPast) {
             rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-            <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg h-[50px] text-xs text-gray-400 flex items-center justify-center gap-1">
+            <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg h-[60px] text-xs text-gray-400 flex items-center justify-center gap-1">
               <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
             </div>
           </td>`;

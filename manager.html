@@ -1244,6 +1244,20 @@
     return Object.values(groups);
   }
 
+  function getOrderTimestamp(order) {
+    if (!order) return 0;
+    const val = order.createdAt;
+    if (val) {
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string') return new Date(val).getTime() || 0;
+      if (typeof val.toDate === 'function') return val.toDate().getTime();
+      if (val.seconds) return val.seconds * 1000;
+    }
+    const firstDate = order.items && order.items[0] && order.items[0].date;
+    if (firstDate) return new Date(firstDate).getTime() || 0;
+    return 0;
+  }
+
   async function renderDashboard() {
     await loadData();
     const today = dayjs().format('YYYY-MM-DD');
@@ -1278,10 +1292,10 @@
       return;
     }
 
-    todayOrders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    todayOrders.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
     
     el.innerHTML = todayOrders.map(order => {
-      const slotsDetail = order.items.map(s => `${CONFIG.courts[s.court] || ('Sân ' + (s.court+1))} (${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00)`).join(', ');
+      const slotsDetail = (order.items || []).map(s => `${(CONFIG.courts && CONFIG.courts[s.court]) || ('Sân ' + (s.court+1))} (${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00)`).join(', ');
       return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50" onclick="openOrderModal('${order.batchId}')">
         <div class="flex items-start gap-3">
           <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0 mt-0.5">
@@ -1641,7 +1655,7 @@
     });
 
     // Sort by latest createdAt or first slot date
-    filtered.sort((a, b) => (b.createdAt || b.items[0]?.date || '').localeCompare(a.createdAt || a.items[0]?.date || ''));
+    filtered.sort((a, b) => getOrderTimestamp(b) - getOrderTimestamp(a));
 
     const countText = document.getElementById('bkListCountText');
     if (countText) countText.textContent = `Hiển thị ${filtered.length} / ${orders.length} đơn hàng`;
