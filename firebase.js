@@ -6,8 +6,8 @@ import {
   updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup,
-  signOut, onAuthStateChanged
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
+  signOut, onAuthStateChanged, signInAnonymously, linkWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ===== CONFIG =====
@@ -38,6 +38,14 @@ export async function getBookingsByDate(date) {
 /** Lấy tất cả lịch đặt (dùng cho admin) */
 export async function getAllBookings() {
   const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+/** Lấy danh sách lịch đặt của User */
+export async function getUserBookings(userId) {
+  if (!userId) return [];
+  const q = query(collection(db, 'bookings'), where('userId', '==', userId));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
@@ -103,10 +111,38 @@ export async function saveSettings(data) {
 
 // ===== AUTH API =====
 
-/** Đăng nhập Google */
+/** Đăng nhập ẩn danh (tự động cho khách) */
+export async function loginAnonymously() {
+  return await signInAnonymously(auth);
+}
+
+/** Đăng nhập Google (và đồng bộ nếu đang ẩn danh) */
 export async function loginWithGoogle() {
-  const result = await signInWithPopup(auth, googleProvider);
-  return result.user;
+  const user = auth.currentUser;
+  if (user && user.isAnonymous) {
+    try {
+      const result = await linkWithPopup(user, googleProvider);
+      return result.user;
+    } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        throw error;
+      }
+      try {
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        if (credential) {
+          const result = await signInWithCredential(auth, credential);
+          return result.user;
+        }
+      } catch (e) {
+        // ignore
+      }
+      const result = await signInWithPopup(auth, googleProvider);
+      return result.user;
+    }
+  } else {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  }
 }
 
 /** Đăng xuất */
