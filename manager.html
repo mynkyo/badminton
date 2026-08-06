@@ -55,8 +55,10 @@
       <a href="index.html" target="_blank" class="flex items-center gap-3 group">
         <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover" />
         <div>
-          <div class="font-bold text-sm text-white leading-tight group-hover:text-green-400 transition-colors">Sân Cầu Việt Đảng</div>
-          <div class="text-xs text-gray-400">Trang quản lý</div>
+          <div id="sidebarCourtBrandName" class="font-bold text-sm text-white leading-tight group-hover:text-green-400 transition-colors">Sân Cầu Việt Đảng</div>
+          <div class="text-xs text-gray-400 flex items-center gap-1">
+            <span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span> Đang hoạt động
+          </div>
         </div>
       </a>
     </div>
@@ -69,16 +71,21 @@
         <i class="fa-regular fa-calendar w-5 text-center"></i> Quản lý lịch
       </button>
       <button onclick="showSection('bookings')" id="nav-bookings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
-        <i class="fa-solid fa-list-check w-5 text-center"></i> Danh sách đặt
+        <i class="fa-solid fa-list-check w-5 text-center"></i> Danh sách đơn đặt
+      </button>
+      <button onclick="showSection('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
+        <i class="fa-solid fa-gear w-5 text-center"></i> Cài đặt thông tin sân
       </button>
     </nav>
 
     <div class="px-3 py-4 border-t border-white/10">
       <div class="flex items-center gap-3 px-3 py-2 mb-2">
-        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm font-bold" id="sidebarAvatar">A</div>
-        <div>
-          <div class="text-sm font-semibold text-white" id="sidebarAdminName">Admin</div>
-          <div class="text-xs text-gray-400">Quản lý</div>
+        <div id="sidebarAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+          <span id="sidebarAvatarText">A</span>
+        </div>
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-white truncate" id="sidebarAdminName">Admin</div>
+          <div class="text-xs text-gray-400">Quản lý sân</div>
         </div>
       </div>
       <button onclick="logout()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-400 hover:text-red-400">
@@ -105,9 +112,11 @@
       </div>
       <div class="flex items-center gap-2">
         <div class="hidden md:flex items-center gap-1.5 bg-green-50 text-primary px-3 py-1.5 rounded-full text-xs font-semibold border border-green-200">
-          <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Đang hoạt động
+          <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Đang kết nối
         </div>
-        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold" id="topbarAvatar">A</div>
+        <div id="topbarAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-sm font-bold">
+          <span id="topbarAvatarText">A</span>
+        </div>
       </div>
     </header>
 
@@ -122,7 +131,7 @@
               <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fa-regular fa-calendar-check text-blue-500"></i></div>
             </div>
             <div class="text-3xl font-extrabold text-gray-800" id="statBooked">0</div>
-            <div class="text-xs text-gray-400 mt-1">/ <span id="statTotal">0</span> slot tổng</div>
+            <div class="text-xs text-gray-400 mt-1"><span id="statBookedSlots">0</span> slot sân</div>
           </div>
           <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <div class="flex items-center justify-between mb-3">
@@ -142,17 +151,17 @@
           </div>
           <div class="stat-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <div class="flex items-center justify-between mb-3">
-              <div class="text-xs text-gray-500 font-medium">Tổng đặt 7 ngày</div>
-              <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fa-solid fa-chart-bar text-purple-500"></i></div>
+              <div class="text-xs text-gray-500 font-medium">Tổng đơn hệ thống</div>
+              <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fa-solid fa-receipt text-purple-500"></i></div>
             </div>
-            <div class="text-3xl font-extrabold text-purple-500" id="statWeek">0</div>
-            <div class="text-xs text-gray-400 mt-1">Lịch đặt</div>
+            <div class="text-3xl font-extrabold text-purple-500" id="statTotalFirestore">0</div>
+            <div class="text-xs text-gray-400 mt-1">Toàn bộ đơn</div>
           </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="font-bold text-gray-800"><i class="fa-solid fa-list text-primary mr-2"></i>Lịch đặt hôm nay</h3>
+            <h3 class="font-bold text-gray-800"><i class="fa-solid fa-receipt text-primary mr-2"></i>Đơn đặt sân hôm nay</h3>
             <button onclick="showSection('schedule')" class="text-xs text-primary hover:underline font-medium">Quản lý lịch →</button>
           </div>
           <div id="todayBookingList"></div>
@@ -163,7 +172,7 @@
       <section id="section-schedule" class="hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch</h3>
+            <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch (Khung giờ)</h3>
             <div class="flex items-center gap-2">
               <button onclick="adminChangeDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-left text-gray-500 text-xs"></i></button>
               <input type="date" id="adminDatePicker" class="border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
@@ -181,7 +190,7 @@
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm border-collapse">
               <thead>
-                <tr class="bg-gray-50 border-b border-gray-200">
+                <tr id="adminTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
                   <th class="py-3 px-4 text-left text-gray-500 font-semibold w-32">Giờ</th>
                   <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 1</th>
                   <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 2</th>
@@ -198,12 +207,132 @@
       <section id="section-bookings" class="hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="font-bold text-gray-800"><i class="fa-solid fa-list-check text-primary mr-2"></i>Tất cả lịch đặt</h3>
+            <h3 class="font-bold text-gray-800"><i class="fa-solid fa-list-check text-primary mr-2"></i>Tất cả đơn đặt sân</h3>
             <button onclick="openAddModal(null,null,null)" class="bg-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-primary-dark transition-all">
-              <i class="fa-solid fa-plus mr-1"></i>Thêm lịch
+              <i class="fa-solid fa-plus mr-1"></i>Thêm đơn mới
             </button>
           </div>
           <div id="allBookingList"></div>
+        </div>
+      </section>
+
+      <!-- ======= COURT SETTINGS ======= -->
+      <section id="section-settings" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+          
+          <!-- Header -->
+          <div class="px-6 py-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-sliders text-primary mr-2"></i>Cấu Hình Thông Tin Sân Cầu</h3>
+              <p class="text-xs text-gray-500 mt-1">Thông tin thiết lập ở đây sẽ tự động đồng bộ sang giao diện người dùng (khách)</p>
+            </div>
+            <button onclick="saveCourtSettings()" id="btnSaveSettings" class="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md">
+              <i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu cấu hình
+            </button>
+          </div>
+
+          <!-- Sub Tabs Navigation -->
+          <div class="flex border-b border-gray-200 bg-white px-6 gap-2 text-sm font-semibold text-gray-500 overflow-x-auto">
+            <button type="button" onclick="switchSettingsTab('general')" id="tabBtn-general" class="set-tab-btn active py-3 px-4 border-b-2 border-primary text-primary flex items-center gap-2">
+              <i class="fa-solid fa-building"></i> Thông tin &amp; Liên hệ
+            </button>
+            <button type="button" onclick="switchSettingsTab('schedule')" id="tabBtn-schedule" class="set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2">
+              <i class="fa-regular fa-clock"></i> Khung giờ &amp; Danh sách sân
+            </button>
+            <button type="button" onclick="switchSettingsTab('pricing')" id="tabBtn-pricing" class="set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2">
+              <i class="fa-solid fa-tag"></i> Bảng giá thuê sân
+            </button>
+            <button type="button" onclick="switchSettingsTab('notice')" id="tabBtn-notice" class="set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn"></i> Quy định &amp; Ghi chú
+            </button>
+          </div>
+
+          <form id="settingsForm" onsubmit="event.preventDefault(); saveCourtSettings();" class="p-6">
+            
+            <!-- Tab 1: Thông tin cơ bản sân -->
+            <div id="setTab-general" class="set-tab-pane space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Tên sân cầu <span class="text-red-500">*</span></label>
+                  <input id="cfgName" type="text" value="Sân Cầu Việt Đảng" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại / Zalo <span class="text-red-500">*</span></label>
+                  <input id="cfgPhone" type="text" value="0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Email liên hệ</label>
+                  <input id="cfgEmail" type="email" value="contact@vietdangbadminton.com" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Link Facebook Fanpage</label>
+                  <input id="cfgFacebook" type="text" value="https://facebook.com/sancauvietdang" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Địa chỉ sân <span class="text-red-500">*</span></label>
+                <input id="cfgAddress" type="text" value="123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Mã nhúng Google Maps (Iframe HTML)</label>
+                <textarea id="cfgGoogleMaps" rows="3" placeholder="<iframe src=...>" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono text-xs resize-none"></textarea>
+                <p class="text-[11px] text-gray-400 mt-1">Dán toàn bộ mã `&lt;iframe src="..."&gt;` từ Google Maps vào đây để hiển thị bản đồ trên trang chủ.</p>
+              </div>
+            </div>
+
+            <!-- Tab 2: Thời gian & Danh sách sân -->
+            <div id="setTab-schedule" class="set-tab-pane space-y-4 hidden">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giờ mở cửa (0 – 23h)</label>
+                  <input id="cfgStartHour" type="number" min="0" max="23" value="5" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giờ đóng cửa (1 – 24h)</label>
+                  <input id="cfgEndHour" type="number" min="1" max="24" value="22" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Danh sách sân (Phân cách bằng dấu phẩy)</label>
+                <input id="cfgCourts" type="text" value="Sân 1, Sân 2, Sân 3" placeholder="Sân 1, Sân 2, Sân 3, Sân 4" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <p class="text-[11px] text-gray-400 mt-1">VD: <i>Sân 1, Sân 2, Sân VIP 3</i> (Bảng lịch đặt sân sẽ tự động sinh theo danh sách này)</p>
+              </div>
+            </div>
+
+            <!-- Tab 3: Bảng giá -->
+            <div id="setTab-pricing" class="set-tab-pane space-y-4 hidden">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giá giờ thường (VNĐ / tiếng)</label>
+                  <input id="cfgPriceNormal" type="number" step="5000" value="80000" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giá giờ cao điểm (VNĐ / tiếng)</label>
+                  <input id="cfgPricePeak" type="number" step="5000" value="120000" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giờ bắt đầu cao điểm</label>
+                  <input id="cfgPeakStart" type="number" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Giờ kết thúc cao điểm</label>
+                  <input id="cfgPeakEnd" type="number" min="1" max="24" value="20" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Thông báo bổ sung -->
+            <div id="setTab-notice" class="set-tab-pane space-y-4 hidden">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Ghi chú quy định gửi khách</label>
+                <textarea id="cfgNotice" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none">Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!</textarea>
+              </div>
+            </div>
+
+          </form>
         </div>
       </section>
 
@@ -215,27 +344,30 @@
 
 <!-- ===== MODAL ===== -->
 <div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md modal-content">
-    <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-content overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-primary text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
       <div>
-        <h3 class="font-bold text-lg" id="modalTitle"><i class="fa-solid fa-calendar-plus mr-2"></i>Thêm Lịch</h3>
+        <h3 class="font-bold text-lg" id="modalTitle"><i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt Sân</h3>
         <p id="modalSlotInfo" class="text-sm text-green-100 mt-0.5"></p>
       </div>
       <button onclick="closeModal()" class="hover:bg-white/20 rounded-lg p-1.5 transition-colors">
         <i class="fa-solid fa-xmark text-xl"></i>
       </button>
     </div>
-    <div class="px-6 py-5 space-y-4">
+    
+    <div class="px-6 py-5 space-y-4 overflow-y-auto flex-1">
 
-      <!-- Slot selectors (free-form add from bookings tab) -->
+      <!-- Multiple Slots List Container -->
+      <div id="orderSlotsContainer" class="hidden space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">Danh sách các slot trong đơn này</label>
+        <div id="orderSlotsList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- Single Slot Selectors (Only shown when adding new) -->
       <div id="slotSelectors" class="hidden grid grid-cols-3 gap-3">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Sân</label>
-          <select id="selectCourt" class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option value="0">Sân 1</option>
-            <option value="1">Sân 2</option>
-            <option value="2">Sân 3</option>
-          </select>
+          <select id="selectCourt" class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"></select>
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Ngày</label>
@@ -247,7 +379,7 @@
         </div>
       </div>
 
-      <!-- Duration (shown when slot known) -->
+      <!-- Duration (for single slot add) -->
       <div id="durationSection" class="hidden">
         <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fa-regular fa-clock mr-1.5 text-primary"></i>Số giờ thuê</label>
         <div id="adminDurationBtns" class="flex flex-wrap gap-2 mb-2"></div>
@@ -259,28 +391,43 @@
 
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-user mr-1.5 text-primary"></i>Họ và tên <span class="text-red-400">*</span></label>
-        <input id="fieldName" type="text" placeholder="Nguyễn Văn A"
-          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-          oninput="clearFieldError('fieldName','fieldNameErr')" />
+        <input id="fieldName" type="text" placeholder="Nguyễn Văn A" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" oninput="clearFieldError('fieldName','fieldNameErr')" />
         <p id="fieldNameErr" class="hidden text-xs text-red-500 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i></p>
       </div>
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-phone mr-1.5 text-primary"></i>Số điện thoại <span class="text-red-400">*</span></label>
-        <input id="fieldPhone" type="tel" placeholder="0901 234 567"
-          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-          oninput="clearFieldError('fieldPhone','fieldPhoneErr')" />
+        <input id="fieldPhone" type="tel" placeholder="0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" oninput="clearFieldError('fieldPhone','fieldPhoneErr')" />
         <p id="fieldPhoneErr" class="hidden text-xs text-red-500 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i></p>
       </div>
+
+      <!-- Radio Group for Order Action Status -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-circle-dot mr-1.5 text-primary"></i>Trạng thái</label>
-        <select id="fieldStatus" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all">
-          <option value="confirmed">✅ Đã xác nhận</option>
-          <option value="pending">⏳ Chờ xác nhận</option>
-          <option value="paid">💰 Đã thanh toán</option>
-        </select>
+        <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fa-solid fa-sliders mr-1.5 text-primary"></i>Xử lý đơn hàng</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl cursor-pointer transition-all">
+            <input type="radio" name="orderActionStatus" value="pending" class="w-4 h-4 text-amber-500 focus:ring-amber-400" />
+            <span class="text-xs font-semibold text-amber-700"><i class="fa-regular fa-clock mr-1"></i>Chờ xác nhận</span>
+          </label>
+
+          <label class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl cursor-pointer transition-all">
+            <input type="radio" name="orderActionStatus" value="confirmed" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500" />
+            <span class="text-xs font-semibold text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Xác nhận</span>
+          </label>
+
+          <label class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl cursor-pointer transition-all">
+            <input type="radio" name="orderActionStatus" value="paid" class="w-4 h-4 text-blue-600 focus:ring-blue-500" />
+            <span class="text-xs font-semibold text-blue-700"><i class="fa-solid fa-credit-card mr-1"></i>Đã thanh toán</span>
+          </label>
+
+          <label class="flex items-center gap-2 bg-red-50 hover:bg-red-100 border border-red-200 p-2.5 rounded-xl cursor-pointer transition-all">
+            <input type="radio" name="orderActionStatus" value="delete" class="w-4 h-4 text-red-600 focus:ring-red-500" />
+            <span class="text-xs font-semibold text-red-700"><i class="fa-solid fa-trash-can mr-1"></i>Xóa đơn này</span>
+          </label>
+        </div>
       </div>
+
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-money-bill mr-1.5 text-primary"></i>Số tiền (VND)</label>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-money-bill mr-1.5 text-primary"></i>Tổng tiền đơn (VND)</label>
         <input id="fieldAmount" type="number" placeholder="80000" step="10000" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
       </div>
       <div>
@@ -288,481 +435,741 @@
         <textarea id="fieldNote" rows="2" placeholder="Ghi chú thêm..." class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"></textarea>
       </div>
     </div>
-    <div class="px-6 pb-5 flex gap-3">
-      <button id="btnDelete" onclick="deleteCurrentBooking()" class="hidden border border-red-200 text-red-500 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-all px-4">
-        <i class="fa-solid fa-trash"></i>
+    
+    <!-- Exactly 2 Bottom Action Buttons: Cancel (40%) and Save Changes (60%) -->
+    <div class="px-6 pb-5 pt-3 border-t border-gray-100 flex gap-3 flex-shrink-0 w-full">
+      <button type="button" onclick="closeModal()" class="w-[40%] border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all text-center">
+        Huỷ
       </button>
-      <button onclick="closeModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-all">Huỷ</button>
-      <button onclick="saveBooking()" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
-        <i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu
+      
+      <button type="button" id="saveBtn" onclick="saveBooking()" class="w-[60%] bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Lưu thay đổi</span>
       </button>
     </div>
   </div>
 </div>
 
-<script>
-// ===== CONFIG =====
-const CONFIG = {
-  name: 'Sân Cầu Việt Đảng',
-  courts: ['Sân 1', 'Sân 2', 'Sân 3'],
-  startHour: 5,
-  endHour: 22,
-  priceNormal: 80000,
-  pricePeak: 120000,
-  peakStart: 17,
-  peakEnd: 20
-};
+<script type="module">
+  import {
+    getBookingsByDate, getAllBookings, addBookings,
+    updateBooking, deleteBooking, getSettings, saveSettings,
+    logoutUser, onAuthChange
+  } from "./firebase.js";
 
-const adminName = sessionStorage.getItem('adminName') || 'Admin';
-document.getElementById('sidebarAdminName').textContent = adminName;
-document.getElementById('sidebarAvatar').textContent = adminName.charAt(0).toUpperCase();
-document.getElementById('topbarAvatar').textContent = adminName.charAt(0).toUpperCase();
-
-// ===== DATA =====
-function getBookings() {
-  // TODO: Replace with Firebase Firestore
-  return JSON.parse(localStorage.getItem('bookings') || '[]');
-}
-function setBookings(arr) {
-  // TODO: Replace with Firebase Firestore
-  localStorage.setItem('bookings', JSON.stringify(arr));
-}
-function findBooking(date, courtIndex, hour) {
-  return getBookings().find(b =>
-    b.date === date &&
-    b.court === courtIndex &&
-    hour >= b.hour &&
-    hour < b.hour + (b.duration || 1)
-  );
-}
-function getMaxDuration(courtIdx, startHour, date, excludeId = null) {
-  let max = 0;
-  for (let h = startHour; h < CONFIG.endHour; h++) {
-    const b = findBooking(date, courtIdx, h);
-    if (b && b.id !== excludeId) break;
-    max++;
-  }
-  return max;
-}
-function calcPrice(startHour, duration) {
-  let total = 0;
-  for (let h = startHour; h < startHour + duration; h++) {
-    total += isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal;
-  }
-  return total;
-}
-function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
-function formatMoney(n) { return (n || 0).toLocaleString('vi-VN') + 'đ'; }
-function formatDate(d) { return d.format('YYYY-MM-DD'); }
-
-// ===== PHONE VALIDATION =====
-const VN_PHONE_PREFIXES = [
-  // Viettel
-  '032','033','034','035','036','037','038','039','086','096','097','098',
-  // Mobifone
-  '070','076','077','078','079','089','090','093',
-  // Vinaphone
-  '081','082','083','084','085','088','091','094',
-  // Vietnamobile
-  '052','056','058','092',
-  // Gmobile
-  '059','099',
-  // Reddi
-  '055','069',
-];
-function validateVNPhone(raw) {
-  let c = raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
-  if (!/^0\d{9}$/.test(c)) return false;
-  return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
-}
-function normalizePhone(raw) {
-  return raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
-}
-function setFieldError(fieldId, errorId, message) {
-  const field = document.getElementById(fieldId);
-  const errEl = document.getElementById(errorId);
-  if (field) { field.classList.add('border-red-400'); field.classList.remove('border-gray-200'); field.focus(); }
-  if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
-}
-function clearFieldError(fieldId, errorId) {
-  const field = document.getElementById(fieldId);
-  const errEl = document.getElementById(errorId);
-  if (field) { field.classList.remove('border-red-400'); field.classList.add('border-gray-200'); }
-  if (errEl) errEl.classList.add('hidden');
-}
-
-// ===== STATUS BADGE =====
-function statusBadge(s) {
-  const map = {
-    confirmed: '<span class="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Xác nhận</span>',
-    pending:   '<span class="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">⏳ Chờ</span>',
-    paid:      '<span class="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">💰 Đã TT</span>',
+  let CONFIG = {
+    name: 'Sân Cầu Việt Đảng',
+    courts: ['Sân 1', 'Sân 2', 'Sân 3'],
+    startHour: 5,
+    endHour: 22,
+    priceNormal: 80000,
+    pricePeak: 120000,
+    peakStart: 17,
+    peakEnd: 20,
+    address: '123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM',
+    phone: '0901 234 567',
+    email: 'contact@vietdangbadminton.com',
+    facebook: 'https://facebook.com/sancauvietdang',
+    googleMaps: '',
+    notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
   };
-  return map[s] || map.pending;
-}
 
-// ===== DATE =====
-let adminDate = dayjs();
-const adminDP = document.getElementById('adminDatePicker');
-function setAdminDate(d) { adminDate = d; adminDP.value = formatDate(d); renderAdminSchedule(); }
-function adminChangeDay(delta) { setAdminDate(adminDate.add(delta, 'day')); }
-function adminGoToday() { setAdminDate(dayjs()); }
-adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
+  async function loadConfig() {
+    const remote = await getSettings();
+    if (remote) {
+      CONFIG = { ...CONFIG, ...remote };
+    }
+    applyConfigUI();
+  }
 
-// ===== SECTIONS =====
-const sections = ['dashboard', 'schedule', 'bookings'];
-function showSection(name) {
-  sections.forEach(s => {
-    document.getElementById('section-' + s).classList.add('hidden');
-    document.getElementById('nav-' + s)?.classList.remove('active');
-  });
-  document.getElementById('section-' + name).classList.remove('hidden');
-  document.getElementById('nav-' + name)?.classList.add('active');
-  const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đặt' };
-  document.getElementById('pageTitle').textContent = titles[name];
-  if (name === 'schedule') renderAdminSchedule();
-  if (name === 'bookings') renderAllBookings();
-  if (name === 'dashboard') renderDashboard();
-  if (window.innerWidth < 1024) toggleSidebar(false);
-}
+  function applyConfigUI() {
+    document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name;
+    
+    // Fill Settings form
+    document.getElementById('cfgName').value = CONFIG.name;
+    document.getElementById('cfgPhone').value = CONFIG.phone;
+    document.getElementById('cfgEmail').value = CONFIG.email || '';
+    document.getElementById('cfgFacebook').value = CONFIG.facebook || '';
+    document.getElementById('cfgAddress').value = CONFIG.address || '';
+    document.getElementById('cfgGoogleMaps').value = CONFIG.googleMaps || '';
+    document.getElementById('cfgStartHour').value = CONFIG.startHour;
+    document.getElementById('cfgEndHour').value = CONFIG.endHour;
+    document.getElementById('cfgCourts').value = (CONFIG.courts || []).join(', ');
+    document.getElementById('cfgPriceNormal').value = CONFIG.priceNormal;
+    document.getElementById('cfgPricePeak').value = CONFIG.pricePeak;
+    document.getElementById('cfgPeakStart').value = CONFIG.peakStart;
+    document.getElementById('cfgPeakEnd').value = CONFIG.peakEnd;
+    document.getElementById('cfgNotice').value = CONFIG.notice || '';
 
-// ===== SIDEBAR =====
-let sidebarOpen = false;
-function toggleSidebar(force) {
-  sidebarOpen = force !== undefined ? force : !sidebarOpen;
-  document.getElementById('sidebar').classList.toggle('-translate-x-full', !sidebarOpen);
-  document.getElementById('sidebarOverlay').classList.toggle('hidden', !sidebarOpen);
-}
+    // Rebuild schedule table header
+    const headerRow = document.getElementById('adminTableHeaderRow');
+    let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-32">Giờ</th>`;
+    (CONFIG.courts || []).forEach(cName => {
+      hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 ${cName}</th>`;
+    });
+    headerRow.innerHTML = hHtml;
 
-// ===== LOGOUT =====
-function logout() {
-  Swal.fire({ title: 'Đăng xuất?', icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a', cancelButtonText: 'Ở lại', confirmButtonText: 'Đăng xuất' })
-    .then(r => {
+    // Rebuild selectCourt options in modal
+    const selCourt = document.getElementById('selectCourt');
+    selCourt.innerHTML = (CONFIG.courts || []).map((cName, idx) => `<option value="${idx}">${cName}</option>`).join('');
+
+    // Rebuild selectHour options in modal
+    const selHour = document.getElementById('selectHour');
+    selHour.innerHTML = '';
+    for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+      selHour.innerHTML += `<option value="${h}">${String(h).padStart(2,'0')}:00</option>`;
+    }
+  }
+
+  window.switchSettingsTab = function(tabName) {
+    const tabs = ['general', 'schedule', 'pricing', 'notice'];
+    tabs.forEach(t => {
+      const pane = document.getElementById('setTab-' + t);
+      const btn = document.getElementById('tabBtn-' + t);
+      if (pane) pane.classList.toggle('hidden', t !== tabName);
+      if (btn) {
+        if (t === tabName) {
+          btn.className = 'set-tab-btn active py-3 px-4 border-b-2 border-primary text-primary flex items-center gap-2';
+        } else {
+          btn.className = 'set-tab-btn py-3 px-4 border-b-2 border-transparent hover:text-gray-700 flex items-center gap-2';
+        }
+      }
+    });
+  };
+
+  window.saveCourtSettings = async function() {
+    const btn = document.getElementById('btnSaveSettings');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang lưu...';
+
+    try {
+      const courtsRaw = document.getElementById('cfgCourts').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      const newConfig = {
+        name: document.getElementById('cfgName').value.trim(),
+        phone: document.getElementById('cfgPhone').value.trim(),
+        email: document.getElementById('cfgEmail').value.trim(),
+        facebook: document.getElementById('cfgFacebook').value.trim(),
+        address: document.getElementById('cfgAddress').value.trim(),
+        googleMaps: document.getElementById('cfgGoogleMaps').value.trim(),
+        startHour: parseInt(document.getElementById('cfgStartHour').value) || 5,
+        endHour: parseInt(document.getElementById('cfgEndHour').value) || 22,
+        courts: courtsRaw.length > 0 ? courtsRaw : ['Sân 1', 'Sân 2', 'Sân 3'],
+        priceNormal: parseInt(document.getElementById('cfgPriceNormal').value) || 80000,
+        pricePeak: parseInt(document.getElementById('cfgPricePeak').value) || 120000,
+        peakStart: parseInt(document.getElementById('cfgPeakStart').value) || 17,
+        peakEnd: parseInt(document.getElementById('cfgPeakEnd').value) || 20,
+        notice: document.getElementById('cfgNotice').value.trim()
+      };
+
+      await saveSettings(newConfig);
+      CONFIG = { ...CONFIG, ...newConfig };
+      applyConfigUI();
+
+      Swal.fire({ icon: 'success', title: 'Đã lưu cấu hình sân!', timer: 1500, showConfirmButton: false, position: 'top-end', toast: true });
+    } catch(e) {
+      console.error(e);
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lưu cấu hình, vui lòng thử lại!', confirmButtonColor: '#ef4444' });
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu cấu hình';
+    }
+  };
+
+  const adminName = sessionStorage.getItem('adminName') || 'Admin';
+  const adminPhoto = sessionStorage.getItem('adminPhoto');
+
+  document.getElementById('sidebarAdminName').textContent = adminName;
+
+  if (adminPhoto) {
+    document.getElementById('sidebarAvatarContainer').innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
+    document.getElementById('topbarAvatarContainer').innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
+  } else {
+    document.getElementById('sidebarAvatarText').textContent = adminName.charAt(0).toUpperCase();
+    document.getElementById('topbarAvatarText').textContent = adminName.charAt(0).toUpperCase();
+  }
+
+  const VN_PHONE_PREFIXES = ['032','033','034','035','036','037','038','039','086','096','097','098','070','076','077','078','079','089','090','093','081','082','083','084','085','088','091','094','052','056','058','092','059','099','055','069'];
+
+  function validateVNPhone(raw) {
+    let c = raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
+    if (!/^0\d{9}$/.test(c)) return false;
+    return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
+  }
+  function normalizePhone(raw) {
+    return raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
+  }
+
+  window.setFieldError = function(fieldId, errorId, message) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    if (field) { field.classList.add('border-red-400'); field.classList.remove('border-gray-200'); field.focus(); }
+    if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
+  };
+  window.clearFieldError = function(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    if (field) { field.classList.remove('border-red-400'); field.classList.add('border-gray-200'); }
+    if (errEl) errEl.classList.add('hidden');
+  };
+
+  function statusBadge(s) {
+    const map = {
+      confirmed: '<span class="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-circle-check text-xs"></i> Đã xác nhận</span>',
+      pending:   '<span class="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-clock text-xs"></i> Chờ xác nhận</span>',
+      paid:      '<span class="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium"><i class="fa-solid fa-money-bill-wave text-xs"></i> Đã TT</span>',
+    };
+    return map[s] || map.pending;
+  }
+
+  function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
+  function formatMoney(n) { return (n || 0).toLocaleString('vi-VN') + 'đ'; }
+  function formatDate(d) { return d.format('YYYY-MM-DD'); }
+  function calcPrice(startHour, duration) {
+    let total = 0;
+    for (let h = startHour; h < startHour + duration; h++) {
+      total += isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal;
+    }
+    return total;
+  }
+
+  let allBookingsList = [];
+  let dayBookingsList = [];
+
+  let adminDate = dayjs();
+  const adminDP = document.getElementById('adminDatePicker');
+  
+  window.setAdminDate = function(d) {
+    adminDate = d;
+    adminDP.value = formatDate(d);
+    renderAdminSchedule();
+  };
+  window.adminChangeDay = function(delta) { setAdminDate(adminDate.add(delta, 'day')); };
+  window.adminGoToday = function() { setAdminDate(dayjs()); };
+  adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
+
+  const sections = ['dashboard', 'schedule', 'bookings', 'settings'];
+  window.showSection = function(name) {
+    sections.forEach(s => {
+      document.getElementById('section-' + s).classList.add('hidden');
+      document.getElementById('nav-' + s)?.classList.remove('active');
+    });
+    document.getElementById('section-' + name).classList.remove('hidden');
+    document.getElementById('nav-' + name)?.classList.add('active');
+    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', settings: 'Cài đặt thông tin sân' };
+    document.getElementById('pageTitle').textContent = titles[name];
+    if (name === 'schedule') renderAdminSchedule();
+    if (name === 'bookings') renderAllBookings();
+    if (name === 'dashboard') renderDashboard();
+    if (window.innerWidth < 1024) toggleSidebar(false);
+  };
+
+  let sidebarOpen = false;
+  window.toggleSidebar = function(force) {
+    sidebarOpen = force !== undefined ? force : !sidebarOpen;
+    document.getElementById('sidebar').classList.toggle('-translate-x-full', !sidebarOpen);
+    document.getElementById('sidebarOverlay').classList.toggle('hidden', !sidebarOpen);
+  };
+
+  window.logout = function() {
+    Swal.fire({
+      title: 'Đăng xuất?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#16a34a',
+      cancelButtonText: 'Ở lại',
+      confirmButtonText: 'Đăng xuất'
+    }).then(async r => {
       if (r.isConfirmed) {
+        try { await logoutUser(); } catch(e){}
         sessionStorage.clear();
         window.location.href = 'login.html';
       }
     });
-}
+  };
 
-// ===== DASHBOARD =====
-function renderDashboard() {
-  const today = dayjs().format('YYYY-MM-DD');
-  const bookings = getBookings();
-  const todayBookings = bookings.filter(b => b.date === today);
-  const totalSlots = CONFIG.courts.length * (CONFIG.endHour - CONFIG.startHour);
-  const nowHour = dayjs().hour();
-  const futureSlots = CONFIG.courts.length * (CONFIG.endHour - Math.max(nowHour, CONFIG.startHour));
-  // Count future-booked slots (by hours)
-  let futureBookedHours = 0;
-  todayBookings.forEach(b => {
-    const start = Math.max(b.hour, nowHour);
-    const end = b.hour + (b.duration || 1);
-    if (end > nowHour) futureBookedHours += end - start;
-  });
-  const revenue = todayBookings.reduce((s, b) => s + (b.amount || calcPrice(b.hour, b.duration || 1)), 0);
-  const weekBookings = bookings.filter(b => dayjs(b.date).isAfter(dayjs().subtract(7, 'day')));
-
-  document.getElementById('statBooked').textContent = todayBookings.length;
-  document.getElementById('statTotal').textContent = totalSlots;
-  document.getElementById('statRevenue').textContent = formatMoney(revenue);
-  document.getElementById('statFree').textContent = Math.max(0, futureSlots - futureBookedHours);
-  document.getElementById('statWeek').textContent = weekBookings.length;
-  document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
-
-  const el = document.getElementById('todayBookingList');
-  if (todayBookings.length === 0) {
-    el.innerHTML = `<div class="py-12 text-center text-gray-400"><i class="fa-regular fa-calendar-xmark text-4xl mb-3 block"></i>Chưa có lịch đặt hôm nay</div>`;
-    return;
+  async function loadData() {
+    try {
+      allBookingsList = await getAllBookings();
+    } catch (e) {
+      console.error("GetAllBookings error:", e);
+      allBookingsList = [];
+    }
   }
-  todayBookings.sort((a, b) => a.hour - b.hour);
-  el.innerHTML = todayBookings.map(b => {
-    const dur = b.duration || 1;
-    return `<div class="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors cursor-pointer" onclick="openEditModal(${b.id})">
-      <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">${String(b.hour).padStart(2,'0')}</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-semibold text-gray-800 text-sm">${b.name} · ${CONFIG.courts[b.court]}</div>
-        <div class="text-xs text-gray-400">${String(b.hour).padStart(2,'0')}:00–${String(b.hour+dur).padStart(2,'0')}:00 · ${dur}h · ${b.phone}</div>
-      </div>
-      <div class="flex items-center gap-2">${statusBadge(b.status)}<span class="text-xs font-semibold text-gray-700">${formatMoney(b.amount)}</span></div>
-    </div>`;
-  }).join('');
-}
 
-// ===== ADMIN SCHEDULE =====
-function renderAdminSchedule() {
-  const dateStr = formatDate(adminDate);
-  const tbody = document.getElementById('adminScheduleBody');
-  const isToday = dateStr === formatDate(dayjs());
-  const nowHour = dayjs().hour();
-  let html = '';
+  function groupOrders(items) {
+    const groups = {};
+    items.forEach(item => {
+      const key = item.batchId || `${item.name}_${item.phone}_${dayjs(item.createdAt).format('YYYYMMDDHHmm')}`;
+      if (!groups[key]) {
+        groups[key] = {
+          batchId: key,
+          name: item.name,
+          phone: item.phone,
+          status: item.status,
+          note: item.note,
+          createdAt: item.createdAt,
+          items: [],
+          totalAmount: 0
+        };
+      }
+      groups[key].items.push(item);
+      groups[key].totalAmount += (item.amount || calcPrice(item.hour, item.duration || 1));
+    });
+    return Object.values(groups);
+  }
 
-  for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
-    const peak = isPeak(h);
-    const isPast = isToday && h < nowHour;
-    const timeLabel = `${String(h).padStart(2,'0')}:00`;
-    let rowCells = `<td class="py-2 px-4 border-b border-gray-100 text-xs text-gray-500 font-medium whitespace-nowrap">
-      ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
-    </td>`;
+  async function renderDashboard() {
+    await loadData();
+    const today = dayjs().format('YYYY-MM-DD');
+    const todayBookings = allBookingsList.filter(b => b.date === today);
+    const todayOrders = groupOrders(todayBookings);
 
-    for (let c = 0; c < CONFIG.courts.length; c++) {
-      const booking = findBooking(dateStr, c, h);
-      if (booking) {
-        const isStart = booking.hour === h;
-        const dur = booking.duration || 1;
-        if (isStart) {
-          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs" onclick="openEditModal(${booking.id})">
-              <div class="font-semibold text-red-600 truncate"><i class="fa-solid fa-user mr-1 text-[10px]"></i>${booking.name}</div>
-              <div class="flex items-center justify-center gap-1 mt-0.5">
-                ${statusBadge(booking.status)}
-                ${dur > 1 ? `<span class="text-[10px] text-red-400">${dur}h</span>` : ''}
-              </div>
+    const totalSlots = (CONFIG.courts || []).length * (CONFIG.endHour - CONFIG.startHour);
+    const nowHour = dayjs().hour();
+    const futureSlots = (CONFIG.courts || []).length * (CONFIG.endHour - Math.max(nowHour, CONFIG.startHour));
+
+    let futureBookedHours = 0;
+    todayBookings.forEach(b => {
+      const start = Math.max(b.hour, nowHour);
+      const end = b.hour + (b.duration || 1);
+      if (end > nowHour) futureBookedHours += end - start;
+    });
+
+    const revenue = todayBookings.reduce((s, b) => s + (b.amount || calcPrice(b.hour, b.duration || 1)), 0);
+    const allOrders = groupOrders(allBookingsList);
+
+    document.getElementById('statBooked').textContent = todayOrders.length;
+    document.getElementById('statBookedSlots').textContent = todayBookings.length;
+    document.getElementById('statRevenue').textContent = formatMoney(revenue);
+    document.getElementById('statFree').textContent = Math.max(0, futureSlots - futureBookedHours);
+    document.getElementById('statTotalFirestore').textContent = allOrders.length;
+    document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
+
+    const el = document.getElementById('todayBookingList');
+    if (todayOrders.length === 0) {
+      el.innerHTML = `<div class="py-12 text-center text-gray-400"><i class="fa-regular fa-calendar-xmark text-4xl mb-3 block"></i>Chưa có đơn đặt sân nào hôm nay</div>`;
+      return;
+    }
+
+    todayOrders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    
+    el.innerHTML = todayOrders.map(order => {
+      const slotsDetail = order.items.map(s => `${CONFIG.courts[s.court] || ('Sân ' + (s.court+1))} (${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00)`).join(', ');
+      return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50" onclick="openOrderModal('${order.batchId}')">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div>
+            <div class="font-bold text-gray-800 text-sm flex items-center gap-2">
+              <span>${order.name}</span>
+              <span class="text-xs font-normal text-gray-400">(${order.phone})</span>
             </div>
+            <div class="text-xs text-gray-600 mt-1 font-medium">
+              <i class="fa-solid fa-cubes text-gray-400 mr-1"></i>${slotsDetail}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between sm:justify-end gap-3 pl-13 sm:pl-0">
+          <div class="text-right">
+            <div class="text-xs font-bold text-gray-800">${formatMoney(order.totalAmount)}</div>
+            <div class="text-[10px] text-gray-400">${order.items.length} slot</div>
+          </div>
+          ${statusBadge(order.status)}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function renderAdminSchedule() {
+    const dateStr = formatDate(adminDate);
+    try {
+      dayBookingsList = await getBookingsByDate(dateStr);
+    } catch(e) {
+      dayBookingsList = [];
+    }
+
+    const tbody = document.getElementById('adminScheduleBody');
+    const isToday = dateStr === formatDate(dayjs());
+    const nowHour = dayjs().hour();
+    let html = '';
+
+    for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+      const peak = isPeak(h);
+      const isPast = isToday && h < nowHour;
+      const timeLabel = `${String(h).padStart(2,'0')}:00`;
+      let rowCells = `<td class="py-2 px-4 border-b border-gray-100 text-xs text-gray-500 font-medium whitespace-nowrap">
+        ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
+      </td>`;
+
+      for (let c = 0; c < (CONFIG.courts || []).length; c++) {
+        const booking = dayBookingsList.find(b => b.court === c && h >= b.hour && h < b.hour + (b.duration || 1));
+        if (booking) {
+          const isStart = booking.hour === h;
+          const dur = booking.duration || 1;
+          const batchId = booking.batchId || `${booking.name}_${booking.phone}_${dayjs(booking.createdAt).format('YYYYMMDDHHmm')}`;
+          if (isStart) {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs" onclick="openOrderModal('${batchId}')">
+                <div class="font-semibold text-red-600 truncate"><i class="fa-solid fa-user mr-1 text-[10px]"></i>${booking.name}</div>
+                <div class="flex items-center justify-center gap-1 mt-0.5">
+                  ${statusBadge(booking.status)}
+                  ${dur > 1 ? `<span class="text-[10px] text-red-400">${dur}h</span>` : ''}
+                </div>
+              </div>
+            </td>`;
+          } else {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-2 text-xs text-red-300 flex items-center justify-center" onclick="openOrderModal('${batchId}')">
+                <i class="fa-solid fa-grip-lines"></i>
+              </div>
+            </td>`;
+          }
+        } else if (isPast) {
+          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+            <div class="bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-300 flex items-center justify-center">–</div>
           </td>`;
         } else {
           rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-2 text-xs text-red-300 flex items-center justify-center" onclick="openEditModal(${booking.id})">
-              <i class="fa-solid fa-grip-lines"></i>
+            <div class="slot-available ${peak ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'} rounded-lg py-2 px-2 text-xs" onclick="openAddModal(${c}, ${h}, '${dateStr}')">
+              <div class="font-medium ${peak ? 'text-amber-500' : 'text-green-600'}"><i class="fa-solid fa-plus text-[10px] mr-1"></i>Thêm</div>
             </div>
           </td>`;
         }
-      } else if (isPast) {
-        rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-          <div class="bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-300 flex items-center justify-center">–</div>
-        </td>`;
-      } else {
-        rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-          <div class="slot-available ${peak ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'} rounded-lg py-2 px-2 text-xs" onclick="openAddModal(${c}, ${h}, '${dateStr}')">
-            <div class="font-medium ${peak ? 'text-amber-500' : 'text-green-600'}"><i class="fa-solid fa-plus text-[10px] mr-1"></i>Thêm</div>
+      }
+      html += `<tr class="${isPast ? 'opacity-40' : ''}">${rowCells}</tr>`;
+    }
+    tbody.innerHTML = html;
+  }
+
+  async function renderAllBookings() {
+    await loadData();
+    const el = document.getElementById('allBookingList');
+    const orders = groupOrders(allBookingsList);
+
+    if (orders.length === 0) {
+      el.innerHTML = `<div class="py-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-4xl mb-3 block"></i>Chưa có đơn đặt sân nào trong hệ thống</div>`;
+      return;
+    }
+
+    orders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+    el.innerHTML = orders.map(order => {
+      const slotsDetail = order.items.map(s => `${CONFIG.courts[s.court] || ('Sân ' + (s.court+1))} ${dayjs(s.date).format('DD/MM')} (${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00)`).join('<br/>');
+      return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100" onclick="openOrderModal('${order.batchId}')">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs flex-shrink-0 text-center leading-tight mt-0.5">
+            <div>${dayjs(order.createdAt || order.items[0]?.date).format('DD')}<br/><span class="font-normal text-[10px]">${dayjs(order.createdAt || order.items[0]?.date).format('MM/YY')}</span></div>
           </div>
-        </td>`;
-      }
+          <div>
+            <div class="font-bold text-gray-800 text-sm flex items-center gap-2">
+              <span>${order.name}</span>
+              <span class="text-xs font-semibold text-gray-500">(${order.phone})</span>
+            </div>
+            <div class="text-xs text-gray-600 mt-1 font-normal leading-relaxed">
+              ${slotsDetail}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between sm:justify-end gap-4 pl-14 sm:pl-0">
+          <div class="text-right">
+            <div class="text-sm font-bold text-primary">${formatMoney(order.totalAmount)}</div>
+            <div class="text-xs text-gray-400">${order.items.length} slot đã chọn</div>
+          </div>
+          <div class="flex items-center gap-2">
+            ${statusBadge(order.status)}
+            <button onclick="event.stopPropagation(); confirmDeleteOrder('${order.batchId}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Xóa đơn"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  let editingBatchId = null;
+  let editingOrderItems = [];
+  let pendingSlot = null;
+  let adminSelectedDuration = 1;
+
+  function getMaxDuration(courtIdx, startHour, date, excludeId = null) {
+    let max = 0;
+    for (let h = startHour; h < CONFIG.endHour; h++) {
+      const b = dayBookingsList.find(x => x.court === courtIdx && h >= x.hour && h < x.hour + (x.duration || 1));
+      if (b && b.id !== excludeId) break;
+      max++;
     }
-    html += `<tr class="${isPast ? 'opacity-40' : ''}">${rowCells}</tr>`;
-  }
-  tbody.innerHTML = html;
-}
-
-// ===== ALL BOOKINGS =====
-function renderAllBookings() {
-  const bookings = [...getBookings()].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-  const el = document.getElementById('allBookingList');
-  if (bookings.length === 0) {
-    el.innerHTML = `<div class="py-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-4xl mb-3 block"></i>Chưa có lịch đặt nào</div>`;
-    return;
-  }
-  el.innerHTML = bookings.map(b => {
-    const dur = b.duration || 1;
-    return `<div class="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors cursor-pointer" onclick="openEditModal(${b.id})">
-      <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs flex-shrink-0 text-center leading-tight">
-        <div>${dayjs(b.date).format('DD')}<br/><span class="font-normal text-[10px]">${dayjs(b.date).format('MM/YY')}</span></div>
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="font-semibold text-gray-800 text-sm">${b.name}</div>
-        <div class="text-xs text-gray-400">${CONFIG.courts[b.court]} · ${String(b.hour).padStart(2,'0')}:00–${String(b.hour+dur).padStart(2,'0')}:00 · ${dur}h · ${b.phone}</div>
-      </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
-        ${statusBadge(b.status)}
-        <span class="text-xs font-semibold text-gray-600 hidden sm:block">${formatMoney(b.amount)}</span>
-        <button onclick="event.stopPropagation(); confirmDelete(${b.id})" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"><i class="fa-solid fa-trash text-xs"></i></button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ===== MODAL =====
-let editingId = null;
-let pendingSlot = null;
-let adminSelectedDuration = 1;
-
-// Fill hour options
-const hourSelect = document.getElementById('selectHour');
-for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
-  hourSelect.innerHTML += `<option value="${h}">${String(h).padStart(2,'0')}:00</option>`;
-}
-
-function buildDurationBtns(startHour, date, courtIdx, currentDur, excludeId) {
-  const maxDur = getMaxDuration(courtIdx, startHour, date, excludeId);
-  adminSelectedDuration = Math.min(currentDur, maxDur);
-  const container = document.getElementById('adminDurationBtns');
-  container.innerHTML = '';
-  for (let d = 1; d <= maxDur; d++) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.dataset.dur = d;
-    btn.textContent = d + 'h';
-    btn.className = `px-3 py-1.5 rounded-lg text-sm font-semibold border-2 transition-all ${d === adminSelectedDuration ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'}`;
-    btn.onclick = () => {
-      adminSelectedDuration = d;
-      container.querySelectorAll('button').forEach(b2 => {
-        b2.className = `px-3 py-1.5 rounded-lg text-sm font-semibold border-2 transition-all ${parseInt(b2.dataset.dur) === d ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'}`;
-      });
-      updateAdminDurationDisplay(startHour, courtIdx);
-    };
-    container.appendChild(btn);
-  }
-  updateAdminDurationDisplay(startHour, courtIdx);
-  document.getElementById('durationSection').classList.remove('hidden');
-}
-
-function updateAdminDurationDisplay(startHour, courtIdx) {
-  const endHour = startHour + adminSelectedDuration;
-  document.getElementById('adminTimeRangeLabel').textContent = `${CONFIG.courts[courtIdx]} · ${String(startHour).padStart(2,'0')}:00–${String(endHour).padStart(2,'0')}:00`;
-  const price = calcPrice(startHour, adminSelectedDuration);
-  document.getElementById('adminTotalPrice').textContent = formatMoney(price);
-  document.getElementById('fieldAmount').value = price;
-}
-
-function openAddModal(courtIdx, hour, date) {
-  editingId = null;
-  pendingSlot = (courtIdx !== null) ? { courtIdx, hour, date } : null;
-  document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-calendar-plus mr-2"></i>Thêm Lịch';
-  document.getElementById('btnDelete').classList.add('hidden');
-  document.getElementById('durationSection').classList.add('hidden');
-
-  if (courtIdx !== null) {
-    document.getElementById('slotSelectors').classList.add('hidden');
-    document.getElementById('modalSlotInfo').textContent = `${CONFIG.courts[courtIdx]} · ${String(hour).padStart(2,'0')}:00 trở đi`;
-    buildDurationBtns(hour, date, courtIdx, 1, null);
-  } else {
-    document.getElementById('slotSelectors').classList.remove('hidden');
-    document.getElementById('selectDate').value = formatDate(dayjs());
-    document.getElementById('modalSlotInfo').textContent = 'Chọn sân, ngày và giờ bên dưới';
-    document.getElementById('fieldAmount').value = '';
+    return max;
   }
 
-  document.getElementById('fieldName').value = '';
-  document.getElementById('fieldPhone').value = '';
-  document.getElementById('fieldNote').value = '';
-  document.getElementById('fieldStatus').value = 'confirmed';
-  document.getElementById('bookingModal').classList.remove('hidden');
-  document.getElementById('bookingModal').classList.add('flex');
-  setTimeout(() => document.getElementById('fieldName').focus(), 100);
-}
-
-function openEditModal(id) {
-  const b = getBookings().find(x => x.id === id);
-  if (!b) return;
-  editingId = id;
-  pendingSlot = { courtIdx: b.court, hour: b.hour, date: b.date };
-  document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen mr-2"></i>Sửa Lịch';
-  document.getElementById('slotSelectors').classList.add('hidden');
-  document.getElementById('btnDelete').classList.remove('hidden');
-  const dur = b.duration || 1;
-  document.getElementById('modalSlotInfo').textContent = `${CONFIG.courts[b.court]} · ${String(b.hour).padStart(2,'0')}:00–${String(b.hour+dur).padStart(2,'0')}:00`;
-  buildDurationBtns(b.hour, b.date, b.court, dur, id);
-  document.getElementById('fieldName').value = b.name;
-  document.getElementById('fieldPhone').value = b.phone;
-  document.getElementById('fieldNote').value = b.note || '';
-  document.getElementById('fieldStatus').value = b.status || 'confirmed';
-  document.getElementById('fieldAmount').value = b.amount || calcPrice(b.hour, dur);
-  document.getElementById('bookingModal').classList.remove('hidden');
-  document.getElementById('bookingModal').classList.add('flex');
-}
-
-function closeModal() {
-  document.getElementById('bookingModal').classList.add('hidden');
-  document.getElementById('bookingModal').classList.remove('flex');
-  editingId = null; pendingSlot = null;
-}
-document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-
-function saveBooking() {
-  const name = document.getElementById('fieldName').value.trim();
-  const phoneRaw = document.getElementById('fieldPhone').value.trim();
-  const phone = normalizePhone(phoneRaw);
-
-  let hasError = false;
-  if (!name) {
-    setFieldError('fieldName', 'fieldNameErr', 'Vui lòng nhập họ và tên');
-    hasError = true;
-  } else {
-    clearFieldError('fieldName', 'fieldNameErr');
-  }
-  if (!phoneRaw) {
-    setFieldError('fieldPhone', 'fieldPhoneErr', 'Vui lòng nhập số điện thoại');
-    hasError = true;
-  } else if (!validateVNPhone(phoneRaw)) {
-    setFieldError('fieldPhone', 'fieldPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
-    hasError = true;
-  } else {
-    clearFieldError('fieldPhone', 'fieldPhoneErr');
-  }
-  if (hasError) return;
-
-  let slot = pendingSlot;
-  if (!slot) {
-    slot = {
-      courtIdx: parseInt(document.getElementById('selectCourt').value),
-      hour: parseInt(document.getElementById('selectHour').value),
-      date: document.getElementById('selectDate').value
-    };
-    adminSelectedDuration = 1;
-  }
-
-  // Conflict check
-  if (!editingId) {
-    for (let h = slot.hour; h < slot.hour + adminSelectedDuration; h++) {
-      if (findBooking(slot.date, slot.courtIdx, h)) {
-        Swal.fire({ icon: 'error', title: 'Slot đã bị đặt!', text: `${CONFIG.courts[slot.courtIdx]} lúc ${String(h).padStart(2,'0')}:00 đã có người đặt.`, confirmButtonColor: '#16a34a' });
-        return;
-      }
+  function buildDurationBtns(startHour, date, courtIdx, currentDur, excludeId) {
+    const maxDur = getMaxDuration(courtIdx, startHour, date, excludeId);
+    adminSelectedDuration = Math.min(currentDur, maxDur || 1);
+    const container = document.getElementById('adminDurationBtns');
+    container.innerHTML = '';
+    for (let d = 1; d <= Math.max(1, maxDur); d++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.dur = d;
+      btn.textContent = d + 'h';
+      btn.className = `px-3 py-1.5 rounded-lg text-sm font-semibold border-2 transition-all ${d === adminSelectedDuration ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'}`;
+      btn.onclick = () => {
+        adminSelectedDuration = d;
+        container.querySelectorAll('button').forEach(b2 => {
+          b2.className = `px-3 py-1.5 rounded-lg text-sm font-semibold border-2 transition-all ${parseInt(b2.dataset.dur) === d ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'}`;
+        });
+        updateAdminDurationDisplay(startHour, courtIdx);
+      };
+      container.appendChild(btn);
     }
+    updateAdminDurationDisplay(startHour, courtIdx);
+    document.getElementById('durationSection').classList.remove('hidden');
   }
 
-  // TODO: Save to Firebase Firestore
-  const bookings = getBookings();
-  const amount = parseInt(document.getElementById('fieldAmount').value) || calcPrice(slot.hour, adminSelectedDuration);
-  if (editingId) {
-    const idx = bookings.findIndex(b => b.id === editingId);
-    if (idx !== -1) {
-      bookings[idx] = { ...bookings[idx], name, phone, note: document.getElementById('fieldNote').value.trim(), status: document.getElementById('fieldStatus').value, amount, duration: adminSelectedDuration };
-    }
-  } else {
-    bookings.push({
-      id: Date.now(),
-      date: slot.date, court: slot.courtIdx, hour: slot.hour,
-      duration: adminSelectedDuration,
-      name, phone,
-      note: document.getElementById('fieldNote').value.trim(),
-      status: document.getElementById('fieldStatus').value,
-      amount,
-      createdAt: new Date().toISOString()
+  function updateAdminDurationDisplay(startHour, courtIdx) {
+    const endHour = startHour + adminSelectedDuration;
+    const courtName = (CONFIG.courts && CONFIG.courts[courtIdx]) || ('Sân ' + (courtIdx + 1));
+    document.getElementById('adminTimeRangeLabel').textContent = `${courtName} · ${String(startHour).padStart(2,'0')}:00–${String(endHour).padStart(2,'0')}:00`;
+    const price = calcPrice(startHour, adminSelectedDuration);
+    document.getElementById('adminTotalPrice').textContent = formatMoney(price);
+    document.getElementById('fieldAmount').value = price;
+  }
+
+  function setRadioStatus(statusVal) {
+    const radios = document.getElementsByName('orderActionStatus');
+    radios.forEach(r => {
+      r.checked = (r.value === (statusVal || 'pending'));
     });
   }
-  setBookings(bookings);
-  closeModal();
 
-  const activeSection = sections.find(s => !document.getElementById('section-' + s).classList.contains('hidden'));
-  if (activeSection === 'schedule') renderAdminSchedule();
-  else if (activeSection === 'bookings') renderAllBookings();
-  else renderDashboard();
+  function getRadioStatus() {
+    const radios = document.getElementsByName('orderActionStatus');
+    for (const r of radios) {
+      if (r.checked) return r.value;
+    }
+    return 'confirmed';
+  }
 
-  Swal.fire({ icon: 'success', title: editingId ? 'Đã cập nhật!' : 'Đã thêm lịch!', timer: 1500, showConfirmButton: false, position: 'top-end', toast: true });
-}
+  window.openAddModal = function(courtIdx, hour, date) {
+    editingBatchId = null;
+    editingOrderItems = [];
+    pendingSlot = (courtIdx !== null) ? { courtIdx, hour, date } : null;
 
-function deleteCurrentBooking() { confirmDelete(editingId); }
-function confirmDelete(id) {
-  Swal.fire({ title: 'Xóa lịch đặt?', text: 'Hành động này không thể hoàn tác.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'Huỷ', confirmButtonText: 'Xóa' })
-    .then(r => {
-      if (r.isConfirmed) {
-        // TODO: Delete from Firebase Firestore
-        setBookings(getBookings().filter(b => b.id !== id));
+    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-calendar-plus mr-2"></i>Thêm Đơn Đặt Sân';
+    document.getElementById('durationSection').classList.add('hidden');
+    document.getElementById('orderSlotsContainer').classList.add('hidden');
+
+    if (courtIdx !== null) {
+      document.getElementById('slotSelectors').classList.add('hidden');
+      const courtName = (CONFIG.courts && CONFIG.courts[courtIdx]) || ('Sân ' + (courtIdx + 1));
+      document.getElementById('modalSlotInfo').textContent = `${courtName} · ${String(hour).padStart(2,'0')}:00 trở đi`;
+      buildDurationBtns(hour, date, courtIdx, 1, null);
+    } else {
+      document.getElementById('slotSelectors').classList.remove('hidden');
+      document.getElementById('selectDate').value = formatDate(dayjs());
+      document.getElementById('modalSlotInfo').textContent = 'Chọn sân, ngày và giờ bên dưới';
+      document.getElementById('fieldAmount').value = '';
+    }
+
+    document.getElementById('fieldName').value = '';
+    document.getElementById('fieldPhone').value = '';
+    document.getElementById('fieldNote').value = '';
+    setRadioStatus('confirmed');
+
+    document.getElementById('bookingModal').classList.remove('hidden');
+    document.getElementById('bookingModal').classList.add('flex');
+    setTimeout(() => document.getElementById('fieldName').focus(), 100);
+  };
+
+  window.openOrderModal = function(batchId) {
+    const allOrders = groupOrders([...allBookingsList, ...dayBookingsList]);
+    const order = allOrders.find(o => o.batchId === batchId);
+    if (!order) return;
+
+    editingBatchId = batchId;
+    editingOrderItems = order.items;
+    pendingSlot = null;
+
+    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt';
+    document.getElementById('modalSlotInfo').textContent = `Đơn gồm ${order.items.length} slot`;
+
+    document.getElementById('slotSelectors').classList.add('hidden');
+    document.getElementById('durationSection').classList.add('hidden');
+
+    const slotsContainer = document.getElementById('orderSlotsContainer');
+    const slotsList = document.getElementById('orderSlotsList');
+    slotsContainer.classList.remove('hidden');
+
+    slotsList.innerHTML = order.items.map(s => `
+      <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-primary"></i>
+          <span class="font-bold text-gray-800">${CONFIG.courts[s.court] || ('Sân ' + (s.court+1))}</span>
+          <span class="text-gray-500">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+(s.duration||1)).padStart(2,'0')}:00</span>
+          <span class="text-gray-400">(${dayjs(s.date).format('DD/MM')})</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-gray-700">${formatMoney(s.amount)}</span>
+          ${order.items.length > 1 ? `<button onclick="deleteSingleItemInOrder('${s.id}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    document.getElementById('fieldName').value = order.name;
+    document.getElementById('fieldPhone').value = order.phone;
+    document.getElementById('fieldNote').value = order.note || '';
+    setRadioStatus(order.status || 'pending');
+    document.getElementById('fieldAmount').value = order.totalAmount;
+
+    document.getElementById('bookingModal').classList.remove('hidden');
+    document.getElementById('bookingModal').classList.add('flex');
+  };
+
+  window.deleteSingleItemInOrder = async function(id) {
+    try {
+      await deleteBooking(id);
+      editingOrderItems = editingOrderItems.filter(x => x.id !== id);
+      if (editingOrderItems.length === 0) {
+        closeModal();
+      } else {
+        openOrderModal(editingBatchId);
+      }
+      const activeSection = sections.find(s => !document.getElementById('section-' + s).classList.contains('hidden'));
+      if (activeSection === 'schedule') await renderAdminSchedule();
+      else if (activeSection === 'bookings') await renderAllBookings();
+      else await renderDashboard();
+      Swal.fire({ icon: 'success', title: 'Đã xóa 1 slot!', timer: 1000, showConfirmButton: false, position: 'top-end', toast: true });
+    } catch(e) {
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message, confirmButtonColor: '#ef4444' });
+    }
+  };
+
+  window.closeModal = function() {
+    document.getElementById('bookingModal').classList.add('hidden');
+    document.getElementById('bookingModal').classList.remove('flex');
+    editingBatchId = null; editingOrderItems = []; pendingSlot = null;
+  };
+  document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+  window.saveBooking = async function() {
+    const selectedAction = getRadioStatus();
+
+    if (selectedAction === 'delete') {
+      if (editingBatchId) {
+        await executeDeleteOrder(editingBatchId);
+      } else {
+        closeModal();
+      }
+      return;
+    }
+
+    const name = document.getElementById('fieldName').value.trim();
+    const phoneRaw = document.getElementById('fieldPhone').value.trim();
+    const phone = normalizePhone(phoneRaw);
+
+    let hasError = false;
+    if (!name) {
+      setFieldError('fieldName', 'fieldNameErr', 'Vui lòng nhập họ và tên');
+      hasError = true;
+    } else {
+      clearFieldError('fieldName', 'fieldNameErr');
+    }
+    if (!phoneRaw) {
+      setFieldError('fieldPhone', 'fieldPhoneErr', 'Vui lòng nhập số điện thoại');
+      hasError = true;
+    } else if (!validateVNPhone(phoneRaw)) {
+      setFieldError('fieldPhone', 'fieldPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
+      hasError = true;
+    } else {
+      clearFieldError('fieldPhone', 'fieldPhoneErr');
+    }
+    if (hasError) return;
+
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang lưu...';
+
+    try {
+      const amount = parseInt(document.getElementById('fieldAmount').value) || 0;
+      const note = document.getElementById('fieldNote').value.trim();
+      const status = selectedAction;
+
+      if (editingBatchId && editingOrderItems.length > 0) {
+        const perItemAmount = Math.round(amount / editingOrderItems.length);
+        for (const item of editingOrderItems) {
+          await updateBooking(item.id, {
+            name, phone, note, status,
+            amount: perItemAmount
+          });
+        }
+      } else {
+        let slot = pendingSlot;
+        if (!slot) {
+          slot = {
+            courtIdx: parseInt(document.getElementById('selectCourt').value),
+            hour: parseInt(document.getElementById('selectHour').value),
+            date: document.getElementById('selectDate').value
+          };
+          adminSelectedDuration = 1;
+        }
+
+        await addBookings([{
+          batchId: String(Date.now()),
+          date: slot.date, court: slot.courtIdx, hour: slot.hour,
+          duration: adminSelectedDuration,
+          name, phone, note, status, amount
+        }]);
+      }
+
+      closeModal();
+      const activeSection = sections.find(s => !document.getElementById('section-' + s).classList.contains('hidden'));
+      if (activeSection === 'schedule') await renderAdminSchedule();
+      else if (activeSection === 'bookings') await renderAllBookings();
+      else await renderDashboard();
+
+      Swal.fire({ icon: 'success', title: 'Đã cập nhật đơn đặt!', timer: 1500, showConfirmButton: false, position: 'top-end', toast: true });
+    } catch(err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Lỗi xử lý', text: 'Không thể xử lý yêu cầu, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu thay đổi';
+    }
+  };
+
+  async function executeDeleteOrder(batchId) {
+    const itemsToDelete = [...allBookingsList, ...dayBookingsList].filter(b => (b.batchId === batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}` === batchId));
+    
+    const result = await Swal.fire({
+      title: 'Xác nhận xóa đơn?',
+      text: `Sẽ xóa toàn bộ ${itemsToDelete.length} slot trong đơn hàng này.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonText: 'Huỷ',
+      confirmButtonText: 'Đồng ý xóa'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        for (const item of itemsToDelete) {
+          await deleteBooking(item.id);
+        }
         closeModal();
         const activeSection = sections.find(s => !document.getElementById('section-' + s).classList.contains('hidden'));
-        if (activeSection === 'schedule') renderAdminSchedule();
-        else if (activeSection === 'bookings') renderAllBookings();
-        else renderDashboard();
-        Swal.fire({ icon: 'success', title: 'Đã xóa!', timer: 1200, showConfirmButton: false, position: 'top-end', toast: true });
+        if (activeSection === 'schedule') await renderAdminSchedule();
+        else if (activeSection === 'bookings') await renderAllBookings();
+        else await renderDashboard();
+        Swal.fire({ icon: 'success', title: 'Đã xóa đơn đặt!', timer: 1200, showConfirmButton: false, position: 'top-end', toast: true });
+      } catch(err) {
+        Swal.fire({ icon: 'error', title: 'Lỗi xóa đơn', text: 'Không thể xóa đơn, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
       }
-    });
-}
+    }
+  }
 
-// ===== INIT =====
-adminDP.value = formatDate(adminDate);
-document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
-renderDashboard();
+  adminDP.value = formatDate(adminDate);
+  document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
+  loadConfig();
+  renderDashboard();
 </script>
 </body>
 </html>

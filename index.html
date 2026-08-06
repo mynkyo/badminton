@@ -28,8 +28,6 @@
     /* Slot states */
     .slot-cell { transition: all .18s; cursor: pointer; user-select: none; }
     .slot-cell:hover { transform: scale(1.04); }
-    .slot-available { }
-    .slot-selected { }
     .slot-booked  { cursor: not-allowed; }
     .slot-cont    { cursor: not-allowed; }
     .slot-past    { cursor: default; }
@@ -59,7 +57,6 @@
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 3px; }
 
-    /* Pulse selected */
     @keyframes selectPop { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
     .slot-pop { animation: selectPop .2s ease; }
   </style>
@@ -72,8 +69,8 @@
     <a href="index.html" class="flex items-center gap-3">
       <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-full object-cover" />
       <div>
-        <div class="font-bold text-lg text-primary leading-tight">Sân Cầu</div>
-        <div class="text-xs text-gray-500 leading-tight font-semibold">Việt Đảng</div>
+        <div id="uiCourtNameTitle" class="font-bold text-lg text-primary leading-tight">Sân Cầu</div>
+        <div id="uiCourtNameSub" class="text-xs text-gray-500 leading-tight font-semibold">Việt Đảng</div>
       </div>
     </a>
     <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
@@ -94,15 +91,15 @@
   <div>
     <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-4">
       <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-      Đang mở cửa · 05:00 – 22:00
+      Đang mở cửa · <span id="uiOpenHours">05:00 – 22:00</span>
     </div>
-    <h1 class="text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-lg">Sân Cầu<br /><span class="text-green-400">Việt Đảng</span></h1>
-    <p class="text-lg text-gray-200 mb-6 max-w-xl mx-auto">3 sân chuẩn thi đấu · Chọn nhiều giờ · Đặt một lần duy nhất</p>
+    <h1 id="uiHeroTitle" class="text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-lg">Sân Cầu<br /><span class="text-green-400">Việt Đảng</span></h1>
+    <p id="uiHeroSub" class="text-lg text-gray-200 mb-6 max-w-xl mx-auto">3 sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng</p>
     <div class="flex flex-wrap gap-3 justify-center">
       <a href="#schedule" class="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
         <i class="fa-regular fa-calendar-check mr-2"></i>Chọn giờ ngay
       </a>
-      <a href="tel:0901234567" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-white/30">
+      <a id="uiHeroCallBtn" href="tel:0901234567" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-white/30">
         <i class="fa-solid fa-phone mr-2"></i>Gọi ngay
       </a>
     </div>
@@ -112,9 +109,9 @@
 <!-- ===== STATS ===== -->
 <div class="bg-primary text-white">
   <div class="max-w-6xl mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-    <div><div class="text-2xl font-bold">3</div><div class="text-xs opacity-80">Sân chuẩn</div></div>
-    <div><div class="text-2xl font-bold">80K</div><div class="text-xs opacity-80">Từ 80.000đ/h</div></div>
-    <div><div class="text-2xl font-bold">17</div><div class="text-xs opacity-80">Giờ mở cửa/ngày</div></div>
+    <div><div class="text-2xl font-bold" id="uiStatCourtsCount">3</div><div class="text-xs opacity-80">Sân chuẩn</div></div>
+    <div><div class="text-2xl font-bold" id="uiStatPriceNormal">80K</div><div class="text-xs opacity-80" id="uiStatPriceNormalLabel">Từ 80.000đ/h</div></div>
+    <div><div class="text-2xl font-bold" id="uiStatHoursTotal">17</div><div class="text-xs opacity-80">Giờ mở cửa/ngày</div></div>
     <div><div class="text-2xl font-bold">⭐ 4.9</div><div class="text-xs opacity-80">Đánh giá khách hàng</div></div>
   </div>
 </div>
@@ -146,14 +143,14 @@
     <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-green-100 border border-green-400 inline-block"></span> Trống</div>
     <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-indigo-100 border-2 border-indigo-500 inline-block"></span> Đã chọn</div>
     <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-red-100 border border-red-300 inline-block"></span> Đã đặt</div>
-    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-amber-100 border border-amber-400 inline-block"></span> Cao điểm (120K/h)</div>
+    <div class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-amber-100 border border-amber-400 inline-block"></span> Cao điểm (<span id="uiLegendPeakPrice">120K</span>/h)</div>
   </div>
 
   <!-- Table -->
   <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
     <table class="min-w-full text-sm border-collapse">
       <thead>
-        <tr class="bg-gray-50 border-b border-gray-200">
+        <tr id="uiTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
           <th class="py-3 px-4 text-left text-gray-500 font-semibold w-28">Giờ</th>
           <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 1</th>
           <th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 Sân 2</th>
@@ -172,18 +169,18 @@
     <p class="text-center text-gray-500 text-sm mb-8">Giá đã bao gồm ánh sáng, không phát sinh thêm</p>
     <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
       <div class="border-2 border-gray-200 rounded-2xl p-6 text-center hover:border-primary transition-all hover:shadow-lg">
-        <div class="text-4xl mb-2">🌤️</div>
+        <div class="text-4xl mb-2 text-amber-500"><i class="fa-solid fa-sun"></i></div>
         <div class="font-bold text-lg text-gray-800 mb-1">Giờ Thường</div>
-        <div class="text-xs text-gray-500 mb-4">05:00 – 17:00 &nbsp;|&nbsp; 20:00 – 22:00</div>
-        <div class="text-4xl font-extrabold text-primary">80K</div>
+        <div id="uiPriceNormalHours" class="text-xs text-gray-500 mb-4">05:00 – 17:00 &nbsp;|&nbsp; 20:00 – 22:00</div>
+        <div id="uiPriceNormalVal" class="text-4xl font-extrabold text-primary">80K</div>
         <div class="text-sm text-gray-500">/ tiếng / sân</div>
       </div>
       <div class="border-2 border-amber-400 rounded-2xl p-6 text-center bg-amber-50 relative overflow-hidden">
         <div class="absolute top-3 right-3 text-xs bg-amber-400 text-white px-2 py-0.5 rounded-full font-semibold">Cao điểm</div>
-        <div class="text-4xl mb-2">🌆</div>
+        <div class="text-4xl mb-2 text-amber-600"><i class="fa-solid fa-bolt"></i></div>
         <div class="font-bold text-lg text-gray-800 mb-1">Giờ Cao Điểm</div>
-        <div class="text-xs text-gray-500 mb-4">17:00 – 20:00 hàng ngày</div>
-        <div class="text-4xl font-extrabold text-amber-500">120K</div>
+        <div id="uiPricePeakHours" class="text-xs text-gray-500 mb-4">17:00 – 20:00 hàng ngày</div>
+        <div id="uiPricePeakVal" class="text-4xl font-extrabold text-amber-500">120K</div>
         <div class="text-sm text-gray-500">/ tiếng / sân</div>
       </div>
     </div>
@@ -206,25 +203,25 @@
       <div class="space-y-4">
         <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
           <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-primary text-xl flex-shrink-0"><i class="fa-solid fa-phone"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Điện thoại / Zalo</div><a href="tel:0901234567" class="font-bold text-gray-800 hover:text-primary transition-colors text-lg">0901 234 567</a></div>
+          <div><div class="text-xs text-gray-500 mb-0.5">Điện thoại / Zalo</div><a id="uiContactPhone" href="tel:0901234567" class="font-bold text-gray-800 hover:text-primary transition-colors text-lg">0901 234 567</a></div>
         </div>
-        <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div id="uiContactFacebookRow" class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
           <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 text-xl flex-shrink-0"><i class="fa-brands fa-facebook"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Facebook</div><a href="#" class="font-semibold text-gray-800 hover:text-primary transition-colors">Sân Cầu Việt Đảng</a></div>
+          <div><div class="text-xs text-gray-500 mb-0.5">Facebook</div><a id="uiContactFacebook" href="#" target="_blank" class="font-semibold text-gray-800 hover:text-primary transition-colors">Sân Cầu Việt Đảng</a></div>
         </div>
         <div class="flex items-start gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
           <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500 text-xl flex-shrink-0"><i class="fa-solid fa-location-dot"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Địa chỉ</div><div class="font-semibold text-gray-800">123 Đường Việt Đảng<br />Phường XX, Quận XX, TP.HCM</div></div>
+          <div><div class="text-xs text-gray-500 mb-0.5">Địa chỉ</div><div id="uiContactAddress" class="font-semibold text-gray-800">123 Đường Việt Đảng<br />Phường XX, Quận XX, TP.HCM</div></div>
         </div>
         <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
           <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 text-xl flex-shrink-0"><i class="fa-regular fa-clock"></i></div>
-          <div><div class="text-xs text-gray-500 mb-0.5">Giờ mở cửa</div><div class="font-semibold text-gray-800">05:00 – 22:00 · Tất cả các ngày</div></div>
+          <div><div class="text-xs text-gray-500 mb-0.5">Giờ mở cửa</div><div id="uiContactOpenHours" class="font-semibold text-gray-800">05:00 – 22:00 · Tất cả các ngày</div></div>
         </div>
       </div>
-      <div class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm min-h-[280px] bg-gray-200 flex items-center justify-center">
+      <div id="uiGoogleMapsContainer" class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm min-h-[280px] bg-gray-200 flex items-center justify-center">
         <div class="text-center text-gray-400">
           <i class="fa-solid fa-map text-5xl mb-3"></i>
-          <p class="text-sm">Google Maps sẽ hiển thị ở đây</p>
+          <p class="text-sm">Bản đồ vị trí sân</p>
         </div>
       </div>
     </div>
@@ -234,10 +231,9 @@
 <!-- ===== FOOTER ===== -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-sm">
   <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-    <div><span class="font-bold text-white">Sân Cầu Việt Đảng</span> · © 2024</div>
+    <div><span id="uiFooterBrandName" class="font-bold text-white">Sân Cầu Việt Đảng</span> · © 2024</div>
     <div class="flex gap-4">
-      <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook text-lg"></i></a>
-      <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-tiktok text-lg"></i></a>
+      <a id="uiFooterFacebook" href="#" target="_blank" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook text-lg"></i></a>
       <a href="login.html" class="opacity-20 hover:opacity-60 transition-opacity" title="Quản lý"><i class="fa-solid fa-user-shield text-lg"></i></a>
     </div>
   </div>
@@ -246,11 +242,8 @@
 <!-- ===== CART BAR (sticky bottom) ===== -->
 <div id="cartBar" class="cart-hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
   <div class="bg-white border-t border-gray-200 shadow-2xl">
-    <!-- Progress strip -->
     <div class="h-1 bg-primary" id="cartProgressBar" style="width:0%"></div>
-
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <!-- Summary -->
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-sm font-bold text-gray-800">
@@ -261,7 +254,6 @@
         </div>
         <div id="cartTagsRow" class="flex gap-1.5 mt-1 flex-wrap max-h-10 overflow-hidden"></div>
       </div>
-      <!-- Actions -->
       <div class="flex items-center gap-2 flex-shrink-0">
         <button onclick="clearCart()" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa tất cả">
           <i class="fa-solid fa-trash-can text-sm"></i>
@@ -301,7 +293,6 @@
 <!-- ===== BOOKING MODAL ===== -->
 <div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col">
-    <!-- Header -->
     <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between flex-shrink-0">
       <div>
         <h3 class="font-bold text-lg"><i class="fa-solid fa-calendar-check mr-2"></i>Xác Nhận Đặt Sân</h3>
@@ -311,13 +302,11 @@
     </div>
 
     <div class="overflow-y-auto flex-1">
-      <!-- Slot summary -->
       <div class="px-6 pt-4 pb-2">
         <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Slot đã chọn</p>
         <div id="modalSlotList" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
       </div>
 
-      <!-- Form -->
       <div class="px-6 py-4 space-y-4 border-t border-gray-100 mt-2">
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-user mr-1.5 text-primary"></i>Họ và tên <span class="text-red-400">*</span></label>
@@ -340,388 +329,512 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="px-6 pb-5 pt-3 flex gap-3 flex-shrink-0 border-t border-gray-100">
       <button onclick="closeBookingModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-all">Huỷ</button>
-      <button onclick="submitBooking()" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
+      <button id="submitBtn" onclick="submitBooking()" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
         <i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu
       </button>
     </div>
   </div>
 </div>
 
-<script>
-// ===== CONFIG =====
-const CONFIG = {
-  name: 'Sân Cầu Việt Đảng',
-  courts: ['Sân 1', 'Sân 2', 'Sân 3'],
-  startHour: 5,
-  endHour: 22,
-  priceNormal: 80000,
-  pricePeak: 120000,
-  peakStart: 17,
-  peakEnd: 20
-};
+<!-- Import Firebase Module -->
+<script type="module">
+  import { getBookingsByDate, addBookings, getSettings } from "./firebase.js";
 
-// ===== HELPERS =====
-function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
-function slotPrice(h) { return isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal; }
-function fmtMoney(n) { return n.toLocaleString('vi-VN') + 'đ'; }
-function fmtDate(d) { return d.format('YYYY-MM-DD'); }
-function fmtDateVN(str) { return dayjs(str).format('DD/MM'); }
-function slotKey(court, hour, date) { return `${date}|${court}|${hour}`; }
+  let CONFIG = {
+    name: 'Sân Cầu Việt Đảng',
+    courts: ['Sân 1', 'Sân 2', 'Sân 3'],
+    startHour: 5,
+    endHour: 22,
+    priceNormal: 80000,
+    pricePeak: 120000,
+    peakStart: 17,
+    peakEnd: 20,
+    address: '123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM',
+    phone: '0901 234 567',
+    email: 'contact@vietdangbadminton.com',
+    facebook: 'https://facebook.com/sancauvietdang',
+    googleMaps: '',
+    notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
+  };
 
-// ===== DATA =====
-function getBookings() {
-  // TODO: Replace with Firebase Firestore
-  return JSON.parse(localStorage.getItem('bookings') || '[]');
-}
-function isSlotBooked(date, court, hour) {
-  return getBookings().some(b =>
-    b.date === date && b.court === court &&
-    hour >= b.hour && hour < b.hour + (b.duration || 1)
-  );
-}
-function findBooking(date, court, hour) {
-  return getBookings().find(b =>
-    b.date === date && b.court === court &&
-    hour >= b.hour && hour < b.hour + (b.duration || 1)
-  );
-}
-
-// ===== CART STATE =====
-let cart = []; // [{key, court, hour, date, price}]
-
-function isInCart(court, hour, date) {
-  return cart.some(s => s.key === slotKey(court, hour, date));
-}
-
-function toggleSlot(courtIdx, hour, date) {
-  const key = slotKey(courtIdx, hour, date);
-  const idx = cart.findIndex(s => s.key === key);
-  if (idx !== -1) {
-    cart.splice(idx, 1);
-  } else {
-    cart.push({ key, court: courtIdx, hour, date, price: slotPrice(hour) });
-  }
-  renderSchedule();
-  updateCartUI();
-}
-
-function removeFromCart(key) {
-  cart = cart.filter(s => s.key !== key);
-  renderSchedule();
-  updateCartUI();
-  renderCartDrawer();
-}
-
-function clearCart() {
-  if (cart.length === 0) return;
-  cart = [];
-  renderSchedule();
-  updateCartUI();
-}
-
-function cartTotal() { return cart.reduce((s, c) => s + c.price, 0); }
-
-// ===== CART UI =====
-function updateCartUI() {
-  const count = cart.length;
-  const total = cartTotal();
-  const bar = document.getElementById('cartBar');
-
-  if (count === 0) {
-    bar.classList.add('cart-hidden');
-    document.getElementById('navCartCount').classList.add('hidden');
-    return;
+  async function loadConfig() {
+    const remote = await getSettings();
+    if (remote) {
+      CONFIG = { ...CONFIG, ...remote };
+    }
+    applyConfigUI();
   }
 
-  bar.classList.remove('cart-hidden');
-  document.getElementById('navCartCount').classList.remove('hidden');
-  document.getElementById('navCartCount').textContent = count;
-  document.getElementById('cartCountLabel').textContent = count;
-  document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
-  document.getElementById('cartProgressBar').style.width = Math.min(100, count * 10) + '%';
+  function applyConfigUI() {
+    const parts = CONFIG.name.split(' ');
+    const firstWord = parts.slice(0, Math.max(1, parts.length - 1)).join(' ');
+    const lastWord = parts.length > 1 ? parts[parts.length - 1] : '';
 
-  // Tags row
-  const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-  const tagsRow = document.getElementById('cartTagsRow');
-  tagsRow.innerHTML = sorted.slice(0, 6).map(s => `
-    <span class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">
-      ${CONFIG.courts[s.court]} ${String(s.hour).padStart(2,'0')}:00 ${fmtDateVN(s.date)}
-      <button onclick="removeFromCart('${s.key}')" class="hover:text-red-500 transition-colors ml-0.5">×</button>
-    </span>`).join('') + (cart.length > 6 ? `<span class="text-xs text-gray-400 py-0.5">+${cart.length - 6} nữa</span>` : '');
-}
+    if (document.getElementById('uiCourtNameTitle')) document.getElementById('uiCourtNameTitle').textContent = firstWord || CONFIG.name;
+    if (document.getElementById('uiCourtNameSub')) document.getElementById('uiCourtNameSub').textContent = lastWord;
 
-// ===== CART DRAWER =====
-let drawerOpen = false;
-function openCartDrawer() {
-  drawerOpen = true;
-  document.getElementById('cartDrawerOverlay').classList.remove('hidden');
-  document.getElementById('cartDrawer').classList.remove('drawer-hidden');
-  renderCartDrawer();
-}
-function closeCartDrawer() {
-  drawerOpen = false;
-  document.getElementById('cartDrawerOverlay').classList.add('hidden');
-  document.getElementById('cartDrawer').classList.add('drawer-hidden');
-}
-function renderCartDrawer() {
-  const count = cart.length;
-  document.getElementById('drawerCount').textContent = count;
-  document.getElementById('drawerTotal').textContent = fmtMoney(cartTotal());
+    if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').innerHTML = `${firstWord}<br/><span class="text-green-400">${lastWord}</span>`;
+    if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts||[]).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
+    
+    const openHoursStr = `${String(CONFIG.startHour).padStart(2,'0')}:00 – ${String(CONFIG.endHour).padStart(2,'0')}:00`;
+    if (document.getElementById('uiOpenHours')) document.getElementById('uiOpenHours').textContent = openHoursStr;
+    if (document.getElementById('uiContactOpenHours')) document.getElementById('uiContactOpenHours').textContent = `${openHoursStr} · Tất cả các ngày`;
 
-  const list = document.getElementById('cartDrawerList');
-  if (count === 0) {
-    list.innerHTML = `<div class="py-8 text-center text-gray-400"><i class="fa-solid fa-cart-shopping text-4xl mb-3 block opacity-30"></i>Chưa chọn slot nào<br/><span class="text-xs mt-1 block">Quay lại lịch để chọn sân</span></div>`;
-    return;
+    if (document.getElementById('uiHeroCallBtn')) document.getElementById('uiHeroCallBtn').href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
+    if (document.getElementById('uiContactPhone')) {
+      const pEl = document.getElementById('uiContactPhone');
+      pEl.textContent = CONFIG.phone;
+      pEl.href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
+    }
+
+    if (document.getElementById('uiContactFacebook')) {
+      const fbEl = document.getElementById('uiContactFacebook');
+      fbEl.textContent = CONFIG.name;
+      fbEl.href = CONFIG.facebook || '#';
+      document.getElementById('uiContactFacebookRow').style.display = CONFIG.facebook ? 'flex' : 'none';
+    }
+
+    if (document.getElementById('uiContactAddress')) document.getElementById('uiContactAddress').textContent = CONFIG.address;
+
+    if (document.getElementById('uiGoogleMapsContainer')) {
+      const mapBox = document.getElementById('uiGoogleMapsContainer');
+      if (CONFIG.googleMaps && CONFIG.googleMaps.includes('<iframe')) {
+        mapBox.innerHTML = CONFIG.googleMaps;
+        const iframe = mapBox.querySelector('iframe');
+        if (iframe) {
+          iframe.className = 'w-full h-full min-h-[280px] border-0 rounded-2xl';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+        }
+      }
+    }
+
+    if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = CONFIG.name;
+    if (document.getElementById('uiFooterFacebook')) document.getElementById('uiFooterFacebook').href = CONFIG.facebook || '#';
+
+    // Stats
+    if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts||[]).length;
+    if (document.getElementById('uiStatPriceNormal')) document.getElementById('uiStatPriceNormal').textContent = (CONFIG.priceNormal/1000) + 'K';
+    if (document.getElementById('uiStatPriceNormalLabel')) document.getElementById('uiStatPriceNormalLabel').textContent = `Từ ${CONFIG.priceNormal.toLocaleString('vi-VN')}đ/h`;
+    if (document.getElementById('uiStatHoursTotal')) document.getElementById('uiStatHoursTotal').textContent = (CONFIG.endHour - CONFIG.startHour);
+
+    // Pricing
+    if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = (CONFIG.pricePeak/1000) + 'K';
+    if (document.getElementById('uiPriceNormalHours')) {
+      const norm1 = `${String(CONFIG.startHour).padStart(2,'0')}:00 – ${String(CONFIG.peakStart).padStart(2,'0')}:00`;
+      const norm2 = `${String(CONFIG.peakEnd).padStart(2,'0')}:00 – ${String(CONFIG.endHour).padStart(2,'0')}:00`;
+      document.getElementById('uiPriceNormalHours').innerHTML = `${norm1} &nbsp;|&nbsp; ${norm2}`;
+    }
+    if (document.getElementById('uiPriceNormalVal')) document.getElementById('uiPriceNormalVal').textContent = (CONFIG.priceNormal/1000) + 'K';
+
+    if (document.getElementById('uiPricePeakHours')) {
+      document.getElementById('uiPricePeakHours').textContent = `${String(CONFIG.peakStart).padStart(2,'0')}:00 – ${String(CONFIG.peakEnd).padStart(2,'0')}:00 hàng ngày`;
+    }
+    if (document.getElementById('uiPricePeakVal')) document.getElementById('uiPricePeakVal').textContent = (CONFIG.pricePeak/1000) + 'K';
+
+    // Notice in Modal
+    if (document.getElementById('modalBookingNotice')) document.getElementById('modalBookingNotice').textContent = CONFIG.notice;
+
+    // Table headers
+    const headerRow = document.getElementById('uiTableHeaderRow');
+    if (headerRow) {
+      let hHtml = `<th class="py-3 px-4 text-left text-gray-500 font-semibold w-28">Giờ</th>`;
+      (CONFIG.courts || []).forEach(cName => {
+        hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold">🏸 ${cName}</th>`;
+      });
+      headerRow.innerHTML = hHtml;
+    }
   }
-  const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-  list.innerHTML = sorted.map(s => `
-    <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5">
-      <div class="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0">
-        ${String(s.hour).padStart(2,'0')}
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="font-semibold text-gray-800 text-sm">${CONFIG.courts[s.court]}</div>
-        <div class="text-xs text-gray-500">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00 · ${dayjs(s.date).format('ddd DD/MM')} ${isPeak(s.hour) ? '⚡' : ''}</div>
-      </div>
-      <div class="text-sm font-bold text-indigo-600 flex-shrink-0">${fmtMoney(s.price)}</div>
-      <button onclick="removeFromCart('${s.key}')" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all flex-shrink-0">
-        <i class="fa-solid fa-xmark text-xs"></i>
-      </button>
-    </div>`).join('');
-}
 
-// ===== BOOKING MODAL =====
-function openBookingModal() {
-  if (cart.length === 0) return;
-  const count = cart.length;
-  const total = cartTotal();
-  document.getElementById('modalSlotCount').textContent = count;
-  document.getElementById('modalTotal').textContent = fmtMoney(total);
-  document.getElementById('guestName').value = '';
-  document.getElementById('guestPhone').value = '';
-  document.getElementById('guestNote').value = '';
+  const VN_PHONE_PREFIXES = ['032','033','034','035','036','037','038','039','086','096','097','098','070','076','077','078','079','089','090','093','081','082','083','084','085','088','091','094','052','056','058','092','059','099','055','069'];
 
-  // Slot list in modal
-  const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-  document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
-    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs">
-      <i class="fa-solid fa-circle-check text-primary"></i>
-      <span class="font-medium text-gray-700">${CONFIG.courts[s.court]}</span>
-      <span class="text-gray-400">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00</span>
-      <span class="text-gray-400">${dayjs(s.date).format('DD/MM/YYYY')}</span>
-      ${isPeak(s.hour) ? '<span class="text-amber-500">⚡120K</span>' : '<span class="text-gray-400">80K</span>'}
-    </div>`).join('');
-
-  document.getElementById('bookingModal').classList.remove('hidden');
-  document.getElementById('bookingModal').classList.add('flex');
-  setTimeout(() => document.getElementById('guestName').focus(), 100);
-}
-
-function closeBookingModal() {
-  document.getElementById('bookingModal').classList.add('hidden');
-  document.getElementById('bookingModal').classList.remove('flex');
-}
-document.getElementById('bookingModal').addEventListener('click', function(e) {
-  if (e.target === this) closeBookingModal();
-});
-
-// ===== PHONE VALIDATION =====
-// Danh sách đầu số hợp lệ tại Việt Nam (cập nhật 2024)
-const VN_PHONE_PREFIXES = [
-  // Viettel
-  '032','033','034','035','036','037','038','039','086','096','097','098',
-  // Mobifone
-  '070','076','077','078','079','089','090','093',
-  // Vinaphone
-  '081','082','083','084','085','088','091','094',
-  // Vietnamobile
-  '052','056','058','092',
-  // Gmobile
-  '059','099',
-  // Reddi (Indochina Telecom)
-  '055','069',
-];
-
-function validateVNPhone(raw) {
-  // Loại bỏ khoảng trắng, dấu gạch ngang, dấu chấm
-  let cleaned = raw.replace(/[\s\-.()]/g, '');
-  // Chuẩn hóa đầu số quốc tế +84 hoặc 84 → 0
-  cleaned = cleaned.replace(/^(\+84|84)/, '0');
-  // Phải đúng 10 chữ số bắt đầu bằng 0
-  if (!/^0\d{9}$/.test(cleaned)) return false;
-  // Kiểm tra đầu số 3 ký tự có hợp lệ không
-  return VN_PHONE_PREFIXES.includes(cleaned.substring(0, 3));
-}
-
-function normalizePhone(raw) {
-  let cleaned = raw.replace(/[\s\-.()]/g, '');
-  return cleaned.replace(/^(\+84|84)/, '0');
-}
-
-function setFieldError(fieldId, errorId, message) {
-  const field = document.getElementById(fieldId);
-  const errEl = document.getElementById(errorId);
-  field.classList.add('border-red-400', 'focus:ring-red-200');
-  field.classList.remove('border-gray-200');
-  if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
-  field.focus();
-}
-
-function clearFieldError(fieldId, errorId) {
-  const field = document.getElementById(fieldId);
-  const errEl = document.getElementById(errorId);
-  field.classList.remove('border-red-400', 'focus:ring-red-200');
-  field.classList.add('border-gray-200');
-  if (errEl) errEl.classList.add('hidden');
-}
-
-function submitBooking() {
-  const name = document.getElementById('guestName').value.trim();
-  const phoneRaw = document.getElementById('guestPhone').value.trim();
-  const phone = normalizePhone(phoneRaw);
-
-  let hasError = false;
-  if (!name) {
-    setFieldError('guestName', 'guestNameErr', 'Vui lòng nhập họ và tên');
-    hasError = true;
-  } else {
-    clearFieldError('guestName', 'guestNameErr');
+  function validateVNPhone(raw) {
+    let c = raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
+    if (!/^0\d{9}$/.test(c)) return false;
+    return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
   }
-  if (!phoneRaw) {
-    setFieldError('guestPhone', 'guestPhoneErr', 'Vui lòng nhập số điện thoại');
-    hasError = true;
-  } else if (!validateVNPhone(phoneRaw)) {
-    setFieldError('guestPhone', 'guestPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
-    hasError = true;
-  } else {
-    clearFieldError('guestPhone', 'guestPhoneErr');
+  function normalizePhone(raw) {
+    return raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
   }
-  if (hasError) return;
 
-  // TODO: Replace with Firebase Firestore batch write
-  const bookings = getBookings();
-  const note = document.getElementById('guestNote').value.trim();
-  const batchId = Date.now();
+  window.setFieldError = function(fieldId, errorId, message) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    field.classList.add('border-red-400', 'focus:ring-red-200');
+    field.classList.remove('border-gray-200');
+    if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
+    field.focus();
+  };
 
-  cart.forEach((s, i) => {
-    bookings.push({
-      id: batchId + i,
-      batchId,
-      date: s.date,
-      court: s.court,
-      hour: s.hour,
-      duration: 1,
-      name, phone, note,
-      status: 'pending',
-      amount: s.price,
-      createdAt: new Date().toISOString()
-    });
+  window.clearFieldError = function(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    field.classList.remove('border-red-400', 'focus:ring-red-200');
+    field.classList.add('border-gray-200');
+    if (errEl) errEl.classList.add('hidden');
+  };
+
+  function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
+  function slotPrice(h) { return isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal; }
+  function fmtMoney(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+  function fmtDate(d) { return d.format('YYYY-MM-DD'); }
+  function fmtDateVN(str) { return dayjs(str).format('DD/MM'); }
+  function slotKey(court, hour, date) { return `${date}|${court}|${hour}`; }
+
+  let currentBookings = [];
+  let cart = [];
+
+  function isInCart(court, hour, date) {
+    return cart.some(s => s.key === slotKey(court, hour, date));
+  }
+
+  window.toggleSlot = function(courtIdx, hour, date) {
+    const key = slotKey(courtIdx, hour, date);
+    const idx = cart.findIndex(s => s.key === key);
+    if (idx !== -1) {
+      cart.splice(idx, 1);
+    } else {
+      cart.push({ key, court: courtIdx, hour, date, price: slotPrice(hour) });
+    }
+    renderSchedule();
+    updateCartUI();
+  };
+
+  window.removeFromCart = function(key) {
+    cart = cart.filter(s => s.key !== key);
+    renderSchedule();
+    updateCartUI();
+    renderCartDrawer();
+  };
+
+  window.clearCart = function() {
+    if (cart.length === 0) return;
+    cart = [];
+    renderSchedule();
+    updateCartUI();
+  };
+
+  function cartTotal() { return cart.reduce((s, c) => s + c.price, 0); }
+
+  function updateCartUI() {
+    const count = cart.length;
+    const total = cartTotal();
+    const bar = document.getElementById('cartBar');
+
+    if (count === 0) {
+      bar.classList.add('cart-hidden');
+      document.getElementById('navCartCount').classList.add('hidden');
+      return;
+    }
+
+    bar.classList.remove('cart-hidden');
+    document.getElementById('navCartCount').classList.remove('hidden');
+    document.getElementById('navCartCount').textContent = count;
+    document.getElementById('cartCountLabel').textContent = count;
+    document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
+    document.getElementById('cartProgressBar').style.width = Math.min(100, count * 10) + '%';
+
+    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+    const tagsRow = document.getElementById('cartTagsRow');
+    tagsRow.innerHTML = sorted.slice(0, 6).map(s => `
+      <span class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">
+        ${CONFIG.courts[s.court]} ${String(s.hour).padStart(2,'0')}:00 ${fmtDateVN(s.date)}
+        <button onclick="removeFromCart('${s.key}')" class="hover:text-red-500 transition-colors ml-0.5">×</button>
+      </span>`).join('') + (cart.length > 6 ? `<span class="text-xs text-gray-400 py-0.5">+${cart.length - 6} nữa</span>` : '');
+  }
+
+  window.openCartDrawer = function() {
+    document.getElementById('cartDrawerOverlay').classList.remove('hidden');
+    document.getElementById('cartDrawer').classList.remove('drawer-hidden');
+    renderCartDrawer();
+  };
+
+  window.closeCartDrawer = function() {
+    document.getElementById('cartDrawerOverlay').classList.add('hidden');
+    document.getElementById('cartDrawer').classList.add('drawer-hidden');
+  };
+
+  function renderCartDrawer() {
+    const count = cart.length;
+    document.getElementById('drawerCount').textContent = count;
+    document.getElementById('drawerTotal').textContent = fmtMoney(cartTotal());
+
+    const list = document.getElementById('cartDrawerList');
+    if (count === 0) {
+      list.innerHTML = `<div class="py-8 text-center text-gray-400"><i class="fa-solid fa-cart-shopping text-4xl mb-3 block opacity-30"></i>Chưa chọn slot nào<br/><span class="text-xs mt-1 block">Quay lại lịch để chọn sân</span></div>`;
+      return;
+    }
+    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+    list.innerHTML = sorted.map(s => `
+      <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5">
+        <div class="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0">
+          ${String(s.hour).padStart(2,'0')}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-gray-800 text-sm">${CONFIG.courts[s.court]}</div>
+          <div class="text-xs text-gray-500">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00 · ${dayjs(s.date).format('ddd DD/MM')} ${isPeak(s.hour) ? '⚡' : ''}</div>
+        </div>
+        <div class="text-sm font-bold text-indigo-600 flex-shrink-0">${fmtMoney(s.price)}</div>
+        <button onclick="removeFromCart('${s.key}')" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all flex-shrink-0">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>`).join('');
+  }
+
+  window.openBookingModal = function() {
+    if (cart.length === 0) return;
+    const count = cart.length;
+    const total = cartTotal();
+    document.getElementById('modalSlotCount').textContent = count;
+    document.getElementById('modalTotal').textContent = fmtMoney(total);
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestPhone').value = '';
+    document.getElementById('guestNote').value = '';
+
+    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+    document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
+      <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs">
+        <i class="fa-solid fa-circle-check text-primary"></i>
+        <span class="font-medium text-gray-700">${CONFIG.courts[s.court]}</span>
+        <span class="text-gray-400">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00</span>
+        <span class="text-gray-400">${dayjs(s.date).format('DD/MM/YYYY')}</span>
+        ${isPeak(s.hour) ? '<span class="text-amber-500">⚡120K</span>' : '<span class="text-gray-400">80K</span>'}
+      </div>`).join('');
+
+    document.getElementById('bookingModal').classList.remove('hidden');
+    document.getElementById('bookingModal').classList.add('flex');
+    setTimeout(() => document.getElementById('guestName').focus(), 100);
+  };
+
+  window.closeBookingModal = function() {
+    document.getElementById('bookingModal').classList.add('hidden');
+    document.getElementById('bookingModal').classList.remove('flex');
+  };
+  document.getElementById('bookingModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
   });
-  localStorage.setItem('bookings', JSON.stringify(bookings));
 
-  const count = cart.length;
-  const total = cartTotal();
-  cart = [];
-  closeBookingModal();
-  renderSchedule();
-  updateCartUI();
+  window.submitBooking = async function() {
+    const name = document.getElementById('guestName').value.trim();
+    const phoneRaw = document.getElementById('guestPhone').value.trim();
+    const phone = normalizePhone(phoneRaw);
 
-  Swal.fire({
-    icon: 'success',
-    title: 'Đặt sân thành công! 🎉',
-    html: `Cảm ơn <b>${name}</b>!<br/>
-           Đã đặt <b>${count} slot</b> · Tổng: <b>${fmtMoney(total)}</b><br/>
-           <span class="text-gray-500 text-sm">Chúng tôi sẽ gọi lại <b>${phone}</b> để xác nhận trong 15 phút.</span>`,
-    confirmButtonColor: '#16a34a',
-    confirmButtonText: 'Tuyệt vời!',
-    timer: 7000,
-    timerProgressBar: true
-  });
-}
+    let hasError = false;
+    if (!name) {
+      setFieldError('guestName', 'guestNameErr', 'Vui lòng nhập họ và tên');
+      hasError = true;
+    } else {
+      clearFieldError('guestName', 'guestNameErr');
+    }
+    if (!phoneRaw) {
+      setFieldError('guestPhone', 'guestPhoneErr', 'Vui lòng nhập số điện thoại');
+      hasError = true;
+    } else if (!validateVNPhone(phoneRaw)) {
+      setFieldError('guestPhone', 'guestPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
+      hasError = true;
+    } else {
+      clearFieldError('guestPhone', 'guestPhoneErr');
+    }
+    if (hasError) return;
 
-// ===== DATE =====
-let currentDate = dayjs();
-const datePicker = document.getElementById('datePicker');
-function setDate(d) { currentDate = d; datePicker.value = fmtDate(d); renderSchedule(); }
-function changeDay(delta) { setDate(currentDate.add(delta, 'day')); }
-function goToday() { setDate(dayjs()); }
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang xử lý...';
 
-// ===== RENDER SCHEDULE =====
-function renderSchedule() {
-  const tbody = document.getElementById('scheduleBody');
-  const dateStr = fmtDate(currentDate);
-  const isToday = dateStr === fmtDate(dayjs());
-  const nowHour = dayjs().hour();
-  let html = '';
+    try {
+      const note = document.getElementById('guestNote').value.trim();
+      const batchId = String(Date.now());
+      const newBookings = cart.map(s => ({
+        batchId,
+        date: s.date,
+        court: s.court,
+        hour: s.hour,
+        duration: 1,
+        name,
+        phone,
+        note,
+        status: 'pending',
+        amount: s.price
+      }));
 
-  for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
-    const peak = isPeak(h);
-    const isPast = isToday && h < nowHour;
-    const timeLabel = `${String(h).padStart(2,'0')}:00`;
-    let rowCells = `<td class="py-2 px-4 border-b border-gray-100 text-xs text-gray-500 font-medium whitespace-nowrap">
-      ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
-    </td>`;
+      // SAVE TO FIRESTORE
+      await addBookings(newBookings);
 
-    for (let c = 0; c < CONFIG.courts.length; c++) {
-      const booking = findBooking(dateStr, c, h);
-      const selected = isInCart(c, h, dateStr);
+      const count = cart.length;
+      const total = cartTotal();
+      cart = [];
+      closeBookingModal();
+      await fetchBookingsAndRender();
+      updateCartUI();
 
-      if (booking) {
-        const isStart = booking.hour === h;
-        if (isStart) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Đặt sân thành công! 🎉',
+        html: `Cảm ơn <b>${name}</b>!<br/>
+               Đã đặt <b>${count} slot</b> · Tổng: <b>${fmtMoney(total)}</b><br/>
+               <span class="text-gray-500 text-sm">Chúng tôi sẽ gọi lại <b>${phone}</b> để xác nhận trong 15 phút.</span>`,
+        confirmButtonColor: '#16a34a',
+        confirmButtonText: 'Đã hiểu'
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Lỗi đặt sân',
+        text: 'Không thể kết nối máy chủ, vui lòng thử lại sau!',
+        confirmButtonColor: '#ef4444'
+      });
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu';
+    }
+  };
+
+  let currentDate = dayjs();
+  const datePicker = document.getElementById('datePicker');
+  
+  window.setDate = function(d) {
+    currentDate = d;
+    datePicker.value = fmtDate(d);
+    fetchBookingsAndRender();
+  };
+  window.changeDay = function(delta) { setDate(currentDate.add(delta, 'day')); };
+  window.goToday = function() { setDate(dayjs()); };
+
+  async function fetchBookingsAndRender() {
+    const dateStr = fmtDate(currentDate);
+    try {
+      currentBookings = await getBookingsByDate(dateStr);
+    } catch (e) {
+      console.error("Firestore getBookingsByDate error:", e);
+      currentBookings = [];
+    }
+    renderSchedule();
+  }
+
+  function findBooking(date, court, hour) {
+    return currentBookings.find(b =>
+      b.date === date && b.court === court &&
+      hour >= b.hour && hour < b.hour + (b.duration || 1)
+    );
+  }
+
+  let showPastState = false;
+
+  window.toggleShowPast = function() {
+    showPastState = !showPastState;
+    renderSchedule();
+  };
+
+  function renderSchedule() {
+    const tbody = document.getElementById('scheduleBody');
+    const dateStr = fmtDate(currentDate);
+    const isToday = dateStr === fmtDate(dayjs());
+    const nowHour = dayjs().hour();
+    let html = '';
+
+    const pastHoursCount = (isToday && nowHour > CONFIG.startHour) ? Math.min(nowHour, CONFIG.endHour) - CONFIG.startHour : 0;
+
+    if (pastHoursCount > 0 && !showPastState) {
+      html += `
+        <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
+          <td colspan="4" class="py-3 px-4 text-center">
+            <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-primary bg-white border border-gray-200 hover:border-primary px-4 py-2 rounded-xl transition-all shadow-sm">
+              <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+              <span>Xem ${pastHoursCount} khung giờ đã qua hôm nay</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+            </button>
+          </td>
+        </tr>`;
+    }
+
+    if (pastHoursCount > 0 && showPastState) {
+      html += `
+        <tr id="pastToggleRow" class="bg-gray-50/80 border-b border-gray-200">
+          <td colspan="4" class="py-2.5 px-4 text-center">
+            <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-primary bg-white border border-gray-200 hover:border-primary px-3 py-1.5 rounded-xl transition-all shadow-sm">
+              <i class="fa-solid fa-eye-slash text-gray-400"></i>
+              <span>Ẩn các khung giờ đã qua</span>
+            </button>
+          </td>
+        </tr>`;
+    }
+
+    for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+      const peak = isPeak(h);
+      const isPast = isToday && h < nowHour;
+
+      if (isPast && !showPastState) {
+        continue;
+      }
+
+      const timeLabel = `${String(h).padStart(2,'0')}:00`;
+      let rowCells = `<td class="py-2 px-4 border-b border-gray-100 text-xs text-gray-500 font-medium whitespace-nowrap">
+        ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
+      </td>`;
+
+      for (let c = 0; c < CONFIG.courts.length; c++) {
+        const booking = findBooking(dateStr, c, h);
+        const selected = isInCart(c, h, dateStr);
+
+        if (booking) {
+          const isStart = booking.hour === h;
+          if (isStart) {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs">
+                <div class="font-semibold text-red-600"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
+                <div class="text-gray-400 mt-0.5">Đã đặt</div>
+              </div>
+            </td>`;
+          } else {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-3 text-xs text-red-200 flex items-center justify-center">
+                <i class="fa-solid fa-grip-lines"></i>
+              </div>
+            </td>`;
+          }
+        } else if (isPast) {
           rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs">
-              <div class="font-semibold text-red-600"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
-              <div class="text-gray-400 mt-0.5">Đã đặt</div>
+            <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-400 flex items-center justify-center gap-1">
+              <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
+            </div>
+          </td>`;
+        } else if (selected) {
+          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+            <div class="slot-cell slot-selected bg-indigo-100 border-2 border-indigo-500 rounded-lg py-2 px-2 text-xs shadow-sm"
+              onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
+              <div class="font-bold text-indigo-700"><i class="fa-solid fa-circle-check mr-1"></i>Đã chọn</div>
+              <div class="text-indigo-500 mt-0.5 font-medium">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
         } else {
           rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-            <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-3 text-xs text-red-200 flex items-center justify-center">
-              <i class="fa-solid fa-grip-lines"></i>
+            <div class="slot-cell slot-available ${peak ? 'bg-amber-50 border border-amber-200 hover:!bg-amber-100 hover:!border-amber-500' : 'bg-green-50 border border-green-200 hover:!bg-green-100 hover:!border-green-500'} rounded-lg py-2 px-2 text-xs"
+              onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
+              <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'}">
+                <i class="fa-regular fa-circle-dot mr-1 text-[10px]"></i>Trống
+              </div>
+              <div class="text-gray-500 mt-0.5">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
         }
-      } else if (isPast) {
-        rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-          <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-400 flex items-center justify-center gap-1">
-            <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
-          </div>
-        </td>`;
-      } else if (selected) {
-        rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-          <div class="slot-cell slot-selected bg-indigo-100 border-2 border-indigo-500 rounded-lg py-2 px-2 text-xs shadow-sm"
-            onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
-            <div class="font-bold text-indigo-700"><i class="fa-solid fa-circle-check mr-1"></i>Đã chọn</div>
-            <div class="text-indigo-500 mt-0.5 font-medium">${fmtMoney(slotPrice(h))}</div>
-          </div>
-        </td>`;
-      } else {
-        rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
-          <div class="slot-cell slot-available ${peak ? 'bg-amber-50 border border-amber-200 hover:!bg-amber-100 hover:!border-amber-500' : 'bg-green-50 border border-green-200 hover:!bg-green-100 hover:!border-green-500'} rounded-lg py-2 px-2 text-xs"
-            onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
-            <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'}">
-              <i class="fa-regular fa-circle-dot mr-1 text-[10px]"></i>Trống
-            </div>
-            <div class="text-gray-500 mt-0.5">${fmtMoney(slotPrice(h))}</div>
-          </div>
-        </td>`;
       }
+      html += `<tr class="${isPast ? 'opacity-50' : ''}">${rowCells}</tr>`;
     }
-    html += `<tr class="${isPast ? 'opacity-50' : ''}">${rowCells}</tr>`;
+    tbody.innerHTML = html;
   }
-  tbody.innerHTML = html;
-}
 
-// ===== INIT =====
-datePicker.value = fmtDate(currentDate);
-datePicker.min = fmtDate(dayjs());
-datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
-renderSchedule();
-updateCartUI();
+  // Init
+  datePicker.value = fmtDate(currentDate);
+  datePicker.min = fmtDate(dayjs());
+  datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
+
+  loadConfig().then(() => {
+    fetchBookingsAndRender();
+    updateCartUI();
+  });
 </script>
 </body>
 </html>

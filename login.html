@@ -7,6 +7,7 @@
   <meta name="robots" content="noindex" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -30,8 +31,8 @@
     .btn-primary { background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: 0 4px 15px rgba(22,163,74,0.4); transition: all .3s; }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,163,74,0.5); }
     .btn-primary:active { transform: translateY(0); }
-    .btn-google { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: all .3s; }
-    .btn-google:hover { background: rgba(255,255,255,0.18); }
+    .btn-google { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); transition: all .3s; }
+    .btn-google:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
     .orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.3; }
     .label-text { color: rgba(255,255,255,0.75); }
     .card-enter { animation: cardEnter .5s cubic-bezier(.34,1.56,.64,1) both; }
@@ -62,8 +63,8 @@
       <p class="text-white/50 text-sm mt-1">Sân Cầu Việt Đảng</p>
     </div>
 
-    <!-- Form -->
-    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+    <!-- Form Bypass (Login bằng pass/user bất kỳ) -->
+    <form id="loginForm" class="space-y-4">
       <div>
         <label class="label-text text-xs font-semibold uppercase tracking-wider block mb-1.5">
           <i class="fa-solid fa-user mr-1.5"></i>Tên đăng nhập
@@ -84,54 +85,86 @@
 
       <button type="submit" id="loginBtn" class="btn-primary w-full text-white font-bold py-3.5 rounded-xl text-sm mt-2 flex items-center justify-center gap-2">
         <i class="fa-solid fa-right-to-bracket"></i>
-        <span>Đăng nhập</span>
+        <span>Đăng nhập nhanh</span>
       </button>
     </form>
 
     <!-- Divider -->
     <div class="flex items-center gap-3 my-5">
       <div class="flex-1 h-px bg-white/15"></div>
-      <span class="text-white/30 text-xs">hoặc</span>
+      <span class="text-white/40 text-xs font-medium">hoặc đăng nhập nhanh</span>
       <div class="flex-1 h-px bg-white/15"></div>
     </div>
 
-    <!-- Google Sign-in (future) -->
-    <button disabled title="Sẽ khả dụng sau khi tích hợp Firebase" class="btn-google w-full text-white/40 font-medium py-3 rounded-xl text-sm flex items-center justify-center gap-2 cursor-not-allowed">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4 opacity-40" />
+    <!-- Google Sign-in Real -->
+    <button id="googleLoginBtn" class="btn-google w-full text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
       <span>Đăng nhập bằng Google</span>
-      <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded-full ml-auto">Sắp có</span>
     </button>
 
-    <p class="text-center text-white/25 text-xs mt-6">
-      <!-- TODO: Firebase Auth integration -->
-      Hệ thống quản lý nội bộ · v1.0
+    <p class="text-center text-white/40 text-xs mt-6">
+      Hệ thống quản lý nội bộ Sân Cầu Việt Đảng
     </p>
   </div>
 
-<script>
+<script type="module">
+  import { loginWithGoogle, onAuthChange } from "./firebase.js";
+
+  // Check if logged in via sessionStorage or Firebase
   if (sessionStorage.getItem('isLoggedIn') === 'true') {
     window.location.href = 'manager.html';
   }
 
-  function togglePwd() {
+  onAuthChange(user => {
+    if (user) {
+      sessionStorage.setItem('isLoggedIn', 'true');
+      sessionStorage.setItem('adminName', user.displayName || user.email);
+      sessionStorage.setItem('adminPhoto', user.photoURL || '');
+      window.location.href = 'manager.html';
+    }
+  });
+
+  window.togglePwd = function() {
     const pwd = document.getElementById('password');
     const icon = document.getElementById('eyeIcon');
     pwd.type = pwd.type === 'password' ? 'text' : 'password';
     icon.className = pwd.type === 'password' ? 'fa-regular fa-eye text-sm' : 'fa-regular fa-eye-slash text-sm';
-  }
+  };
 
-  function handleLogin(e) {
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const btn = document.getElementById('loginBtn');
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang xác thực...</span>';
     btn.disabled = true;
     setTimeout(() => {
-      // TODO: Replace with Firebase Auth
       sessionStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('adminName', document.getElementById('username').value.trim() || 'Admin');
       window.location.href = 'manager.html';
-    }, 800);
-  }
+    }, 600);
+  });
+
+  document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('googleLoginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang mở Google...';
+    try {
+      const user = await loginWithGoogle();
+      sessionStorage.setItem('isLoggedIn', 'true');
+      sessionStorage.setItem('adminName', user.displayName || user.email);
+      sessionStorage.setItem('adminPhoto', user.photoURL || '');
+      window.location.href = 'manager.html';
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Đăng nhập thất bại',
+        text: err.message,
+        confirmButtonColor: '#ef4444'
+      });
+      btn.disabled = false;
+      btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"><span>Đăng nhập bằng Google</span>';
+    }
+  });
 </script>
 </body>
 </html>
