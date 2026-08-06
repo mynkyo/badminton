@@ -742,9 +742,31 @@
                 class="text-red-400">*</span></label>
             <input id="guestPhone" type="tel" placeholder="0901 234 567"
               class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              oninput="clearFieldError('guestPhone','guestPhoneErr')" />
+              oninput="clearFieldError('guestPhone','guestPhoneErr'); syncZaloIfSame()" />
             <p id="guestPhoneErr" class="hidden text-xs text-red-500 mt-1"><i
                 class="fa-solid fa-circle-exclamation mr-1"></i>Số điện thoại không hợp lệ</p>
+          </div>
+          <!-- Zalo Option -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fa-brands fa-square-whatsapp mr-1.5 text-[#0068ff]"></i>Zalo liên hệ <span class="text-gray-400 font-normal text-xs">(không bắt buộc)</span></label>
+            <div class="grid grid-cols-3 gap-1.5 mb-2">
+              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
+                <input type="radio" name="zaloOption" value="same" class="w-3.5 h-3.5 text-[#0068ff]" checked onchange="handleZaloOption(this.value)" />
+                <span>Giống SĐT</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-[#0068ff]/50 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-700">
+                <input type="radio" name="zaloOption" value="other" class="w-3.5 h-3.5 text-[#0068ff]" onchange="handleZaloOption(this.value)" />
+                <span>Số khác</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 hover:border-red-200 p-2 rounded-lg cursor-pointer transition-all text-xs font-semibold text-gray-500">
+                <input type="radio" name="zaloOption" value="none" class="w-3.5 h-3.5 text-gray-400" onchange="handleZaloOption(this.value)" />
+                <span>Không dùng</span>
+              </label>
+            </div>
+            <div id="zaloCustomRow" class="hidden">
+              <input id="guestZalo" type="tel" placeholder="Số Zalo khác (VD: 0901 234 567)"
+                class="w-full border border-[#0068ff]/30 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0068ff]/20 focus:border-[#0068ff]/60 transition-all" />
+            </div>
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i
@@ -1375,6 +1397,14 @@
       localStorage.setItem('userPhone', phone);
       localStorage.setItem('userPhoneRaw', phoneRaw);
 
+      // Zalo
+      const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
+      const zaloOption = zaloOptionEl ? zaloOptionEl.value : 'same';
+      let zalo = '';
+      if (zaloOption === 'same') zalo = phoneRaw;
+      else if (zaloOption === 'other') zalo = (document.getElementById('guestZalo').value || '').trim();
+      // 'none' => zalo stays ''
+
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang xử lý...';
@@ -1391,6 +1421,7 @@
           name,
           phone,
           note,
+          zalo,
           status: 'pending',
           amount: s.price,
           userId: currentUser ? currentUser.uid : null
@@ -1426,6 +1457,25 @@
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu';
+      }
+    };
+
+    window.handleZaloOption = function(val) {
+      const row = document.getElementById('zaloCustomRow');
+      if (val === 'other') {
+        row.classList.remove('hidden');
+        document.getElementById('guestZalo').focus();
+      } else {
+        row.classList.add('hidden');
+      }
+    };
+
+    window.syncZaloIfSame = function() {
+      const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
+      if (zaloOptionEl && zaloOptionEl.value === 'same') {
+        const phone = document.getElementById('guestPhone').value;
+        const customInput = document.getElementById('guestZalo');
+        if (customInput) customInput.value = phone;
       }
     };
 
