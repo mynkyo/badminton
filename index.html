@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sân Cầu Việt Đảng — Đặt Sân Online</title>
+  <title>Đặt Sân Cầu Lông Online</title>
   <meta name="description"
-    content="Đặt sân cầu lông nhanh chóng tại Sân Cầu Việt Đảng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
+    content="Đặt sân cầu lông nhanh chóng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
   <link id="appFavicon" rel="icon" href="assets/logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -209,7 +209,7 @@
         </div>
         <div id="uiHeaderBrandName"
           class="font-extrabold text-base sm:text-lg text-navy tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px] sm:max-w-[320px]">
-          Sân Cầu Việt Đảng</div>
+        </div>
       </a>
       <!-- Links (Desktop) -->
       <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy">
@@ -240,11 +240,9 @@
     style="background-image: linear-gradient(rgba(11, 26, 54, 0.45), rgba(11, 26, 54, 0.2)), url('assets/hero-bg.jpg');">
     <div class="max-w-6xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
       <h1 id="uiHeroTitle"
-        class="text-2xl sm:text-4xl lg:text-6xl font-extrabold text-white leading-tight mb-2 sm:mb-4 drop-shadow-md">
-        Sân Cầu Việt Đảng
+        class="text-2xl sm:text-4xl lg:text-6xl font-extrabold text-white leading-tight mb-2 sm:mb-4 drop-shadow-md min-h-[1.2em]">
       </h1>
-      <p id="uiHeroSub" class="text-xs sm:text-base text-blue-100 font-medium mb-6 sm:mb-8 max-w-2xl drop-shadow">
-        Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm
+      <p id="uiHeroSub" class="text-xs sm:text-base text-blue-100 font-medium mb-6 sm:mb-8 max-w-2xl drop-shadow min-h-[1.2em]">
       </p>
 
       <!-- Hero Feature Badges (Responsive 2x2 Grid on Mobile, Flex on Desktop) -->
@@ -256,7 +254,7 @@
             class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
             <i class="fa-solid fa-check"></i>
           </div>
-          <span id="uiBadgeCourtCount">3 Sân đạt chuẩn</span>
+          <span id="uiBadgeCourtCount"></span>
         </div>
 
         <!-- Badge 2: Giờ mở cửa -->
@@ -266,7 +264,7 @@
             class="w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0">
             <i class="fa-regular fa-clock"></i>
           </div>
-          <span id="uiBadgeOpenHours">05:00 - 22:00</span>
+          <span id="uiBadgeOpenHours"></span>
         </div>
 
         <!-- Badge 3: Giá hợp lý -->
@@ -355,7 +353,7 @@
             </div>
             <span>Giá thường</span>
           </div>
-          <b id="uiStatPriceNormal" class="text-primary font-black text-sm sm:text-base">50.000đ/h</b>
+          <b id="uiStatPriceNormal" class="text-primary font-black text-sm sm:text-base"></b>
         </div>
 
         <!-- Card 2: Giá Cao Điểm -->
@@ -368,12 +366,11 @@
             </div>
             <div class="truncate">
               <span>Cao điểm</span>
-              <span class="text-[11px] text-rose-500/80 font-medium ml-1">(<span id="uiHeaderPeakHours">18:00 -
-                  21:00</span>)</span>
+              <span class="text-[11px] text-rose-500/80 font-medium ml-1">(<span id="uiHeaderPeakHours"></span>)</span>
             </div>
           </div>
           <b id="uiLegendPeakPrice"
-            class="text-rose-600 font-black text-sm sm:text-base flex-shrink-0 ml-2">60.000đ/h</b>
+            class="text-rose-600 font-black text-sm sm:text-base flex-shrink-0 ml-2"></b>
         </div>
       </div>
       <!-- Toggle Past Hours Button Container (Centered outside scrollable table) -->
@@ -435,8 +432,8 @@
             <i class="fa-regular fa-sun"></i>
           </div>
           <h3 class="font-bold text-xl text-navy mb-1">Giờ Thường</h3>
-          <p id="uiPriceNormalHours" class="text-xs text-slate-500 font-medium mb-6">05:00 – 17:00 | 20:00 – 24:00</p>
-          <div id="uiPriceNormalVal" class="text-5xl font-black text-primary mb-1">80K</div>
+          <p id="uiPriceNormalHours" class="text-xs text-slate-500 font-medium mb-6"></p>
+          <div id="uiPriceNormalVal" class="text-5xl font-black text-primary mb-1"></div>
           <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
         </div>
 
@@ -452,8 +449,8 @@
             <i class="fa-solid fa-bolt"></i>
           </div>
           <h3 class="font-bold text-xl text-navy mb-1">Giờ Cao Điểm</h3>
-          <p id="uiPricePeakHours" class="text-xs text-slate-500 font-medium mb-6">17:00 – 20:00 hàng ngày</p>
-          <div id="uiPricePeakVal" class="text-5xl font-black text-amber-500 mb-1">120K</div>
+          <p id="uiPricePeakHours" class="text-xs text-slate-500 font-medium mb-6"></p>
+          <div id="uiPricePeakVal" class="text-5xl font-black text-amber-500 mb-1"></div>
           <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
         </div>
       </div>
@@ -530,8 +527,7 @@
             </div>
             <div>
               <div class="text-xs text-slate-400 font-semibold mb-0.5">Facebook</div><a id="uiContactFacebook" href="#"
-                target="_blank" class="font-bold text-navy hover:text-primary transition-colors text-base">Sân Cầu Việt
-                Đảng</a>
+                target="_blank" class="font-bold text-navy hover:text-primary transition-colors text-base"></a>
             </div>
           </div>
           <div
@@ -542,8 +538,7 @@
             </div>
             <div>
               <div class="text-xs text-slate-400 font-semibold mb-0.5">Địa chỉ</div>
-              <div id="uiContactAddress" class="font-bold text-navy text-sm leading-snug">123 Đường Việt
-                Đảng<br />Phường XX, Quận XX, TP.HCM</div>
+              <div id="uiContactAddress" class="font-bold text-navy text-sm leading-snug"></div>
             </div>
           </div>
           <div
@@ -554,7 +549,7 @@
             </div>
             <div>
               <div class="text-xs text-slate-400 font-semibold mb-0.5">Giờ mở cửa</div>
-              <div id="uiContactOpenHours" class="font-bold text-navy text-sm">05:00 – 22:00 · Tất cả các ngày</div>
+              <div id="uiContactOpenHours" class="font-bold text-navy text-sm"></div>
             </div>
           </div>
         </div>
@@ -580,11 +575,11 @@
             <div id="uiFooterLogoContainer" class="flex-shrink-0">
               <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
             </div>
-            <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight">Sân Cầu Việt Đảng</div>
+            <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight"></div>
           </div>
           <p class="text-slate-400 mb-6 max-w-xs text-sm">Mang đến không gian thể thao chất lượng, năng động và chuyên
             nghiệp cho mọi lứa tuổi.</p>
-          <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông Thành Công. All rights reserved.</p>
+          <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông. All rights reserved.</p>
         </div>
 
         <!-- Cột 2: Liên hệ -->
@@ -593,15 +588,15 @@
           <ul class="space-y-4">
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-phone w-5 text-center text-slate-400"></i>
-              <a id="uiFooterPhone" href="tel:0965123456" class="hover:text-white transition-colors">0965 123 456</a>
+              <a id="uiFooterPhone" href="#" class="hover:text-white transition-colors"></a>
             </li>
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-comment-sms w-5 text-center text-slate-400"></i>
-              <span id="uiFooterZalo">Zalo: 0965 123 456</span>
+              <span id="uiFooterZalo"></span>
             </li>
             <li class="flex items-start gap-3">
               <i class="fa-solid fa-location-dot w-5 text-center text-slate-400 mt-1"></i>
-              <span id="uiFooterAddress">123 Đường ABC, P. Thanh Mỹ,<br>Q. Liên Chiểu, TP. Đà Nẵng</span>
+              <span id="uiFooterAddress"></span>
             </li>
           </ul>
         </div>
@@ -618,7 +613,7 @@
             <div class="relative z-10 flex flex-col items-center">
               <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-1"></i>
               <span class="text-xs font-semibold text-white drop-shadow-md bg-black/30 px-2 py-0.5 rounded">Sân Cầu
-                Lông<br>Thành Công</span>
+                Lông</span>
             </div>
           </div>
         </div>
@@ -762,7 +757,7 @@
     import { getBookingsByDate, addBookings, getSettings, onSettingsChange } from "./firebase.js";
 
     let CONFIG = {
-      name: 'Sân Cầu Việt Đảng',
+      name: '',
       courts: ['Sân 1', 'Sân 2', 'Sân 3'],
       startHour: 5,
       endHour: 22,
@@ -770,12 +765,12 @@
       pricePeak: 120000,
       peakStart: 17,
       peakEnd: 20,
-      address: '123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM',
-      phone: '0901 234 567',
-      email: 'contact@vietdangbadminton.com',
-      facebook: 'https://facebook.com/sancauvietdang',
+      address: '',
+      phone: '',
+      email: '',
+      facebook: '',
       googleMaps: '',
-      notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!',
+      notice: '',
       theme: 'default'
     };
 
@@ -820,14 +815,14 @@
     }
 
     function applyConfigUI() {
-      const courtName = CONFIG.name || 'Sân Cầu Việt Đảng';
-      const phoneRaw = CONFIG.phone || '0901234567';
+      const courtName = CONFIG.name || '';
+      const phoneRaw = CONFIG.phone || '';
       const phoneClean = phoneRaw.replace(/[\s\-.()]/g, '');
       const phoneFormatted = formatPhoneVN(phoneRaw);
 
       const zaloRaw = CONFIG.zalo || phoneRaw;
       const zaloFormatted = formatPhoneVN(zaloRaw);
-      const address = CONFIG.address || '123 Đường Việt Đảng, TP.HCM';
+      const address = CONFIG.address || '';
 
       // Header & Footer Brand
       if (document.getElementById('uiHeaderBrandName')) document.getElementById('uiHeaderBrandName').textContent = courtName;
@@ -1520,7 +1515,7 @@
   <!-- Floating Quick Contact Buttons (Bottom Right) -->
   <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end">
     <!-- Zalo Floating Button -->
-    <a id="uiFloatZaloBtn" href="https://zalo.me/0901234567" target="_blank" title="Chat Zalo"
+    <a id="uiFloatZaloBtn" href="#" target="_blank" title="Chat Zalo"
       class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-[#0068ff] hover:bg-[#0052cc] text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
       <span id="uiFloatZaloText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">Chat
         Zalo</span>
@@ -1528,11 +1523,10 @@
     </a>
 
     <!-- Phone Call Floating Button -->
-    <a id="uiFloatCallBtn" href="tel:0901234567" title="Gọi Hotline"
+    <a id="uiFloatCallBtn" href="#" title="Gọi Hotline"
       class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden relative">
       <span class="absolute inset-0 rounded-full bg-emerald-500/40 animate-ping -z-10"></span>
-      <span id="uiFloatCallText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">0901
-        234 567</span>
+      <span id="uiFloatCallText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2"></span>
       <i class="fa-solid fa-phone text-lg flex-shrink-0"></i>
     </a>
   </div>
