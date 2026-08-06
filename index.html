@@ -276,7 +276,7 @@
           </li>
           <li class="flex items-center gap-3">
             <i class="fa-solid fa-comment-sms w-5 text-center text-slate-400"></i>
-            <span>Zalo: 0965 123 456</span>
+            <span id="uiFooterZalo">Zalo: 0965 123 456</span>
           </li>
           <li class="flex items-start gap-3">
             <i class="fa-solid fa-location-dot w-5 text-center text-slate-400 mt-1"></i>
@@ -452,20 +452,6 @@
     if (document.getElementById('uiContactOpenHours')) document.getElementById('uiContactOpenHours').textContent = `${openHoursStr} · Tất cả các ngày`;
 
     if (document.getElementById('uiHeroCallBtn')) document.getElementById('uiHeroCallBtn').href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
-    if (document.getElementById('uiContactPhone')) {
-      const pEl = document.getElementById('uiContactPhone');
-      pEl.textContent = CONFIG.phone;
-      pEl.href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
-    }
-
-    if (document.getElementById('uiContactFacebook')) {
-      const fbEl = document.getElementById('uiContactFacebook');
-      fbEl.textContent = CONFIG.name;
-      fbEl.href = CONFIG.facebook || '#';
-      document.getElementById('uiContactFacebookRow').style.display = CONFIG.facebook ? 'flex' : 'none';
-    }
-
-    if (document.getElementById('uiContactAddress')) document.getElementById('uiContactAddress').textContent = CONFIG.address;
 
     if (document.getElementById('uiGoogleMapsContainer')) {
       const mapBox = document.getElementById('uiGoogleMapsContainer');
@@ -480,8 +466,28 @@
       }
     }
 
-    if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = CONFIG.name;
-    if (document.getElementById('uiFooterFacebook')) document.getElementById('uiFooterFacebook').href = CONFIG.facebook || '#';
+    if (document.getElementById('uiFooterMapContainer')) {
+      const mapBox2 = document.getElementById('uiFooterMapContainer');
+      if (CONFIG.googleMaps && CONFIG.googleMaps.includes('<iframe')) {
+        mapBox2.innerHTML = CONFIG.googleMaps;
+        const iframe = mapBox2.querySelector('iframe');
+        if (iframe) {
+          iframe.className = 'w-full h-full border-0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+        }
+      }
+    }
+
+    if (document.getElementById('uiFooterBrandTitle')) document.getElementById('uiFooterBrandTitle').textContent = firstWord || CONFIG.name;
+    if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = lastWord;
+    if (document.getElementById('uiFooterPhone')) {
+      const pEl = document.getElementById('uiFooterPhone');
+      pEl.textContent = CONFIG.phone;
+      pEl.href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
+    }
+    if (document.getElementById('uiFooterZalo')) document.getElementById('uiFooterZalo').textContent = `Zalo: ${CONFIG.phone}`;
+    if (document.getElementById('uiFooterAddress')) document.getElementById('uiFooterAddress').textContent = CONFIG.address;
 
     // Stats
     if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts||[]).length;
