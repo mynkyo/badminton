@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sân Cầu Việt Đảng — Đặt Sân Online</title>
-  <meta name="description" content="Đặt sân cầu lông nhanh chóng tại Sân Cầu Việt Đảng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
+  <meta name="description"
+    content="Đặt sân cầu lông nhanh chóng tại Sân Cầu Việt Đảng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
   <link id="appFavicon" rel="icon" href="assets/logo.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -15,7 +20,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+          fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
           colors: {
             primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
             navy: { DEFAULT: '#0b1a36', light: '#1e3a8a', dark: '#020617' }
@@ -25,1061 +30,1276 @@
     }
   </script>
   <style>
-    html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
-    * { font-family: 'Outfit', sans-serif; }
-    input[type="date"]::-webkit-calendar-picker-indicator { display: none !important; -webkit-appearance: none; }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 6rem;
+    }
+
+    * {
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      display: none !important;
+      -webkit-appearance: none;
+    }
 
     /* Slot states */
-    .slot-cell { transition: all .18s; cursor: pointer; user-select: none; }
-    .slot-cell:hover { transform: scale(1.04); }
-    .slot-booked  { cursor: not-allowed; }
-    .slot-cont    { cursor: not-allowed; }
-    .slot-past    { cursor: default; }
+    .slot-cell {
+      transition: all .18s;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .slot-cell:hover {
+      transform: scale(1.04);
+    }
+
+    .slot-booked {
+      cursor: not-allowed;
+    }
+
+    .slot-cont {
+      cursor: not-allowed;
+    }
+
+    .slot-past {
+      cursor: default;
+    }
 
     /* Hero */
-    .hero-bg { background-image: linear-gradient(135deg, rgba(239,246,255,0.9) 0%, rgba(219,234,254,0.7) 100%), url('assets/hero-bg.jpg'); background-size: cover; background-position: center; }
+    .hero-bg {
+      background-image: linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.7) 100%), url('assets/hero-bg.jpg');
+      background-size: cover;
+      background-position: center;
+    }
 
     /* Cart bar */
-    #cartBar { transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .25s; }
-    #cartBar.cart-hidden { transform: translateY(120%); opacity: 0; pointer-events: none; }
+    #cartBar {
+      transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s;
+    }
+
+    #cartBar.cart-hidden {
+      transform: translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+    }
 
     /* Modals */
-    .modal-overlay { animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    .modal-content { animation: slideUp .3s cubic-bezier(.34,1.56,.64,1); }
-    @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .modal-overlay {
+      animation: fadeIn .2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .modal-content {
+      animation: slideUp .3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(24px);
+        opacity: 0
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1
+      }
+    }
 
     /* Cart drawer */
-    #cartDrawer { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
-    #cartDrawer.drawer-hidden { transform: translateY(100%); }
+    #cartDrawer {
+      transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    #cartDrawer.drawer-hidden {
+      transform: translateY(100%);
+    }
 
     /* Nav */
-    .nav-link { transition: color .2s; }
-    .nav-link:hover { color: #1d4ed8; }
+    .nav-link {
+      transition: color .2s;
+    }
 
-    ::-webkit-scrollbar { height: 7px; width: 7px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 4px; }
+    .nav-link:hover {
+      color: #1d4ed8;
+    }
 
-    #uiScheduleTableWrapper::-webkit-scrollbar { height: 9px; }
-    #uiScheduleTableWrapper::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 6px; }
-    #uiScheduleTableWrapper::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 6px; }
-    #uiScheduleTableWrapper::-webkit-scrollbar-thumb:hover { background: #1e40af; }
+    ::-webkit-scrollbar {
+      height: 7px;
+      width: 7px;
+    }
 
-    @keyframes selectPop { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
-    .slot-pop { animation: selectPop .2s ease; }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1d4ed8;
+      border-radius: 4px;
+    }
+
+    #uiScheduleTableWrapper::-webkit-scrollbar {
+      height: 9px;
+    }
+
+    #uiScheduleTableWrapper::-webkit-scrollbar-track {
+      background: #e2e8f0;
+      border-radius: 6px;
+    }
+
+    #uiScheduleTableWrapper::-webkit-scrollbar-thumb {
+      background: #1d4ed8;
+      border-radius: 6px;
+    }
+
+    #uiScheduleTableWrapper::-webkit-scrollbar-thumb:hover {
+      background: #1e40af;
+    }
+
+    @keyframes selectPop {
+      0% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.08)
+      }
+
+      100% {
+        transform: scale(1)
+      }
+    }
+
+    .slot-pop {
+      animation: selectPop .2s ease;
+    }
   </style>
 </head>
+
 <body class="bg-slate-50 text-gray-800">
 
-<!-- ===== NAVBAR ===== -->
-<nav class="bg-white border-b border-gray-100 sticky top-0 z-40 transition-all">
-  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-    <!-- Logo -->
-    <a href="index.html" class="flex items-center gap-3">
-      <div id="uiHeaderLogoContainer" class="flex-shrink-0">
-        <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
-      </div>
-      <div id="uiHeaderBrandName" class="font-extrabold text-lg text-navy tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] sm:max-w-[320px]">Sân Cầu Việt Đảng</div>
-    </a>
-    <!-- Links -->
-    <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy">
-      <a href="#home" class="nav-link border-b-2 border-primary text-primary pb-1">Trang chủ</a>
-      <a href="#schedule" class="nav-link text-gray-500 hover:text-primary pb-1">Lịch sân</a>
-      <a href="#pricing" class="nav-link text-gray-500 hover:text-primary pb-1">Bảng giá</a>
-      <a href="#contact" class="nav-link text-gray-500 hover:text-primary pb-1">Liên hệ</a>
-    </div>
-    <!-- Right side buttons -->
-    <div class="flex items-center gap-3">
-      <a id="uiHeroCallBtn" href="tel:0965123456" class="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-md">
-        <i class="fa-solid fa-phone"></i><span class="hidden sm:inline">0965 123 456</span>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="bg-white border-b border-gray-100 sticky top-0 z-40 transition-all">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3">
+        <div id="uiHeaderLogoContainer" class="flex-shrink-0">
+          <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+        </div>
+        <div id="uiHeaderBrandName"
+          class="font-extrabold text-lg text-navy tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] sm:max-w-[320px]">
+          Sân Cầu Việt Đảng</div>
       </a>
-      <button id="navCartBtn" onclick="openCartDrawer()" class="relative bg-gray-100 text-gray-700 p-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all">
-        <i class="fa-solid fa-cart-shopping"></i>
-        <span id="navCartCount" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
-      </button>
-    </div>
-  </div>
-</nav>
-
-<!-- ===== HERO ===== -->
-<section id="home" class="relative overflow-hidden bg-navy text-white pt-20 pb-36 bg-cover bg-center transition-all" style="background-image: linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg');">
-  <div class="max-w-6xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
-    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 drop-shadow-md">
-      Đặt sân dễ dàng<br/>Trải nghiệm trọn vẹn
-    </h1>
-    <p class="text-lg text-blue-100 font-medium mb-8 max-w-2xl drop-shadow">
-      Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm
-    </p>
-    
-    <div class="flex flex-wrap justify-center gap-4 mb-4">
-      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
-        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></div>
-        <span id="uiBadgeCourtCount">3 Sân đạt chuẩn</span>
+      <!-- Links -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy">
+        <a href="#home" class="nav-link border-b-2 border-primary text-primary pb-1">Trang chủ</a>
+        <a href="#schedule" class="nav-link text-gray-500 hover:text-primary pb-1">Lịch sân</a>
+        <a href="#pricing" class="nav-link text-gray-500 hover:text-primary pb-1">Bảng giá</a>
+        <a href="#contact" class="nav-link text-gray-500 hover:text-primary pb-1">Liên hệ</a>
       </div>
-      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
-        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-money-bill"></i></div>
-        Giá hợp lý
-      </div>
-      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
-        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-shield-heart"></i></div>
-        Phục vụ tận tâm
+      <!-- Right side buttons -->
+      <div class="flex items-center gap-3">
+        <a id="uiHeroCallBtn" href="tel:0965123456"
+          class="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-md">
+          <i class="fa-solid fa-phone"></i><span class="hidden sm:inline">0965 123 456</span>
+        </a>
+        <button id="navCartBtn" onclick="openCartDrawer()"
+          class="relative bg-gray-100 text-gray-700 p-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span id="navCartCount"
+            class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
+        </button>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
 
-<!-- ===== SCHEDULE ===== -->
-<section id="schedule" class="max-w-6xl mx-auto px-4 -mt-20 relative z-20 mb-20 scroll-mt-28">
-  <div class="bg-white rounded-3xl p-6 lg:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100">
-    
-    <!-- Header of Card -->
-    <!-- Top Bar: Title - Centered Date Picker - Legend -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-100">
-      <!-- Left: Title -->
-      <h2 class="text-xl font-extrabold text-navy flex items-center gap-2.5">
-        <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
-      </h2>
+  <!-- ===== HERO ===== -->
+  <section id="home" class="relative overflow-hidden bg-navy text-white pt-20 pb-36 bg-cover bg-center transition-all"
+    style="background-image: linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg');">
+    <div class="max-w-6xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 drop-shadow-md">
+        Đặt sân dễ dàng<br />Trải nghiệm trọn vẹn
+      </h1>
+      <p class="text-lg text-blue-100 font-medium mb-8 max-w-2xl drop-shadow">
+        Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm
+      </p>
 
-      <!-- Center: Date Picker -->
-      <div class="flex items-center bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
-        <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600" onclick="changeDay(-1)">
+      <div class="flex flex-wrap justify-center gap-4 mb-4">
+        <div
+          class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+          <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i
+              class="fa-solid fa-check"></i></div>
+          <span id="uiBadgeCourtCount">3 Sân đạt chuẩn</span>
+        </div>
+        <div
+          class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+          <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i
+              class="fa-solid fa-money-bill"></i></div>
+          Giá hợp lý
+        </div>
+        <div
+          class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+          <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i
+              class="fa-solid fa-shield-heart"></i></div>
+          Phục vụ tận tâm
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCHEDULE ===== -->
+  <section id="schedule" class="max-w-6xl mx-auto px-4 -mt-20 relative z-20 mb-20 scroll-mt-28">
+    <div class="bg-white rounded-3xl p-6 lg:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100">
+
+      <!-- Header of Card -->
+      <!-- Top Bar: Title - Centered Date Picker - Legend -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-100">
+        <!-- Left: Title -->
+        <h2 class="text-xl font-extrabold text-navy flex items-center gap-2.5">
+          <i class="fa-regular fa-calendar-check text-primary text-xl"></i>Lịch đặt sân
+        </h2>
+
+        <!-- Center: Date Picker -->
+        <div class="flex items-center bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
+            onclick="changeDay(-1)">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <div class="relative flex items-center px-1">
+            <input type="date" id="datePicker"
+              class="w-[120px] border-none font-bold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10"
+              onclick="this.showPicker()" />
+          </div>
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
+            onclick="changeDay(1)">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Right: Status Legend -->
+        <div class="flex items-center gap-3 text-xs font-bold">
+          <div
+            class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-300/60"></span>
+            <span>Trống</span>
+          </div>
+          <div
+            class="flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-300/60"></span>
+            <span>Đã đặt</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar: Price Info (Separate Row, Larger Font) -->
+      <div
+        class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-blue-50/50 border border-blue-100/70 rounded-2xl px-5 py-3 text-sm font-semibold text-slate-700">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-primary text-base"></i>
+          <span>Giá thường: <b id="uiStatPriceNormal" class="text-primary font-extrabold text-base">80.000đ/h</b></span>
+        </div>
+        <div class="text-red-500 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-red-500 text-base"></i>
+          <span>Giá cao điểm (<span id="uiHeaderPeakHours" class="font-bold">17:00 - 20:00</span>): <b
+              id="uiLegendPeakPrice" class="font-extrabold text-base">120.000đ/h</b></span>
+        </div>
+      </div>
+      <!-- Toggle Past Hours Button Container (Centered outside scrollable table) -->
+      <div id="uiPastToggleContainer" class="mb-4 text-center"></div>
+
+      <!-- Table Wrapper with Left / Right Scroll Buttons -->
+      <div class="relative px-7 group">
+        <!-- Left Scroll Arrow -->
+        <button onclick="scrollScheduleTable(-300)" title="Cuộn sang trái"
+          class="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
           <i class="fa-solid fa-chevron-left text-xs"></i>
         </button>
-        <div class="relative flex items-center px-1">
-          <input type="date" id="datePicker" class="w-[120px] border-none font-bold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10" onclick="this.showPicker()" />
-        </div>
-        <button class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600" onclick="changeDay(1)">
+
+        <!-- Right Scroll Arrow -->
+        <button onclick="scrollScheduleTable(300)" title="Cuộn sang phải"
+          class="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
           <i class="fa-solid fa-chevron-right text-xs"></i>
         </button>
-      </div>
 
-      <!-- Right: Status Legend -->
-      <div class="flex items-center gap-5 text-xs font-bold text-slate-600">
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500 shadow-xs"></span><span>Trống</span></div>
-        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500 shadow-xs"></span><span>Đã đặt</span></div>
-      </div>
-    </div>
-
-    <!-- Bottom Bar: Price Info (Separate Row, Larger Font) -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-blue-50/50 border border-blue-100/70 rounded-2xl px-5 py-3 text-sm font-semibold text-slate-700">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-circle-info text-primary text-base"></i>
-        <span>Giá thường: <b id="uiStatPriceNormal" class="text-primary font-extrabold text-base">80.000đ/h</b></span>
-      </div>
-      <div class="text-red-500 flex items-center gap-2">
-        <i class="fa-solid fa-bolt text-red-500 text-base"></i>
-        <span>Giá cao điểm (<span id="uiHeaderPeakHours" class="font-bold">17:00 - 20:00</span>): <b id="uiLegendPeakPrice" class="font-extrabold text-base">120.000đ/h</b></span>
-      </div>
-    </div>
-    <!-- Toggle Past Hours Button Container (Centered outside scrollable table) -->
-    <div id="uiPastToggleContainer" class="mb-4 text-center"></div>
-
-    <!-- Table Wrapper with Left / Right Scroll Buttons -->
-    <div class="relative px-7 group">
-      <!-- Left Scroll Arrow -->
-      <button onclick="scrollScheduleTable(-300)" title="Cuộn sang trái" class="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
-        <i class="fa-solid fa-chevron-left text-xs"></i>
-      </button>
-
-      <!-- Right Scroll Arrow -->
-      <button onclick="scrollScheduleTable(300)" title="Cuộn sang phải" class="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
-        <i class="fa-solid fa-chevron-right text-xs"></i>
-      </button>
-
-      <!-- Table Container -->
-      <div id="uiScheduleTableWrapper" class="overflow-x-auto scroll-smooth pb-2">
-        <table class="w-full text-sm border-collapse text-center">
-          <thead>
-            <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
-              <th class="sticky left-0 bg-white z-20 py-4 px-2 text-gray-500 font-semibold w-24 text-left shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>
-              <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
-              <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
-              <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
-            </tr>
-          </thead>
-          <tbody id="scheduleBody"></tbody>
-        </table>
-      </div>
-    </div>
-</section>
-
-<!-- ===== PRICING ===== -->
-<section id="pricing" class="bg-white py-16 scroll-mt-20">
-  <div class="max-w-6xl mx-auto px-4">
-    <!-- Header -->
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-extrabold text-navy flex items-center justify-center gap-3 mb-2">
-        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-primary text-lg">
-          <i class="fa-solid fa-tag"></i>
-        </div>
-        Bảng Giá
-      </h2>
-      <p class="text-slate-500 text-sm font-medium">Giá đã bao gồm ánh sáng, không phát sinh thêm</p>
-    </div>
-
-    <!-- 2 Main Cards -->
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
-      <!-- Card 1: Giờ Thường -->
-      <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center hover:shadow-lg transition-all">
-        <div class="w-14 h-14 bg-blue-100/60 rounded-2xl flex items-center justify-center text-primary text-2xl mb-4">
-          <i class="fa-regular fa-sun"></i>
-        </div>
-        <h3 class="font-bold text-xl text-navy mb-1">Giờ Thường</h3>
-        <p id="uiPriceNormalHours" class="text-xs text-slate-500 font-medium mb-6">05:00 – 17:00 | 20:00 – 24:00</p>
-        <div id="uiPriceNormalVal" class="text-5xl font-black text-primary mb-1">80K</div>
-        <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
-      </div>
-
-      <!-- Card 2: Giờ Cao Điểm -->
-      <div class="bg-white border-2 border-amber-400 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center shadow-sm hover:shadow-xl transition-all">
-        <div class="absolute top-4 right-4 bg-amber-400 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-star text-[10px]"></i> Cao điểm
-        </div>
-        <div class="w-14 h-14 bg-amber-100/60 rounded-2xl flex items-center justify-center text-amber-500 text-2xl mb-4">
-          <i class="fa-solid fa-bolt"></i>
-        </div>
-        <h3 class="font-bold text-xl text-navy mb-1">Giờ Cao Điểm</h3>
-        <p id="uiPricePeakHours" class="text-xs text-slate-500 font-medium mb-6">17:00 – 20:00 hàng ngày</p>
-        <div id="uiPricePeakVal" class="text-5xl font-black text-amber-500 mb-1">120K</div>
-        <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
-      </div>
-    </div>
-
-    <!-- Wide Card: Dịch vụ đi kèm -->
-    <div class="bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 border border-blue-100/80 rounded-3xl p-6 shadow-sm">
-      <div class="flex items-center gap-3 text-primary font-bold text-base mb-4 border-b border-blue-100/60 pb-3">
-        <div class="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center text-sm shadow-sm">
-          <i class="fa-solid fa-box-archive"></i>
-        </div>
-        <span>Dịch vụ đi kèm</span>
-      </div>
-      <div id="uiServicesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
-          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
-          <span>Cho thuê vợt: 20.000đ/cây</span>
-        </div>
-        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
-          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
-          <span>Nước suối miễn phí</span>
-        </div>
-        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
-          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
-          <span>Thay dây vợt theo yêu cầu</span>
+        <!-- Table Container -->
+        <div id="uiScheduleTableWrapper" class="overflow-x-auto scroll-smooth pb-2">
+          <table class="w-full text-sm border-collapse text-center">
+            <thead>
+              <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
+                <th
+                  class="sticky left-0 bg-white z-20 py-4 px-2 text-gray-500 font-semibold w-24 text-left shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
+                  Giờ</th>
+                <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
+                <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
+                <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== CONTACT ===== -->
-<section id="contact" class="py-16 bg-slate-50 scroll-mt-20">
-  <div class="max-w-6xl mx-auto px-4">
-    <!-- Header -->
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-extrabold text-navy flex items-center justify-center gap-3 mb-2">
-        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-primary text-lg">
-          <i class="fa-solid fa-phone"></i>
-        </div>
-        Liên Hệ &amp; Địa Chỉ
-      </h2>
-      <p class="text-slate-500 text-sm font-medium">Chúng tôi luôn sẵn sàng hỗ trợ và phục vụ quý khách</p>
-    </div>
-
-    <div id="uiContactContainer" class="grid md:grid-cols-2 gap-8">
-      <div id="uiContactItems" class="space-y-4">
-        <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
-          <div class="w-12 h-12 bg-green-100/80 rounded-2xl flex items-center justify-center text-primary text-xl flex-shrink-0"><i class="fa-solid fa-phone"></i></div>
-          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Điện thoại / Zalo</div><a id="uiContactPhone" href="tel:0901234567" class="font-bold text-navy hover:text-primary transition-colors text-lg">0901 234 567</a></div>
-        </div>
-        <div id="uiContactFacebookRow" class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
-          <div class="w-12 h-12 bg-blue-100/80 rounded-2xl flex items-center justify-center text-blue-500 text-xl flex-shrink-0"><i class="fa-brands fa-facebook"></i></div>
-          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Facebook</div><a id="uiContactFacebook" href="#" target="_blank" class="font-bold text-navy hover:text-primary transition-colors text-base">Sân Cầu Việt Đảng</a></div>
-        </div>
-        <div class="flex items-start gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
-          <div class="w-12 h-12 bg-red-100/80 rounded-2xl flex items-center justify-center text-red-500 text-xl flex-shrink-0 mt-0.5"><i class="fa-solid fa-location-dot"></i></div>
-          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Địa chỉ</div><div id="uiContactAddress" class="font-bold text-navy text-sm leading-snug">123 Đường Việt Đảng<br />Phường XX, Quận XX, TP.HCM</div></div>
-        </div>
-        <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
-          <div class="w-12 h-12 bg-amber-100/80 rounded-2xl flex items-center justify-center text-amber-500 text-xl flex-shrink-0"><i class="fa-regular fa-clock"></i></div>
-          <div><div class="text-xs text-slate-400 font-semibold mb-0.5">Giờ mở cửa</div><div id="uiContactOpenHours" class="font-bold text-navy text-sm">05:00 – 22:00 · Tất cả các ngày</div></div>
-        </div>
-      </div>
-
-      <div id="uiGoogleMapsContainer" class="rounded-3xl overflow-hidden border border-slate-200 shadow-sm min-h-[300px] bg-slate-200 flex items-center justify-center">
-        <div class="text-center text-slate-400">
-          <i class="fa-solid fa-map text-5xl mb-3"></i>
-          <p class="text-sm">Bản đồ vị trí sân</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer class="bg-navy text-slate-300 pt-16 pb-8 text-sm border-t border-navy-light mt-10">
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-      <!-- Cột 1: Logo và tên -->
-      <div>
-        <div class="flex items-center gap-3 mb-6">
-          <div id="uiFooterLogoContainer" class="flex-shrink-0">
-            <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+  <!-- ===== PRICING ===== -->
+  <section id="pricing" class="bg-white py-16 scroll-mt-20">
+    <div class="max-w-6xl mx-auto px-4">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-extrabold text-navy flex items-center justify-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-primary text-lg">
+            <i class="fa-solid fa-tag"></i>
           </div>
-          <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight">Sân Cầu Việt Đảng</div>
-        </div>
-        <p class="text-slate-400 mb-6 max-w-xs text-sm">Mang đến không gian thể thao chất lượng, năng động và chuyên nghiệp cho mọi lứa tuổi.</p>
-        <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông Thành Công. All rights reserved.</p>
-      </div>
-      
-      <!-- Cột 2: Liên hệ -->
-      <div>
-        <h3 class="text-white font-bold text-base mb-6">Liên hệ</h3>
-        <ul class="space-y-4">
-          <li class="flex items-center gap-3">
-            <i class="fa-solid fa-phone w-5 text-center text-slate-400"></i>
-            <a id="uiFooterPhone" href="tel:0965123456" class="hover:text-white transition-colors">0965 123 456</a>
-          </li>
-          <li class="flex items-center gap-3">
-            <i class="fa-solid fa-comment-sms w-5 text-center text-slate-400"></i>
-            <span id="uiFooterZalo">Zalo: 0965 123 456</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <i class="fa-solid fa-location-dot w-5 text-center text-slate-400 mt-1"></i>
-            <span id="uiFooterAddress">123 Đường ABC, P. Thanh Mỹ,<br>Q. Liên Chiểu, TP. Đà Nẵng</span>
-          </li>
-        </ul>
+          Bảng Giá
+        </h2>
+        <p class="text-slate-500 text-sm font-medium">Giá đã bao gồm ánh sáng, không phát sinh thêm</p>
       </div>
 
-      <!-- Cột 3: Bản đồ -->
-      <div id="uiFooterMapCol">
-        <h3 class="text-white font-bold text-base mb-6">Bản đồ</h3>
-        <div id="uiFooterMapContainer" class="w-full h-32 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative group cursor-pointer">
-          <!-- Giả lập ảnh bản đồ -->
-          <div class="absolute inset-0 opacity-40 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=Da+Nang&zoom=14&size=400x150&maptype=roadmap')] bg-cover bg-center transition-opacity group-hover:opacity-60"></div>
-          <div class="relative z-10 flex flex-col items-center">
-            <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-1"></i>
-            <span class="text-xs font-semibold text-white drop-shadow-md bg-black/30 px-2 py-0.5 rounded">Sân Cầu Lông<br>Thành Công</span>
+      <!-- 2 Main Cards -->
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Card 1: Giờ Thường -->
+        <div
+          class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center hover:shadow-lg transition-all">
+          <div class="w-14 h-14 bg-blue-100/60 rounded-2xl flex items-center justify-center text-primary text-2xl mb-4">
+            <i class="fa-regular fa-sun"></i>
+          </div>
+          <h3 class="font-bold text-xl text-navy mb-1">Giờ Thường</h3>
+          <p id="uiPriceNormalHours" class="text-xs text-slate-500 font-medium mb-6">05:00 – 17:00 | 20:00 – 24:00</p>
+          <div id="uiPriceNormalVal" class="text-5xl font-black text-primary mb-1">80K</div>
+          <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
+        </div>
+
+        <!-- Card 2: Giờ Cao Điểm -->
+        <div
+          class="bg-white border-2 border-amber-400 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center shadow-sm hover:shadow-xl transition-all">
+          <div
+            class="absolute top-4 right-4 bg-amber-400 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-star text-[10px]"></i> Cao điểm
+          </div>
+          <div
+            class="w-14 h-14 bg-amber-100/60 rounded-2xl flex items-center justify-center text-amber-500 text-2xl mb-4">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <h3 class="font-bold text-xl text-navy mb-1">Giờ Cao Điểm</h3>
+          <p id="uiPricePeakHours" class="text-xs text-slate-500 font-medium mb-6">17:00 – 20:00 hàng ngày</p>
+          <div id="uiPricePeakVal" class="text-5xl font-black text-amber-500 mb-1">120K</div>
+          <p class="text-xs text-slate-400 font-medium">/ tiếng / sân</p>
+        </div>
+      </div>
+
+      <!-- Wide Card: Dịch vụ đi kèm -->
+      <div
+        class="bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 border border-blue-100/80 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-center gap-3 text-primary font-bold text-base mb-4 border-b border-blue-100/60 pb-3">
+          <div class="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid fa-box-archive"></i>
+          </div>
+          <span>Dịch vụ đi kèm</span>
+        </div>
+        <div id="uiServicesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div
+            class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+            <span
+              class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i
+                class="fa-solid fa-check"></i></span>
+            <span>Cho thuê vợt: 20.000đ/cây</span>
+          </div>
+          <div
+            class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+            <span
+              class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i
+                class="fa-solid fa-check"></i></span>
+            <span>Nước suối miễn phí</span>
+          </div>
+          <div
+            class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+            <span
+              class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0"><i
+                class="fa-solid fa-check"></i></span>
+            <span>Thay dây vợt theo yêu cầu</span>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Dòng admin góc dưới -->
-    <div class="border-t border-slate-800 pt-6 flex justify-end">
-      <a href="login.html" class="flex items-center gap-2 text-xs text-slate-500 hover:text-white transition-colors" title="Quản lý">
-        <i class="fa-solid fa-lock"></i> Đăng nhập quản lý
-      </a>
-    </div>
-  </div>
-</footer>
+  </section>
 
-<!-- ===== CART BAR (sticky bottom) ===== -->
-<div id="cartBar" class="cart-hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
-  <div class="bg-white/90 backdrop-blur-md border-t border-white/20 shadow-[0_-4px_25px_-5px_rgba(0,0,0,0.1)]">
-    <div class="h-1 bg-primary" id="cartProgressBar" style="width:0%"></div>
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-sm font-bold text-gray-800">
-            <span id="cartCountLabel" class="text-primary">0</span> slot đã chọn
-          </span>
-          <span class="text-gray-300">·</span>
-          <span class="text-sm font-bold text-primary" id="cartTotalLabel">0đ</span>
+  <!-- ===== CONTACT ===== -->
+  <section id="contact" class="py-16 bg-slate-50 scroll-mt-20">
+    <div class="max-w-6xl mx-auto px-4">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-extrabold text-navy flex items-center justify-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-primary text-lg">
+            <i class="fa-solid fa-phone"></i>
+          </div>
+          Liên Hệ &amp; Địa Chỉ
+        </h2>
+        <p class="text-slate-500 text-sm font-medium">Chúng tôi luôn sẵn sàng hỗ trợ và phục vụ quý khách</p>
+      </div>
+
+      <div id="uiContactContainer" class="grid md:grid-cols-2 gap-8">
+        <div id="uiContactItems" class="space-y-4">
+          <div
+            class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+            <div
+              class="w-12 h-12 bg-green-100/80 rounded-2xl flex items-center justify-center text-primary text-xl flex-shrink-0">
+              <i class="fa-solid fa-phone"></i></div>
+            <div>
+              <div class="text-xs text-slate-400 font-semibold mb-0.5">Điện thoại / Zalo</div><a id="uiContactPhone"
+                href="tel:0901234567" class="font-bold text-navy hover:text-primary transition-colors text-lg">0901 234
+                567</a>
+            </div>
+          </div>
+          <div id="uiContactFacebookRow"
+            class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+            <div
+              class="w-12 h-12 bg-blue-100/80 rounded-2xl flex items-center justify-center text-blue-500 text-xl flex-shrink-0">
+              <i class="fa-brands fa-facebook"></i></div>
+            <div>
+              <div class="text-xs text-slate-400 font-semibold mb-0.5">Facebook</div><a id="uiContactFacebook" href="#"
+                target="_blank" class="font-bold text-navy hover:text-primary transition-colors text-base">Sân Cầu Việt
+                Đảng</a>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+            <div
+              class="w-12 h-12 bg-red-100/80 rounded-2xl flex items-center justify-center text-red-500 text-xl flex-shrink-0 mt-0.5">
+              <i class="fa-solid fa-location-dot"></i></div>
+            <div>
+              <div class="text-xs text-slate-400 font-semibold mb-0.5">Địa chỉ</div>
+              <div id="uiContactAddress" class="font-bold text-navy text-sm leading-snug">123 Đường Việt
+                Đảng<br />Phường XX, Quận XX, TP.HCM</div>
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all">
+            <div
+              class="w-12 h-12 bg-amber-100/80 rounded-2xl flex items-center justify-center text-amber-500 text-xl flex-shrink-0">
+              <i class="fa-regular fa-clock"></i></div>
+            <div>
+              <div class="text-xs text-slate-400 font-semibold mb-0.5">Giờ mở cửa</div>
+              <div id="uiContactOpenHours" class="font-bold text-navy text-sm">05:00 – 22:00 · Tất cả các ngày</div>
+            </div>
+          </div>
         </div>
-        <div id="cartTagsRow" class="flex gap-1.5 mt-1 flex-wrap max-h-10 overflow-hidden"></div>
-      </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <button onclick="clearCart()" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa tất cả">
-          <i class="fa-solid fa-trash-can text-sm"></i>
-        </button>
-        <button onclick="openCartDrawer()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-all">
-          <i class="fa-solid fa-list-ul"></i>
-          <span class="hidden sm:inline">Xem giỏ</span>
-        </button>
-        <button onclick="openBookingModal()" class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg">
-          <i class="fa-solid fa-calendar-check"></i>
-          <span>Đặt ngay</span>
-        </button>
+
+        <div id="uiGoogleMapsContainer"
+          class="rounded-3xl overflow-hidden border border-slate-200 shadow-sm min-h-[300px] bg-slate-200 flex items-center justify-center">
+          <div class="text-center text-slate-400">
+            <i class="fa-solid fa-map text-5xl mb-3"></i>
+            <p class="text-sm">Bản đồ vị trí sân</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- ===== CART DRAWER (slide up) ===== -->
-<div id="cartDrawerOverlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="closeCartDrawer()"></div>
-<div id="cartDrawer" class="drawer-hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[75vh] flex flex-col">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-cart-shopping text-primary mr-2"></i>Giỏ Đặt Sân</h3>
-    <button onclick="closeCartDrawer()" class="p-2 hover:bg-gray-100 rounded-xl transition-all"><i class="fa-solid fa-xmark text-gray-500"></i></button>
-  </div>
-  <div id="cartDrawerList" class="flex-1 overflow-y-auto px-5 py-3 space-y-2"></div>
-  <div class="px-5 py-4 border-t border-gray-100 bg-gray-50">
-    <div class="flex items-center justify-between mb-3">
-      <span class="text-sm text-gray-500">Tổng cộng (<span id="drawerCount">0</span> slot)</span>
-      <span class="text-xl font-extrabold text-primary" id="drawerTotal">0đ</span>
-    </div>
-    <button onclick="closeCartDrawer(); openBookingModal();" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg">
-      <i class="fa-solid fa-calendar-check mr-2"></i>Tiến hành đặt sân
-    </button>
-  </div>
-</div>
-
-<!-- ===== BOOKING MODAL ===== -->
-<div id="bookingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
-  <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col border border-white/40">
-    <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between flex-shrink-0">
-      <div>
-        <h3 class="font-bold text-lg"><i class="fa-solid fa-calendar-check mr-2"></i>Xác Nhận Đặt Sân</h3>
-        <p class="text-sm text-green-100 mt-0.5"><span id="modalSlotCount">0</span> slot · Tổng: <span id="modalTotal" class="font-bold">0đ</span></p>
-      </div>
-      <button onclick="closeBookingModal()" class="hover:bg-white/20 rounded-lg p-1.5 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-    </div>
-
-    <div class="overflow-y-auto flex-1">
-      <div class="px-6 pt-4 pb-2">
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Slot đã chọn</p>
-        <div id="modalSlotList" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
-      </div>
-
-      <div class="px-6 py-4 space-y-4 border-t border-gray-100 mt-2">
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-navy text-slate-300 pt-16 pb-8 text-sm border-t border-navy-light mt-10">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <!-- Cột 1: Logo và tên -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-user mr-1.5 text-primary"></i>Họ và tên <span class="text-red-400">*</span></label>
-          <input id="guestName" type="text" placeholder="Nguyễn Văn A" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" oninput="clearFieldError('guestName','guestNameErr')" />
-          <p id="guestNameErr" class="hidden text-xs text-red-500 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>Vui lòng nhập họ tên</p>
+          <div class="flex items-center gap-3 mb-6">
+            <div id="uiFooterLogoContainer" class="flex-shrink-0">
+              <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+            </div>
+            <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight">Sân Cầu Việt Đảng</div>
+          </div>
+          <p class="text-slate-400 mb-6 max-w-xs text-sm">Mang đến không gian thể thao chất lượng, năng động và chuyên
+            nghiệp cho mọi lứa tuổi.</p>
+          <p class="text-slate-500 text-xs">© 2024 Sân Cầu Lông Thành Công. All rights reserved.</p>
         </div>
+
+        <!-- Cột 2: Liên hệ -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-solid fa-phone mr-1.5 text-primary"></i>Số điện thoại <span class="text-red-400">*</span></label>
-          <input id="guestPhone" type="tel" placeholder="0901 234 567" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" oninput="clearFieldError('guestPhone','guestPhoneErr')" />
-          <p id="guestPhoneErr" class="hidden text-xs text-red-500 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>Số điện thoại không hợp lệ</p>
+          <h3 class="text-white font-bold text-base mb-6">Liên hệ</h3>
+          <ul class="space-y-4">
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-phone w-5 text-center text-slate-400"></i>
+              <a id="uiFooterPhone" href="tel:0965123456" class="hover:text-white transition-colors">0965 123 456</a>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-comment-sms w-5 text-center text-slate-400"></i>
+              <span id="uiFooterZalo">Zalo: 0965 123 456</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot w-5 text-center text-slate-400 mt-1"></i>
+              <span id="uiFooterAddress">123 Đường ABC, P. Thanh Mỹ,<br>Q. Liên Chiểu, TP. Đà Nẵng</span>
+            </li>
+          </ul>
         </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i class="fa-regular fa-note-sticky mr-1.5 text-primary"></i>Ghi chú</label>
-          <textarea id="guestNote" rows="2" placeholder="Yêu cầu thêm (cho thuê vợt, nước...)" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"></textarea>
+
+        <!-- Cột 3: Bản đồ -->
+        <div id="uiFooterMapCol">
+          <h3 class="text-white font-bold text-base mb-6">Bản đồ</h3>
+          <div id="uiFooterMapContainer"
+            class="w-full h-32 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative group cursor-pointer">
+            <!-- Giả lập ảnh bản đồ -->
+            <div
+              class="absolute inset-0 opacity-40 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=Da+Nang&zoom=14&size=400x150&maptype=roadmap')] bg-cover bg-center transition-opacity group-hover:opacity-60">
+            </div>
+            <div class="relative z-10 flex flex-col items-center">
+              <i class="fa-solid fa-location-dot text-red-500 text-2xl mb-1"></i>
+              <span class="text-xs font-semibold text-white drop-shadow-md bg-black/30 px-2 py-0.5 rounded">Sân Cầu
+                Lông<br>Thành Công</span>
+            </div>
+          </div>
         </div>
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-          Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!
+      </div>
+
+      <!-- Dòng admin góc dưới -->
+      <div class="border-t border-slate-800 pt-6 flex justify-end">
+        <a href="login.html" class="flex items-center gap-2 text-xs text-slate-500 hover:text-white transition-colors"
+          title="Quản lý">
+          <i class="fa-solid fa-lock"></i> Đăng nhập quản lý
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== CART BAR (sticky bottom) ===== -->
+  <div id="cartBar" class="cart-hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
+    <div class="bg-white/90 backdrop-blur-md border-t border-white/20 shadow-[0_-4px_25px_-5px_rgba(0,0,0,0.1)]">
+      <div class="h-1 bg-primary" id="cartProgressBar" style="width:0%"></div>
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-bold text-gray-800">
+              <span id="cartCountLabel" class="text-primary">0</span> slot đã chọn
+            </span>
+            <span class="text-gray-300">·</span>
+            <span class="text-sm font-bold text-primary" id="cartTotalLabel">0đ</span>
+          </div>
+          <div id="cartTagsRow" class="flex gap-1.5 mt-1 flex-wrap max-h-10 overflow-hidden"></div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button onclick="clearCart()"
+            class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa tất cả">
+            <i class="fa-solid fa-trash-can text-sm"></i>
+          </button>
+          <button onclick="openCartDrawer()"
+            class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium transition-all">
+            <i class="fa-solid fa-list-ul"></i>
+            <span class="hidden sm:inline">Xem giỏ</span>
+          </button>
+          <button onclick="openBookingModal()"
+            class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Đặt ngay</span>
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="px-6 pb-5 pt-3 flex gap-3 flex-shrink-0 border-t border-gray-100">
-      <button onclick="closeBookingModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-all">Huỷ</button>
-      <button id="submitBtn" onclick="submitBooking()" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
-        <i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu
+  <!-- ===== CART DRAWER (slide up) ===== -->
+  <div id="cartDrawerOverlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="closeCartDrawer()"></div>
+  <div id="cartDrawer"
+    class="drawer-hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[75vh] flex flex-col">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-cart-shopping text-primary mr-2"></i>Giỏ Đặt Sân
+      </h3>
+      <button onclick="closeCartDrawer()" class="p-2 hover:bg-gray-100 rounded-xl transition-all"><i
+          class="fa-solid fa-xmark text-gray-500"></i></button>
+    </div>
+    <div id="cartDrawerList" class="flex-1 overflow-y-auto px-5 py-3 space-y-2"></div>
+    <div class="px-5 py-4 border-t border-gray-100 bg-gray-50">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm text-gray-500">Tổng cộng (<span id="drawerCount">0</span> slot)</span>
+        <span class="text-xl font-extrabold text-primary" id="drawerTotal">0đ</span>
+      </div>
+      <button onclick="closeCartDrawer(); openBookingModal();"
+        class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg">
+        <i class="fa-solid fa-calendar-check mr-2"></i>Tiến hành đặt sân
       </button>
     </div>
   </div>
-</div>
 
-<!-- Import Firebase Module -->
-<script type="module">
-  import { getBookingsByDate, addBookings, getSettings } from "./firebase.js";
+  <!-- ===== BOOKING MODAL ===== -->
+  <div id="bookingModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div
+      class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col border border-white/40">
+      <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div>
+          <h3 class="font-bold text-lg"><i class="fa-solid fa-calendar-check mr-2"></i>Xác Nhận Đặt Sân</h3>
+          <p class="text-sm text-green-100 mt-0.5"><span id="modalSlotCount">0</span> slot · Tổng: <span id="modalTotal"
+              class="font-bold">0đ</span></p>
+        </div>
+        <button onclick="closeBookingModal()" class="hover:bg-white/20 rounded-lg p-1.5 transition-colors"><i
+            class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
 
-  let CONFIG = {
-    name: 'Sân Cầu Việt Đảng',
-    courts: ['Sân 1', 'Sân 2', 'Sân 3'],
-    startHour: 5,
-    endHour: 22,
-    priceNormal: 80000,
-    pricePeak: 120000,
-    peakStart: 17,
-    peakEnd: 20,
-    address: '123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM',
-    phone: '0901 234 567',
-    email: 'contact@vietdangbadminton.com',
-    facebook: 'https://facebook.com/sancauvietdang',
-    googleMaps: '',
-    notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
-  };
+      <div class="overflow-y-auto flex-1">
+        <div class="px-6 pt-4 pb-2">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Slot đã chọn</p>
+          <div id="modalSlotList" class="space-y-1.5 max-h-44 overflow-y-auto pr-1"></div>
+        </div>
 
-  async function loadConfig() {
-    const remote = await getSettings();
-    if (remote) {
-      CONFIG = { ...CONFIG, ...remote };
-    }
-    applyConfigUI();
-  }
+        <div class="px-6 py-4 space-y-4 border-t border-gray-100 mt-2">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i
+                class="fa-solid fa-user mr-1.5 text-primary"></i>Họ và tên <span class="text-red-400">*</span></label>
+            <input id="guestName" type="text" placeholder="Nguyễn Văn A"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+              oninput="clearFieldError('guestName','guestNameErr')" />
+            <p id="guestNameErr" class="hidden text-xs text-red-500 mt-1"><i
+                class="fa-solid fa-circle-exclamation mr-1"></i>Vui lòng nhập họ tên</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i
+                class="fa-solid fa-phone mr-1.5 text-primary"></i>Số điện thoại <span
+                class="text-red-400">*</span></label>
+            <input id="guestPhone" type="tel" placeholder="0901 234 567"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+              oninput="clearFieldError('guestPhone','guestPhoneErr')" />
+            <p id="guestPhoneErr" class="hidden text-xs text-red-500 mt-1"><i
+                class="fa-solid fa-circle-exclamation mr-1"></i>Số điện thoại không hợp lệ</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5"><i
+                class="fa-regular fa-note-sticky mr-1.5 text-primary"></i>Ghi chú</label>
+            <textarea id="guestNote" rows="2" placeholder="Yêu cầu thêm (cho thuê vợt, nước...)"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"></textarea>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+            Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!
+          </div>
+        </div>
+      </div>
 
-  function formatPhoneVN(raw) {
-    if (!raw) return '';
-    const clean = raw.replace(/[\s\-.()]/g, '');
-    if (clean.length === 10) {
-      return `${clean.substring(0, 4)} ${clean.substring(4, 7)} ${clean.substring(7)}`;
-    }
-    return raw;
-  }
+      <div class="px-6 pb-5 pt-3 flex gap-3 flex-shrink-0 border-t border-gray-100">
+        <button onclick="closeBookingModal()"
+          class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-all">Huỷ</button>
+        <button id="submitBtn" onclick="submitBooking()"
+          class="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md">
+          <i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu
+        </button>
+      </div>
+    </div>
+  </div>
 
-  function applyConfigUI() {
-    const courtName = CONFIG.name || 'Sân Cầu Việt Đảng';
-    const phoneRaw = CONFIG.phone || '0901234567';
-    const phoneClean = phoneRaw.replace(/[\s\-.()]/g, '');
-    const phoneFormatted = formatPhoneVN(phoneRaw);
+  <!-- Import Firebase Module -->
+  <script type="module">
+    import { getBookingsByDate, addBookings, getSettings } from "./firebase.js";
 
-    const zaloRaw = CONFIG.zalo || phoneRaw;
-    const zaloFormatted = formatPhoneVN(zaloRaw);
-    const address = CONFIG.address || '123 Đường Việt Đảng, TP.HCM';
+    let CONFIG = {
+      name: 'Sân Cầu Việt Đảng',
+      courts: ['Sân 1', 'Sân 2', 'Sân 3'],
+      startHour: 5,
+      endHour: 22,
+      priceNormal: 80000,
+      pricePeak: 120000,
+      peakStart: 17,
+      peakEnd: 20,
+      address: '123 Đường Việt Đảng, Phường XX, Quận XX, TP.HCM',
+      phone: '0901 234 567',
+      email: 'contact@vietdangbadminton.com',
+      facebook: 'https://facebook.com/sancauvietdang',
+      googleMaps: '',
+      notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
+    };
 
-    // Header & Footer Brand
-    if (document.getElementById('uiHeaderBrandName')) document.getElementById('uiHeaderBrandName').textContent = courtName;
-    if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = courtName;
-    if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').textContent = courtName;
-    if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts||[]).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
-    
-    // Call Button & Floating Call Button
-    if (document.getElementById('uiHeroCallBtn')) {
-      const callBtn = document.getElementById('uiHeroCallBtn');
-      callBtn.href = `tel:${phoneClean}`;
-      callBtn.innerHTML = `<i class="fa-solid fa-phone"></i><span class="hidden sm:inline">${phoneFormatted}</span>`;
-    }
-    if (document.getElementById('uiFloatCallBtn')) {
-      const floatCall = document.getElementById('uiFloatCallBtn');
-      floatCall.href = `tel:${phoneClean}`;
-      if (document.getElementById('uiFloatCallText')) {
-        document.getElementById('uiFloatCallText').textContent = phoneFormatted;
+    async function loadConfig() {
+      const remote = await getSettings();
+      if (remote) {
+        CONFIG = { ...CONFIG, ...remote };
       }
+      applyConfigUI();
     }
 
-    // Floating Zalo Button
-    if (document.getElementById('uiFloatZaloBtn')) {
-      const floatZalo = document.getElementById('uiFloatZaloBtn');
-      const zaloClean = zaloRaw.replace(/[\s\-.()]/g, '');
-      floatZalo.href = `https://zalo.me/${zaloClean}`;
-      if (document.getElementById('uiFloatZaloText')) {
-        document.getElementById('uiFloatZaloText').textContent = `Chat Zalo (${zaloFormatted})`;
+    function formatPhoneVN(raw) {
+      if (!raw) return '';
+      const clean = raw.replace(/[\s\-.()]/g, '');
+      if (clean.length === 10) {
+        return `${clean.substring(0, 4)} ${clean.substring(4, 7)} ${clean.substring(7)}`;
       }
+      return raw;
     }
 
-    // Contact Section
-    if (document.getElementById('uiContactPhone')) {
-      const contactPhone = document.getElementById('uiContactPhone');
-      contactPhone.href = `tel:${phoneClean}`;
-      contactPhone.textContent = phoneFormatted;
-    }
-    if (document.getElementById('uiContactAddress')) {
-      document.getElementById('uiContactAddress').textContent = address;
-    }
-    if (document.getElementById('uiContactFacebook')) {
-      const fbLink = document.getElementById('uiContactFacebook');
-      if (CONFIG.facebook) {
-        fbLink.href = CONFIG.facebook;
-        fbLink.textContent = CONFIG.facebookName || courtName;
-        if (document.getElementById('uiContactFacebookRow')) document.getElementById('uiContactFacebookRow').style.display = 'flex';
-      } else {
-        if (document.getElementById('uiContactFacebookRow')) document.getElementById('uiContactFacebookRow').style.display = 'none';
+    function applyConfigUI() {
+      const courtName = CONFIG.name || 'Sân Cầu Việt Đảng';
+      const phoneRaw = CONFIG.phone || '0901234567';
+      const phoneClean = phoneRaw.replace(/[\s\-.()]/g, '');
+      const phoneFormatted = formatPhoneVN(phoneRaw);
+
+      const zaloRaw = CONFIG.zalo || phoneRaw;
+      const zaloFormatted = formatPhoneVN(zaloRaw);
+      const address = CONFIG.address || '123 Đường Việt Đảng, TP.HCM';
+
+      // Header & Footer Brand
+      if (document.getElementById('uiHeaderBrandName')) document.getElementById('uiHeaderBrandName').textContent = courtName;
+      if (document.getElementById('uiFooterBrandName')) document.getElementById('uiFooterBrandName').textContent = courtName;
+      if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').textContent = courtName;
+      if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts || []).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
+
+      // Call Button & Floating Call Button
+      if (document.getElementById('uiHeroCallBtn')) {
+        const callBtn = document.getElementById('uiHeroCallBtn');
+        callBtn.href = `tel:${phoneClean}`;
+        callBtn.innerHTML = `<i class="fa-solid fa-phone"></i><span class="hidden sm:inline">${phoneFormatted}</span>`;
       }
-    }
-
-    // Badge
-    if (document.getElementById('uiBadgeCourtCount')) {
-      document.getElementById('uiBadgeCourtCount').textContent = `${(CONFIG.courts||[]).length} Sân đạt chuẩn`;
-    }
-    
-    // Open Hours
-    const openHoursStr = `${String(CONFIG.startHour).padStart(2,'0')}:00 – ${String(CONFIG.endHour).padStart(2,'0')}:00`;
-    if (document.getElementById('uiOpenHours')) document.getElementById('uiOpenHours').textContent = openHoursStr;
-    if (document.getElementById('uiContactOpenHours')) document.getElementById('uiContactOpenHours').textContent = `${openHoursStr} · Tất cả các ngày`;
-
-    // Apply Logo & Favicon
-    const logoBox = document.getElementById('uiHeaderLogoContainer');
-    const footerLogoBox = document.getElementById('uiFooterLogoContainer');
-    const favicon = document.getElementById('appFavicon');
-    const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : 'assets/logo.png';
-
-    if (favicon) favicon.href = logoSrc;
-    if (logoBox) logoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
-    if (footerLogoBox) footerLogoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
-
-    // Apply Hero Background
-    const heroSec = document.getElementById('home');
-    if (heroSec) {
-      if (CONFIG.useDefaultBg || !CONFIG.bgBase64) {
-        heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg')`;
-      } else {
-        heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('${CONFIG.bgBase64}')`;
-      }
-    }
-
-    // Google Maps validation & rendering
-    const rawMap = (CONFIG.googleMaps || '').trim();
-    const isValidMap = rawMap.includes('<iframe') && rawMap.includes('src=') && !rawMap.includes('<iframe src=...>');
-
-    const mapBox = document.getElementById('uiGoogleMapsContainer');
-    const contactContainer = document.getElementById('uiContactContainer');
-    const contactItems = document.getElementById('uiContactItems');
-    const footerMapCol = document.getElementById('uiFooterMapCol');
-
-    if (mapBox) {
-      if (isValidMap) {
-        mapBox.style.display = 'block';
-        mapBox.innerHTML = rawMap;
-        const iframe = mapBox.querySelector('iframe');
-        if (iframe) {
-          iframe.className = 'w-full h-full min-h-[300px] border-0 rounded-3xl';
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
+      if (document.getElementById('uiFloatCallBtn')) {
+        const floatCall = document.getElementById('uiFloatCallBtn');
+        floatCall.href = `tel:${phoneClean}`;
+        if (document.getElementById('uiFloatCallText')) {
+          document.getElementById('uiFloatCallText').textContent = phoneFormatted;
         }
-        if (contactContainer) contactContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-8';
-        if (contactItems) contactItems.className = 'space-y-4';
-      } else {
-        mapBox.style.display = 'none';
-        if (contactContainer) contactContainer.className = 'block';
-        if (contactItems) contactItems.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto';
       }
-    }
 
-    if (footerMapCol) {
-      if (isValidMap) {
-        footerMapCol.style.display = 'block';
-        const mapBox2 = document.getElementById('uiFooterMapContainer');
-        if (mapBox2) {
-          mapBox2.innerHTML = rawMap;
-          const iframe2 = mapBox2.querySelector('iframe');
-          if (iframe2) {
-            iframe2.className = 'w-full h-full border-0';
-            iframe2.style.width = '100%';
-            iframe2.style.height = '100%';
+      // Floating Zalo Button
+      if (document.getElementById('uiFloatZaloBtn')) {
+        const floatZalo = document.getElementById('uiFloatZaloBtn');
+        const zaloClean = zaloRaw.replace(/[\s\-.()]/g, '');
+        floatZalo.href = `https://zalo.me/${zaloClean}`;
+        if (document.getElementById('uiFloatZaloText')) {
+          document.getElementById('uiFloatZaloText').textContent = `Chat Zalo (${zaloFormatted})`;
+        }
+      }
+
+      // Contact Section
+      if (document.getElementById('uiContactPhone')) {
+        const contactPhone = document.getElementById('uiContactPhone');
+        contactPhone.href = `tel:${phoneClean}`;
+        contactPhone.textContent = phoneFormatted;
+      }
+      if (document.getElementById('uiContactAddress')) {
+        document.getElementById('uiContactAddress').textContent = address;
+      }
+      if (document.getElementById('uiContactFacebook')) {
+        const fbLink = document.getElementById('uiContactFacebook');
+        if (CONFIG.facebook) {
+          fbLink.href = CONFIG.facebook;
+          fbLink.textContent = CONFIG.facebookName || courtName;
+          if (document.getElementById('uiContactFacebookRow')) document.getElementById('uiContactFacebookRow').style.display = 'flex';
+        } else {
+          if (document.getElementById('uiContactFacebookRow')) document.getElementById('uiContactFacebookRow').style.display = 'none';
+        }
+      }
+
+      // Badge
+      if (document.getElementById('uiBadgeCourtCount')) {
+        document.getElementById('uiBadgeCourtCount').textContent = `${(CONFIG.courts || []).length} Sân đạt chuẩn`;
+      }
+
+      // Open Hours
+      const openHoursStr = `${String(CONFIG.startHour).padStart(2, '0')}:00 – ${String(CONFIG.endHour).padStart(2, '0')}:00`;
+      if (document.getElementById('uiOpenHours')) document.getElementById('uiOpenHours').textContent = openHoursStr;
+      if (document.getElementById('uiContactOpenHours')) document.getElementById('uiContactOpenHours').textContent = `${openHoursStr} · Tất cả các ngày`;
+
+      // Apply Logo & Favicon
+      const logoBox = document.getElementById('uiHeaderLogoContainer');
+      const footerLogoBox = document.getElementById('uiFooterLogoContainer');
+      const favicon = document.getElementById('appFavicon');
+      const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : 'assets/logo.png';
+
+      if (favicon) favicon.href = logoSrc;
+      if (logoBox) logoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
+      if (footerLogoBox) footerLogoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
+
+      // Apply Hero Background
+      const heroSec = document.getElementById('home');
+      if (heroSec) {
+        if (CONFIG.useDefaultBg || !CONFIG.bgBase64) {
+          heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg')`;
+        } else {
+          heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('${CONFIG.bgBase64}')`;
+        }
+      }
+
+      // Google Maps validation & rendering
+      const rawMap = (CONFIG.googleMaps || '').trim();
+      const isValidMap = rawMap.includes('<iframe') && rawMap.includes('src=') && !rawMap.includes('<iframe src=...>');
+
+      const mapBox = document.getElementById('uiGoogleMapsContainer');
+      const contactContainer = document.getElementById('uiContactContainer');
+      const contactItems = document.getElementById('uiContactItems');
+      const footerMapCol = document.getElementById('uiFooterMapCol');
+
+      if (mapBox) {
+        if (isValidMap) {
+          mapBox.style.display = 'block';
+          mapBox.innerHTML = rawMap;
+          const iframe = mapBox.querySelector('iframe');
+          if (iframe) {
+            iframe.className = 'w-full h-full min-h-[300px] border-0 rounded-3xl';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
           }
+          if (contactContainer) contactContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-8';
+          if (contactItems) contactItems.className = 'space-y-4';
+        } else {
+          mapBox.style.display = 'none';
+          if (contactContainer) contactContainer.className = 'block';
+          if (contactItems) contactItems.className = 'grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto';
         }
-      } else {
-        footerMapCol.style.display = 'none';
       }
-    }
 
-    // Footer Info
-    if (document.getElementById('uiFooterPhone')) {
-      const pEl = document.getElementById('uiFooterPhone');
-      pEl.textContent = phoneFormatted;
-      pEl.href = `tel:${phoneClean}`;
-    }
-    if (document.getElementById('uiFooterZalo')) document.getElementById('uiFooterZalo').textContent = `Zalo: ${zaloFormatted}`;
-    if (document.getElementById('uiFooterAddress')) document.getElementById('uiFooterAddress').textContent = address;
+      if (footerMapCol) {
+        if (isValidMap) {
+          footerMapCol.style.display = 'block';
+          const mapBox2 = document.getElementById('uiFooterMapContainer');
+          if (mapBox2) {
+            mapBox2.innerHTML = rawMap;
+            const iframe2 = mapBox2.querySelector('iframe');
+            if (iframe2) {
+              iframe2.className = 'w-full h-full border-0';
+              iframe2.style.width = '100%';
+              iframe2.style.height = '100%';
+            }
+          }
+        } else {
+          footerMapCol.style.display = 'none';
+        }
+      }
 
-    // Stats & Prices
-    if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts||[]).length;
-    if (document.getElementById('uiStatPriceNormal')) document.getElementById('uiStatPriceNormal').textContent = CONFIG.priceNormal.toLocaleString('vi-VN') + 'đ/h';
-    if (document.getElementById('uiStatPriceNormalLabel')) document.getElementById('uiStatPriceNormalLabel').textContent = `Từ ${CONFIG.priceNormal.toLocaleString('vi-VN')}đ/h`;
-    if (document.getElementById('uiStatHoursTotal')) document.getElementById('uiStatHoursTotal').textContent = (CONFIG.endHour - CONFIG.startHour);
+      // Footer Info
+      if (document.getElementById('uiFooterPhone')) {
+        const pEl = document.getElementById('uiFooterPhone');
+        pEl.textContent = phoneFormatted;
+        pEl.href = `tel:${phoneClean}`;
+      }
+      if (document.getElementById('uiFooterZalo')) document.getElementById('uiFooterZalo').textContent = `Zalo: ${zaloFormatted}`;
+      if (document.getElementById('uiFooterAddress')) document.getElementById('uiFooterAddress').textContent = address;
 
-    // Schedule Header Prices & Peak Hours
-    if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = CONFIG.pricePeak.toLocaleString('vi-VN') + 'đ/h';
-    if (document.getElementById('uiHeaderPeakHours')) {
-      document.getElementById('uiHeaderPeakHours').textContent = `${String(CONFIG.peakStart).padStart(2,'0')}:00 - ${String(CONFIG.peakEnd).padStart(2,'0')}:00`;
-    }
+      // Stats & Prices
+      if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts || []).length;
+      if (document.getElementById('uiStatPriceNormal')) document.getElementById('uiStatPriceNormal').textContent = CONFIG.priceNormal.toLocaleString('vi-VN') + 'đ/h';
+      if (document.getElementById('uiStatPriceNormalLabel')) document.getElementById('uiStatPriceNormalLabel').textContent = `Từ ${CONFIG.priceNormal.toLocaleString('vi-VN')}đ/h`;
+      if (document.getElementById('uiStatHoursTotal')) document.getElementById('uiStatHoursTotal').textContent = (CONFIG.endHour - CONFIG.startHour);
 
-    // Pricing Cards
-    if (document.getElementById('uiPriceNormalHours')) {
-      const norm1 = `${String(CONFIG.startHour).padStart(2,'0')}:00 – ${String(CONFIG.peakStart).padStart(2,'0')}:00`;
-      const norm2 = `${String(CONFIG.peakEnd).padStart(2,'0')}:00 – ${String(CONFIG.endHour).padStart(2,'0')}:00`;
-      document.getElementById('uiPriceNormalHours').innerHTML = `${norm1} &nbsp;|&nbsp; ${norm2}`;
-    }
-    if (document.getElementById('uiPriceNormalVal')) document.getElementById('uiPriceNormalVal').textContent = (CONFIG.priceNormal/1000) + 'K';
+      // Schedule Header Prices & Peak Hours
+      if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = CONFIG.pricePeak.toLocaleString('vi-VN') + 'đ/h';
+      if (document.getElementById('uiHeaderPeakHours')) {
+        document.getElementById('uiHeaderPeakHours').textContent = `${String(CONFIG.peakStart).padStart(2, '0')}:00 - ${String(CONFIG.peakEnd).padStart(2, '0')}:00`;
+      }
 
-    if (document.getElementById('uiPricePeakHours')) {
-      document.getElementById('uiPricePeakHours').textContent = `${String(CONFIG.peakStart).padStart(2,'0')}:00 – ${String(CONFIG.peakEnd).padStart(2,'0')}:00 hàng ngày`;
-    }
-    if (document.getElementById('uiPricePeakVal')) document.getElementById('uiPricePeakVal').textContent = (CONFIG.pricePeak/1000) + 'K';
+      // Pricing Cards
+      if (document.getElementById('uiPriceNormalHours')) {
+        const norm1 = `${String(CONFIG.startHour).padStart(2, '0')}:00 – ${String(CONFIG.peakStart).padStart(2, '0')}:00`;
+        const norm2 = `${String(CONFIG.peakEnd).padStart(2, '0')}:00 – ${String(CONFIG.endHour).padStart(2, '0')}:00`;
+        document.getElementById('uiPriceNormalHours').innerHTML = `${norm1} &nbsp;|&nbsp; ${norm2}`;
+      }
+      if (document.getElementById('uiPriceNormalVal')) document.getElementById('uiPriceNormalVal').textContent = (CONFIG.priceNormal / 1000) + 'K';
 
-    // Services
-    if (document.getElementById('uiServicesContainer')) {
-      const servicesList = (CONFIG.services && CONFIG.services.length > 0)
-        ? CONFIG.services
-        : ['Cho thuê vợt: 20.000đ/cây', 'Nước suối miễn phí', 'Thay dây vợt theo yêu cầu'];
+      if (document.getElementById('uiPricePeakHours')) {
+        document.getElementById('uiPricePeakHours').textContent = `${String(CONFIG.peakStart).padStart(2, '0')}:00 – ${String(CONFIG.peakEnd).padStart(2, '0')}:00 hàng ngày`;
+      }
+      if (document.getElementById('uiPricePeakVal')) document.getElementById('uiPricePeakVal').textContent = (CONFIG.pricePeak / 1000) + 'K';
 
-      document.getElementById('uiServicesContainer').innerHTML = servicesList.map(s => `
+      // Services
+      if (document.getElementById('uiServicesContainer')) {
+        const servicesList = (CONFIG.services && CONFIG.services.length > 0)
+          ? CONFIG.services
+          : ['Cho thuê vợt: 20.000đ/cây', 'Nước suối miễn phí', 'Thay dây vợt theo yêu cầu'];
+
+        document.getElementById('uiServicesContainer').innerHTML = servicesList.map(s => `
         <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs hover:border-primary/40 hover:shadow-sm transition-all">
           <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
           <span class="break-words">${s}</span>
         </div>
       `).join('');
+      }
+
+      // Notice in Modal
+      if (document.getElementById('modalBookingNotice')) document.getElementById('modalBookingNotice').textContent = CONFIG.notice;
+
+      // Table headers
+      const headerRow = document.getElementById('uiTableHeaderRow');
+      if (headerRow) {
+        let hHtml = `<th class="sticky left-0 bg-white z-20 py-3 px-4 text-left text-slate-500 font-bold min-w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>`;
+        (CONFIG.courts || []).forEach(cName => {
+          hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
+        });
+        headerRow.innerHTML = hHtml;
+      }
     }
 
-    // Notice in Modal
-    if (document.getElementById('modalBookingNotice')) document.getElementById('modalBookingNotice').textContent = CONFIG.notice;
+    const VN_PHONE_PREFIXES = ['032', '033', '034', '035', '036', '037', '038', '039', '086', '096', '097', '098', '070', '076', '077', '078', '079', '089', '090', '093', '081', '082', '083', '084', '085', '088', '091', '094', '052', '056', '058', '092', '059', '099', '055', '069'];
 
-    // Table headers
-    const headerRow = document.getElementById('uiTableHeaderRow');
-    if (headerRow) {
-      let hHtml = `<th class="sticky left-0 bg-white z-20 py-3 px-4 text-left text-slate-500 font-bold min-w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>`;
-      (CONFIG.courts || []).forEach(cName => {
-        hHtml += `<th class="py-3 px-4 text-center text-gray-700 font-semibold min-w-[120px]">🏸 ${cName}</th>`;
-      });
-      headerRow.innerHTML = hHtml;
+    function validateVNPhone(raw) {
+      let c = raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
+      if (!/^0\d{9}$/.test(c)) return false;
+      return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
     }
-  }
-
-  const VN_PHONE_PREFIXES = ['032','033','034','035','036','037','038','039','086','096','097','098','070','076','077','078','079','089','090','093','081','082','083','084','085','088','091','094','052','056','058','092','059','099','055','069'];
-
-  function validateVNPhone(raw) {
-    let c = raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
-    if (!/^0\d{9}$/.test(c)) return false;
-    return VN_PHONE_PREFIXES.includes(c.substring(0, 3));
-  }
-  function normalizePhone(raw) {
-    return raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
-  }
-
-  window.setFieldError = function(fieldId, errorId, message) {
-    const field = document.getElementById(fieldId);
-    const errEl = document.getElementById(errorId);
-    field.classList.add('border-red-400', 'focus:ring-red-200');
-    field.classList.remove('border-gray-200');
-    if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
-    field.focus();
-  };
-
-  window.clearFieldError = function(fieldId, errorId) {
-    const field = document.getElementById(fieldId);
-    const errEl = document.getElementById(errorId);
-    field.classList.remove('border-red-400', 'focus:ring-red-200');
-    field.classList.add('border-gray-200');
-    if (errEl) errEl.classList.add('hidden');
-  };
-
-  function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
-  function slotPrice(h) { return isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal; }
-  function fmtMoney(n) { return n.toLocaleString('vi-VN') + 'đ'; }
-  function fmtDate(d) { return d.format('YYYY-MM-DD'); }
-  function fmtDateVN(str) { return dayjs(str).format('DD/MM'); }
-  function slotKey(court, hour, date) { return `${date}|${court}|${hour}`; }
-
-  let currentBookings = [];
-  let cart = [];
-
-  function isInCart(court, hour, date) {
-    return cart.some(s => s.key === slotKey(court, hour, date));
-  }
-
-  window.toggleSlot = function(courtIdx, hour, date) {
-    const key = slotKey(courtIdx, hour, date);
-    const idx = cart.findIndex(s => s.key === key);
-    if (idx !== -1) {
-      cart.splice(idx, 1);
-    } else {
-      cart.push({ key, court: courtIdx, hour, date, price: slotPrice(hour) });
-    }
-    renderSchedule();
-    updateCartUI();
-  };
-
-  window.removeFromCart = function(key) {
-    cart = cart.filter(s => s.key !== key);
-    renderSchedule();
-    updateCartUI();
-    renderCartDrawer();
-  };
-
-  window.clearCart = function() {
-    if (cart.length === 0) return;
-    cart = [];
-    renderSchedule();
-    updateCartUI();
-  };
-
-  function cartTotal() { return cart.reduce((s, c) => s + c.price, 0); }
-
-  function updateCartUI() {
-    const count = cart.length;
-    const total = cartTotal();
-    const bar = document.getElementById('cartBar');
-
-    if (count === 0) {
-      bar.classList.add('cart-hidden');
-      document.getElementById('navCartCount').classList.add('hidden');
-      return;
+    function normalizePhone(raw) {
+      return raw.replace(/[\s\-.()]/g, '').replace(/^(\+84|84)/, '0');
     }
 
-    bar.classList.remove('cart-hidden');
-    document.getElementById('navCartCount').classList.remove('hidden');
-    document.getElementById('navCartCount').textContent = count;
-    document.getElementById('cartCountLabel').textContent = count;
-    document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
-    document.getElementById('cartProgressBar').style.width = Math.min(100, count * 10) + '%';
+    window.setFieldError = function (fieldId, errorId, message) {
+      const field = document.getElementById(fieldId);
+      const errEl = document.getElementById(errorId);
+      field.classList.add('border-red-400', 'focus:ring-red-200');
+      field.classList.remove('border-gray-200');
+      if (errEl) { errEl.textContent = message; errEl.classList.remove('hidden'); }
+      field.focus();
+    };
 
-    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-    const tagsRow = document.getElementById('cartTagsRow');
-    tagsRow.innerHTML = sorted.slice(0, 6).map(s => `
+    window.clearFieldError = function (fieldId, errorId) {
+      const field = document.getElementById(fieldId);
+      const errEl = document.getElementById(errorId);
+      field.classList.remove('border-red-400', 'focus:ring-red-200');
+      field.classList.add('border-gray-200');
+      if (errEl) errEl.classList.add('hidden');
+    };
+
+    function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
+    function slotPrice(h) { return isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal; }
+    function fmtMoney(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+    function fmtDate(d) { return d.format('YYYY-MM-DD'); }
+    function fmtDateVN(str) { return dayjs(str).format('DD/MM'); }
+    function slotKey(court, hour, date) { return `${date}|${court}|${hour}`; }
+
+    let currentBookings = [];
+    let cart = [];
+
+    function isInCart(court, hour, date) {
+      return cart.some(s => s.key === slotKey(court, hour, date));
+    }
+
+    window.toggleSlot = function (courtIdx, hour, date) {
+      const key = slotKey(courtIdx, hour, date);
+      const idx = cart.findIndex(s => s.key === key);
+      if (idx !== -1) {
+        cart.splice(idx, 1);
+      } else {
+        cart.push({ key, court: courtIdx, hour, date, price: slotPrice(hour) });
+      }
+      renderSchedule();
+      updateCartUI();
+    };
+
+    window.removeFromCart = function (key) {
+      cart = cart.filter(s => s.key !== key);
+      renderSchedule();
+      updateCartUI();
+      renderCartDrawer();
+    };
+
+    window.clearCart = function () {
+      if (cart.length === 0) return;
+      cart = [];
+      renderSchedule();
+      updateCartUI();
+    };
+
+    function cartTotal() { return cart.reduce((s, c) => s + c.price, 0); }
+
+    function updateCartUI() {
+      const count = cart.length;
+      const total = cartTotal();
+      const bar = document.getElementById('cartBar');
+
+      if (count === 0) {
+        bar.classList.add('cart-hidden');
+        document.getElementById('navCartCount').classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('cart-hidden');
+      document.getElementById('navCartCount').classList.remove('hidden');
+      document.getElementById('navCartCount').textContent = count;
+      document.getElementById('cartCountLabel').textContent = count;
+      document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
+      document.getElementById('cartProgressBar').style.width = Math.min(100, count * 10) + '%';
+
+      const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+      const tagsRow = document.getElementById('cartTagsRow');
+      tagsRow.innerHTML = sorted.slice(0, 6).map(s => `
       <span class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">
-        ${CONFIG.courts[s.court]} ${String(s.hour).padStart(2,'0')}:00 ${fmtDateVN(s.date)}
+        ${CONFIG.courts[s.court]} ${String(s.hour).padStart(2, '0')}:00 ${fmtDateVN(s.date)}
         <button onclick="removeFromCart('${s.key}')" class="hover:text-red-500 transition-colors ml-0.5">×</button>
       </span>`).join('') + (cart.length > 6 ? `<span class="text-xs text-gray-400 py-0.5">+${cart.length - 6} nữa</span>` : '');
-  }
-
-  window.openCartDrawer = function() {
-    document.getElementById('cartDrawerOverlay').classList.remove('hidden');
-    document.getElementById('cartDrawer').classList.remove('drawer-hidden');
-    renderCartDrawer();
-  };
-
-  window.closeCartDrawer = function() {
-    document.getElementById('cartDrawerOverlay').classList.add('hidden');
-    document.getElementById('cartDrawer').classList.add('drawer-hidden');
-  };
-
-  function renderCartDrawer() {
-    const count = cart.length;
-    document.getElementById('drawerCount').textContent = count;
-    document.getElementById('drawerTotal').textContent = fmtMoney(cartTotal());
-
-    const list = document.getElementById('cartDrawerList');
-    if (count === 0) {
-      list.innerHTML = `<div class="py-8 text-center text-gray-400"><i class="fa-solid fa-cart-shopping text-4xl mb-3 block opacity-30"></i>Chưa chọn slot nào<br/><span class="text-xs mt-1 block">Quay lại lịch để chọn sân</span></div>`;
-      return;
     }
-    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-    list.innerHTML = sorted.map(s => `
+
+    window.openCartDrawer = function () {
+      document.getElementById('cartDrawerOverlay').classList.remove('hidden');
+      document.getElementById('cartDrawer').classList.remove('drawer-hidden');
+      renderCartDrawer();
+    };
+
+    window.closeCartDrawer = function () {
+      document.getElementById('cartDrawerOverlay').classList.add('hidden');
+      document.getElementById('cartDrawer').classList.add('drawer-hidden');
+    };
+
+    function renderCartDrawer() {
+      const count = cart.length;
+      document.getElementById('drawerCount').textContent = count;
+      document.getElementById('drawerTotal').textContent = fmtMoney(cartTotal());
+
+      const list = document.getElementById('cartDrawerList');
+      if (count === 0) {
+        list.innerHTML = `<div class="py-8 text-center text-gray-400"><i class="fa-solid fa-cart-shopping text-4xl mb-3 block opacity-30"></i>Chưa chọn slot nào<br/><span class="text-xs mt-1 block">Quay lại lịch để chọn sân</span></div>`;
+        return;
+      }
+      const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+      list.innerHTML = sorted.map(s => `
       <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5">
         <div class="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0">
-          ${String(s.hour).padStart(2,'0')}
+          ${String(s.hour).padStart(2, '0')}
         </div>
         <div class="flex-1 min-w-0">
           <div class="font-semibold text-gray-800 text-sm">${CONFIG.courts[s.court]}</div>
-          <div class="text-xs text-gray-500">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00 · ${dayjs(s.date).format('ddd DD/MM')} ${isPeak(s.hour) ? '⚡' : ''}</div>
+          <div class="text-xs text-gray-500">${String(s.hour).padStart(2, '0')}:00–${String(s.hour + 1).padStart(2, '0')}:00 · ${dayjs(s.date).format('ddd DD/MM')} ${isPeak(s.hour) ? '⚡' : ''}</div>
         </div>
         <div class="text-sm font-bold text-indigo-600 flex-shrink-0">${fmtMoney(s.price)}</div>
         <button onclick="removeFromCart('${s.key}')" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all flex-shrink-0">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>`).join('');
-  }
+    }
 
-  window.openBookingModal = function() {
-    if (cart.length === 0) return;
-    const count = cart.length;
-    const total = cartTotal();
-    document.getElementById('modalSlotCount').textContent = count;
-    document.getElementById('modalTotal').textContent = fmtMoney(total);
-    document.getElementById('guestName').value = '';
-    document.getElementById('guestPhone').value = '';
-    document.getElementById('guestNote').value = '';
+    window.openBookingModal = function () {
+      if (cart.length === 0) return;
+      const count = cart.length;
+      const total = cartTotal();
+      document.getElementById('modalSlotCount').textContent = count;
+      document.getElementById('modalTotal').textContent = fmtMoney(total);
+      document.getElementById('guestName').value = '';
+      document.getElementById('guestPhone').value = '';
+      document.getElementById('guestNote').value = '';
 
-    const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-    document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
+      const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
+      document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
       <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs">
         <i class="fa-solid fa-circle-check text-primary"></i>
         <span class="font-medium text-gray-700">${CONFIG.courts[s.court]}</span>
-        <span class="text-gray-400">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00</span>
+        <span class="text-gray-400">${String(s.hour).padStart(2, '0')}:00–${String(s.hour + 1).padStart(2, '0')}:00</span>
         <span class="text-gray-400">${dayjs(s.date).format('DD/MM/YYYY')}</span>
         ${isPeak(s.hour) ? '<span class="text-amber-500">⚡120K</span>' : '<span class="text-gray-400">80K</span>'}
       </div>`).join('');
 
-    document.getElementById('bookingModal').classList.remove('hidden');
-    document.getElementById('bookingModal').classList.add('flex');
-    setTimeout(() => document.getElementById('guestName').focus(), 100);
-  };
+      document.getElementById('bookingModal').classList.remove('hidden');
+      document.getElementById('bookingModal').classList.add('flex');
+      setTimeout(() => document.getElementById('guestName').focus(), 100);
+    };
 
-  window.closeBookingModal = function() {
-    document.getElementById('bookingModal').classList.add('hidden');
-    document.getElementById('bookingModal').classList.remove('flex');
-  };
-  document.getElementById('bookingModal').addEventListener('click', function(e) {
-    if (e.target === this) closeBookingModal();
-  });
+    window.closeBookingModal = function () {
+      document.getElementById('bookingModal').classList.add('hidden');
+      document.getElementById('bookingModal').classList.remove('flex');
+    };
+    document.getElementById('bookingModal').addEventListener('click', function (e) {
+      if (e.target === this) closeBookingModal();
+    });
 
-  window.submitBooking = async function() {
-    const name = document.getElementById('guestName').value.trim();
-    const phoneRaw = document.getElementById('guestPhone').value.trim();
-    const phone = normalizePhone(phoneRaw);
+    window.submitBooking = async function () {
+      const name = document.getElementById('guestName').value.trim();
+      const phoneRaw = document.getElementById('guestPhone').value.trim();
+      const phone = normalizePhone(phoneRaw);
 
-    let hasError = false;
-    if (!name) {
-      setFieldError('guestName', 'guestNameErr', 'Vui lòng nhập họ và tên');
-      hasError = true;
-    } else {
-      clearFieldError('guestName', 'guestNameErr');
-    }
-    if (!phoneRaw) {
-      setFieldError('guestPhone', 'guestPhoneErr', 'Vui lòng nhập số điện thoại');
-      hasError = true;
-    } else if (!validateVNPhone(phoneRaw)) {
-      setFieldError('guestPhone', 'guestPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
-      hasError = true;
-    } else {
-      clearFieldError('guestPhone', 'guestPhoneErr');
-    }
-    if (hasError) return;
+      let hasError = false;
+      if (!name) {
+        setFieldError('guestName', 'guestNameErr', 'Vui lòng nhập họ và tên');
+        hasError = true;
+      } else {
+        clearFieldError('guestName', 'guestNameErr');
+      }
+      if (!phoneRaw) {
+        setFieldError('guestPhone', 'guestPhoneErr', 'Vui lòng nhập số điện thoại');
+        hasError = true;
+      } else if (!validateVNPhone(phoneRaw)) {
+        setFieldError('guestPhone', 'guestPhoneErr', 'Số điện thoại không hợp lệ (VD: 0901 234 567)');
+        hasError = true;
+      } else {
+        clearFieldError('guestPhone', 'guestPhoneErr');
+      }
+      if (hasError) return;
 
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang xử lý...';
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Đang xử lý...';
 
-    try {
-      const note = document.getElementById('guestNote').value.trim();
-      const batchId = String(Date.now());
-      const newBookings = cart.map(s => ({
-        batchId,
-        date: s.date,
-        court: s.court,
-        hour: s.hour,
-        duration: 1,
-        name,
-        phone,
-        note,
-        status: 'pending',
-        amount: s.price
-      }));
+      try {
+        const note = document.getElementById('guestNote').value.trim();
+        const batchId = String(Date.now());
+        const newBookings = cart.map(s => ({
+          batchId,
+          date: s.date,
+          court: s.court,
+          hour: s.hour,
+          duration: 1,
+          name,
+          phone,
+          note,
+          status: 'pending',
+          amount: s.price
+        }));
 
-      // SAVE TO FIRESTORE
-      await addBookings(newBookings);
+        // SAVE TO FIRESTORE
+        await addBookings(newBookings);
 
-      const count = cart.length;
-      const total = cartTotal();
-      cart = [];
-      closeBookingModal();
-      await fetchBookingsAndRender();
-      updateCartUI();
+        const count = cart.length;
+        const total = cartTotal();
+        cart = [];
+        closeBookingModal();
+        await fetchBookingsAndRender();
+        updateCartUI();
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Đặt sân thành công! 🎉',
-        html: `Cảm ơn <b>${name}</b>!<br/>
+        Swal.fire({
+          icon: 'success',
+          title: 'Đặt sân thành công! 🎉',
+          html: `Cảm ơn <b>${name}</b>!<br/>
                Đã đặt <b>${count} slot</b> · Tổng: <b>${fmtMoney(total)}</b><br/>
                <span class="text-gray-500 text-sm">Chúng tôi sẽ gọi lại <b>${phone}</b> để xác nhận trong 15 phút.</span>`,
-        confirmButtonColor: '#16a34a',
-        confirmButtonText: 'Đã hiểu'
-      });
-    } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Lỗi đặt sân',
-        text: 'Không thể kết nối máy chủ, vui lòng thử lại sau!',
-        confirmButtonColor: '#ef4444'
-      });
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu';
+          confirmButtonColor: '#16a34a',
+          confirmButtonText: 'Đã hiểu'
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi đặt sân',
+          text: 'Không thể kết nối máy chủ, vui lòng thử lại sau!',
+          confirmButtonColor: '#ef4444'
+        });
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i>Gửi yêu cầu';
+      }
+    };
+
+    let currentDate = dayjs();
+    const datePicker = document.getElementById('datePicker');
+
+    window.setDate = function (d) {
+      const today = dayjs().startOf('day');
+      if (d.startOf('day').isBefore(today)) {
+        d = today; // Prevent past dates
+      }
+      currentDate = d;
+      datePicker.value = fmtDate(d);
+      fetchBookingsAndRender();
+    };
+    window.changeDay = function (delta) { setDate(currentDate.add(delta, 'day')); };
+    window.goToday = function () { setDate(dayjs()); };
+
+    async function fetchBookingsAndRender() {
+      const dateStr = fmtDate(currentDate);
+      try {
+        currentBookings = await getBookingsByDate(dateStr);
+      } catch (e) {
+        console.error("Firestore getBookingsByDate error:", e);
+        currentBookings = [];
+      }
+      renderSchedule();
     }
-  };
 
-  let currentDate = dayjs();
-  const datePicker = document.getElementById('datePicker');
-  
-  window.setDate = function(d) {
-    const today = dayjs().startOf('day');
-    if (d.startOf('day').isBefore(today)) {
-      d = today; // Prevent past dates
+    function findBooking(date, court, hour) {
+      return currentBookings.find(b =>
+        b.date === date && b.court === court &&
+        hour >= b.hour && hour < b.hour + (b.duration || 1)
+      );
     }
-    currentDate = d;
-    datePicker.value = fmtDate(d);
-    fetchBookingsAndRender();
-  };
-  window.changeDay = function(delta) { setDate(currentDate.add(delta, 'day')); };
-  window.goToday = function() { setDate(dayjs()); };
 
-  async function fetchBookingsAndRender() {
-    const dateStr = fmtDate(currentDate);
-    try {
-      currentBookings = await getBookingsByDate(dateStr);
-    } catch (e) {
-      console.error("Firestore getBookingsByDate error:", e);
-      currentBookings = [];
-    }
-    renderSchedule();
-  }
+    window.scrollScheduleTable = function (direction) {
+      const wrapper = document.getElementById('uiScheduleTableWrapper');
+      if (wrapper) {
+        wrapper.scrollBy({ left: direction, behavior: 'smooth' });
+      }
+    };
 
-  function findBooking(date, court, hour) {
-    return currentBookings.find(b =>
-      b.date === date && b.court === court &&
-      hour >= b.hour && hour < b.hour + (b.duration || 1)
-    );
-  }
+    let showPastState = false;
 
-  window.scrollScheduleTable = function(direction) {
-    const wrapper = document.getElementById('uiScheduleTableWrapper');
-    if (wrapper) {
-      wrapper.scrollBy({ left: direction, behavior: 'smooth' });
-    }
-  };
+    window.toggleShowPast = function () {
+      showPastState = !showPastState;
+      renderSchedule();
+    };
 
-  let showPastState = false;
+    function renderSchedule() {
+      const tbody = document.getElementById('scheduleBody');
+      const dateStr = fmtDate(currentDate);
+      const isToday = dateStr === fmtDate(dayjs());
+      const nowHour = dayjs().hour();
+      let html = '';
 
-  window.toggleShowPast = function() {
-    showPastState = !showPastState;
-    renderSchedule();
-  };
+      const pastHoursCount = (isToday && nowHour > CONFIG.startHour) ? Math.min(nowHour, CONFIG.endHour) - CONFIG.startHour : 0;
 
-  function renderSchedule() {
-    const tbody = document.getElementById('scheduleBody');
-    const dateStr = fmtDate(currentDate);
-    const isToday = dateStr === fmtDate(dayjs());
-    const nowHour = dayjs().hour();
-    let html = '';
+      const totalCols = (CONFIG.courts || []).length + 1;
 
-    const pastHoursCount = (isToday && nowHour > CONFIG.startHour) ? Math.min(nowHour, CONFIG.endHour) - CONFIG.startHour : 0;
-
-    const totalCols = (CONFIG.courts || []).length + 1;
-
-    const pastContainer = document.getElementById('uiPastToggleContainer');
-    if (pastContainer) {
-      if (pastHoursCount > 0 && !showPastState) {
-        pastContainer.innerHTML = `
+      const pastContainer = document.getElementById('uiPastToggleContainer');
+      if (pastContainer) {
+        if (pastHoursCount > 0 && !showPastState) {
+          pastContainer.innerHTML = `
           <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-slate-50 border border-slate-200/80 hover:border-primary px-4 py-2 rounded-xl transition-all shadow-xs active:scale-95">
             <i class="fa-solid fa-clock-rotate-left text-primary"></i>
             <span>Xem ${pastHoursCount} khung giờ đã qua hôm nay</span>
             <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
           </button>`;
-      } else if (pastHoursCount > 0 && showPastState) {
-        pastContainer.innerHTML = `
+        } else if (pastHoursCount > 0 && showPastState) {
+          pastContainer.innerHTML = `
           <button onclick="toggleShowPast()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-primary bg-slate-50 border border-slate-200/80 hover:border-primary px-3.5 py-1.5 rounded-xl transition-all shadow-xs active:scale-95">
             <i class="fa-solid fa-eye-slash text-slate-400"></i>
             <span>Ẩn các khung giờ đã qua</span>
           </button>`;
-      } else {
-        pastContainer.innerHTML = '';
-      }
-    }
-
-    for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
-      const peak = isPeak(h);
-      const isPast = isToday && h < nowHour;
-
-      if (isPast && !showPastState) {
-        continue;
+        } else {
+          pastContainer.innerHTML = '';
+        }
       }
 
-      const timeLabel = `${String(h).padStart(2,'0')}:00`;
-      let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-4 border-b border-gray-100 text-xs text-slate-600 font-bold whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
+      for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+        const peak = isPeak(h);
+        const isPast = isToday && h < nowHour;
+
+        if (isPast && !showPastState) {
+          continue;
+        }
+
+        const timeLabel = `${String(h).padStart(2, '0')}:00`;
+        let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-4 border-b border-gray-100 text-xs text-slate-600 font-bold whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">
         ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
       </td>`;
 
-      for (let c = 0; c < CONFIG.courts.length; c++) {
-        const booking = findBooking(dateStr, c, h);
-        const selected = isInCart(c, h, dateStr);
+        for (let c = 0; c < CONFIG.courts.length; c++) {
+          const booking = findBooking(dateStr, c, h);
+          const selected = isInCart(c, h, dateStr);
 
-        if (booking) {
-          const isStart = booking.hour === h;
-          if (isStart) {
-            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+          if (booking) {
+            const isStart = booking.hour === h;
+            if (isStart) {
+              rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
               <div class="slot-booked bg-red-50 border border-red-200 rounded-lg py-2 px-2 text-xs">
                 <div class="font-semibold text-red-600"><i class="fa-solid fa-lock mr-1 text-[10px]"></i>${booking.name}</div>
                 <div class="text-red-400 mt-0.5">Đã đặt</div>
               </div>
             </td>`;
-          } else {
-            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+            } else {
+              rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
               <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg py-3 text-xs text-red-200 flex items-center justify-center">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
-          }
-        } else if (isPast) {
-          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+            }
+          } else if (isPast) {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
             <div class="slot-past bg-gray-100 border border-gray-200 rounded-lg py-2 text-xs text-gray-400 flex items-center justify-center gap-1">
               <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
             </div>
           </td>`;
-        } else if (selected) {
-          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+          } else if (selected) {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
             <div class="slot-cell slot-selected bg-indigo-100 border-2 border-indigo-500 rounded-lg py-2 px-2 text-xs shadow-sm"
               onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
               <div class="font-bold text-indigo-700"><i class="fa-solid fa-circle-check mr-1"></i>Đã chọn</div>
               <div class="text-indigo-500 mt-0.5 font-medium">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
-        } else {
-          rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
+          } else {
+            rowCells += `<td class="py-2 px-3 border-b border-gray-100 text-center">
             <div class="slot-cell slot-available ${peak ? 'bg-amber-50 border border-amber-200 hover:!bg-amber-100 hover:!border-amber-500' : 'bg-green-50 border border-green-200 hover:!bg-green-100 hover:!border-green-500'} rounded-lg py-2 px-2 text-xs"
               onclick="toggleSlot(${c}, ${h}, '${dateStr}')">
               <div class="font-semibold ${peak ? 'text-amber-600' : 'text-green-600'}">
@@ -1088,97 +1308,102 @@
               <div class="${peak ? 'text-amber-500/80' : 'text-green-600/70'} mt-0.5">${fmtMoney(slotPrice(h))}</div>
             </div>
           </td>`;
+          }
         }
+        html += `<tr class="${isPast ? 'opacity-50' : ''}">${rowCells}</tr>`;
       }
-      html += `<tr class="${isPast ? 'opacity-50' : ''}">${rowCells}</tr>`;
-    }
-    tbody.innerHTML = html;
-  }
-
-  // Init
-  datePicker.value = fmtDate(currentDate);
-  datePicker.min = fmtDate(dayjs());
-  datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
-
-  loadConfig().then(() => {
-    fetchBookingsAndRender();
-    updateCartUI();
-  });
-
-  // ScrollSpy for navbar active state
-  function initScrollSpy() {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('section[id]');
-    if (!sections.length || !navLinks.length) return;
-
-    function setActive(currentId) {
-      navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === `#${currentId}`) {
-          link.classList.add('border-b-2', 'border-primary', 'text-primary');
-          link.classList.remove('text-gray-500');
-        } else {
-          link.classList.remove('border-b-2', 'border-primary', 'text-primary');
-          link.classList.add('text-gray-500');
-        }
-      });
+      tbody.innerHTML = html;
     }
 
-    function onScroll() {
-      const isAtBottom = (window.innerHeight + Math.ceil(window.scrollY)) >= (document.documentElement.scrollHeight - 60);
-      let currentId = '';
+    // Init
+    datePicker.value = fmtDate(currentDate);
+    datePicker.min = fmtDate(dayjs());
+    datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
 
-      if (isAtBottom) {
-        currentId = 'contact';
-      } else {
-        const scrollPos = window.scrollY + 200;
-        sections.forEach(sec => {
-          const top = sec.offsetTop;
-          const height = sec.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            currentId = sec.getAttribute('id');
+    loadConfig().then(() => {
+      fetchBookingsAndRender();
+      updateCartUI();
+    });
+
+    // ScrollSpy for navbar active state
+    function initScrollSpy() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('section[id]');
+      if (!sections.length || !navLinks.length) return;
+
+      function setActive(currentId) {
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === `#${currentId}`) {
+            link.classList.add('border-b-2', 'border-primary', 'text-primary');
+            link.classList.remove('text-gray-500');
+          } else {
+            link.classList.remove('border-b-2', 'border-primary', 'text-primary');
+            link.classList.add('text-gray-500');
           }
         });
       }
 
-      if (!currentId && window.scrollY < 200) {
-        currentId = 'home';
+      function onScroll() {
+        const isAtBottom = (window.innerHeight + Math.ceil(window.scrollY)) >= (document.documentElement.scrollHeight - 60);
+        let currentId = '';
+
+        if (isAtBottom) {
+          currentId = 'contact';
+        } else {
+          const scrollPos = window.scrollY + 200;
+          sections.forEach(sec => {
+            const top = sec.offsetTop;
+            const height = sec.offsetHeight;
+            if (scrollPos >= top && scrollPos < top + height) {
+              currentId = sec.getAttribute('id');
+            }
+          });
+        }
+
+        if (!currentId && window.scrollY < 200) {
+          currentId = 'home';
+        }
+
+        if (currentId) setActive(currentId);
       }
 
-      if (currentId) setActive(currentId);
+      navLinks.forEach(link => {
+        link.addEventListener('click', function () {
+          const targetId = this.getAttribute('href')?.replace('#', '');
+          if (targetId) {
+            setActive(targetId);
+          }
+        });
+      });
+
+      window.addEventListener('scroll', onScroll);
+      window.addEventListener('load', onScroll);
+      onScroll();
     }
 
-    navLinks.forEach(link => {
-      link.addEventListener('click', function() {
-        const targetId = this.getAttribute('href')?.replace('#', '');
-        if (targetId) {
-          setActive(targetId);
-        }
-      });
-    });
+    initScrollSpy();
+  </script>
+  <!-- Floating Quick Contact Buttons (Bottom Right) -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end">
+    <!-- Zalo Floating Button -->
+    <a id="uiFloatZaloBtn" href="https://zalo.me/0901234567" target="_blank" title="Chat Zalo"
+      class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-[#0068ff] hover:bg-[#0052cc] text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+      <span id="uiFloatZaloText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">Chat
+        Zalo</span>
+      <span class="font-black text-2xl font-sans leading-none flex-shrink-0 tracking-tighter">Z</span>
+    </a>
 
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('load', onScroll);
-    onScroll();
-  }
-
-  initScrollSpy();
-</script>
-<!-- Floating Quick Contact Buttons (Bottom Right) -->
-<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end">
-  <!-- Zalo Floating Button -->
-  <a id="uiFloatZaloBtn" href="https://zalo.me/0901234567" target="_blank" title="Chat Zalo" class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-[#0068ff] hover:bg-[#0052cc] text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-    <span id="uiFloatZaloText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">Chat Zalo</span>
-    <span class="font-black text-2xl font-sans leading-none flex-shrink-0 tracking-tighter">Z</span>
-  </a>
-
-  <!-- Phone Call Floating Button -->
-  <a id="uiFloatCallBtn" href="tel:0901234567" title="Gọi Hotline" class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden relative">
-    <span class="absolute inset-0 rounded-full bg-emerald-500/40 animate-ping -z-10"></span>
-    <span id="uiFloatCallText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">0901 234 567</span>
-    <i class="fa-solid fa-phone text-lg flex-shrink-0"></i>
-  </a>
-</div>
+    <!-- Phone Call Floating Button -->
+    <a id="uiFloatCallBtn" href="tel:0901234567" title="Gọi Hotline"
+      class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden relative">
+      <span class="absolute inset-0 rounded-full bg-emerald-500/40 animate-ping -z-10"></span>
+      <span id="uiFloatCallText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">0901
+        234 567</span>
+      <i class="fa-solid fa-phone text-lg flex-shrink-0"></i>
+    </a>
+  </div>
 
 </body>
+
 </html>

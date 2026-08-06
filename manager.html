@@ -6,7 +6,9 @@
   <title>Quản Lý Sân — Sân Cầu Việt Đảng</title>
   <meta name="robots" content="noindex" />
   <link id="appFavicon" rel="icon" href="assets/logo.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -16,7 +18,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+          fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
           colors: {
             primary: { DEFAULT: '#1d4ed8', light: '#2563eb', dark: '#1e40af', 50: '#eff6ff', 100: '#dbeafe' },
             navy: { DEFAULT: '#0b1a36' }
@@ -26,7 +28,7 @@
     }
   </script>
   <style>
-    * { font-family: 'Outfit', sans-serif; }
+    * { font-family: 'Be Vietnam Pro', sans-serif; }
     .slot-available { cursor: pointer; transition: all .2s; }
     .slot-available:hover { background: #dcfce7 !important; border-color: #16a34a !important; transform: scale(1.03); }
     .slot-booked { cursor: pointer; transition: all .2s; }
