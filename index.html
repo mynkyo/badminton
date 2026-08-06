@@ -471,11 +471,23 @@
     applyConfigUI();
   }
 
+  function formatPhoneVN(raw) {
+    if (!raw) return '';
+    const clean = raw.replace(/[\s\-.()]/g, '');
+    if (clean.length === 10) {
+      return `${clean.substring(0, 4)} ${clean.substring(4, 7)} ${clean.substring(7)}`;
+    }
+    return raw;
+  }
+
   function applyConfigUI() {
     const courtName = CONFIG.name || 'Sân Cầu Việt Đảng';
-    const phoneFormatted = CONFIG.phone || '0901 234 567';
-    const phoneClean = phoneFormatted.replace(/[\s.-]/g, '');
-    const zaloFormatted = CONFIG.zalo || phoneFormatted;
+    const phoneRaw = CONFIG.phone || '0901234567';
+    const phoneClean = phoneRaw.replace(/[\s\-.()]/g, '');
+    const phoneFormatted = formatPhoneVN(phoneRaw);
+
+    const zaloRaw = CONFIG.zalo || phoneRaw;
+    const zaloFormatted = formatPhoneVN(zaloRaw);
     const address = CONFIG.address || '123 Đường Việt Đảng, TP.HCM';
 
     // Header & Footer Brand
@@ -484,11 +496,28 @@
     if (document.getElementById('uiHeroTitle')) document.getElementById('uiHeroTitle').textContent = courtName;
     if (document.getElementById('uiHeroSub')) document.getElementById('uiHeroSub').textContent = `${(CONFIG.courts||[]).length} sân chuẩn thi đấu · Chọn nhiều giờ · Đặt sân nhanh chóng`;
     
-    // Call Button
+    // Call Button & Floating Call Button
     if (document.getElementById('uiHeroCallBtn')) {
       const callBtn = document.getElementById('uiHeroCallBtn');
       callBtn.href = `tel:${phoneClean}`;
       callBtn.innerHTML = `<i class="fa-solid fa-phone"></i><span class="hidden sm:inline">${phoneFormatted}</span>`;
+    }
+    if (document.getElementById('uiFloatCallBtn')) {
+      const floatCall = document.getElementById('uiFloatCallBtn');
+      floatCall.href = `tel:${phoneClean}`;
+      if (document.getElementById('uiFloatCallText')) {
+        document.getElementById('uiFloatCallText').textContent = phoneFormatted;
+      }
+    }
+
+    // Floating Zalo Button
+    if (document.getElementById('uiFloatZaloBtn')) {
+      const floatZalo = document.getElementById('uiFloatZaloBtn');
+      const zaloClean = zaloRaw.replace(/[\s\-.()]/g, '');
+      floatZalo.href = `https://zalo.me/${zaloClean}`;
+      if (document.getElementById('uiFloatZaloText')) {
+        document.getElementById('uiFloatZaloText').textContent = `Chat Zalo (${zaloFormatted})`;
+      }
     }
 
     // Contact Section
@@ -1102,5 +1131,21 @@
 
   initScrollSpy();
 </script>
+<!-- Floating Quick Contact Buttons (Bottom Right) -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 items-end">
+  <!-- Zalo Floating Button -->
+  <a id="uiFloatZaloBtn" href="https://zalo.me/0901234567" target="_blank" title="Chat Zalo" class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-[#0068ff] hover:bg-[#0052cc] text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+    <span id="uiFloatZaloText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">Chat Zalo</span>
+    <i class="fa-solid fa-comment-dots text-lg flex-shrink-0"></i>
+  </a>
+
+  <!-- Phone Call Floating Button -->
+  <a id="uiFloatCallBtn" href="tel:0901234567" title="Gọi Hotline" class="group flex items-center justify-center h-12 w-12 hover:w-auto hover:px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden relative">
+    <span class="absolute inset-0 rounded-full bg-emerald-500/40 animate-ping -z-10"></span>
+    <span id="uiFloatCallText" class="hidden group-hover:inline-block whitespace-nowrap text-xs font-bold mr-2">0901 234 567</span>
+    <i class="fa-solid fa-phone text-lg flex-shrink-0"></i>
+  </a>
+</div>
+
 </body>
 </html>
