@@ -57,9 +57,14 @@
     .nav-link { transition: color .2s; }
     .nav-link:hover { color: #1d4ed8; }
 
-    ::-webkit-scrollbar { height: 5px; width: 5px; }
+    ::-webkit-scrollbar { height: 7px; width: 7px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 4px; }
+
+    #uiScheduleTableWrapper::-webkit-scrollbar { height: 9px; }
+    #uiScheduleTableWrapper::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 6px; }
+    #uiScheduleTableWrapper::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 6px; }
+    #uiScheduleTableWrapper::-webkit-scrollbar-thumb:hover { background: #1e40af; }
 
     @keyframes selectPop { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
     .slot-pop { animation: selectPop .2s ease; }
@@ -170,20 +175,33 @@
     <!-- Toggle Past Hours Button Container (Centered outside scrollable table) -->
     <div id="uiPastToggleContainer" class="mb-4 text-center"></div>
 
-    <!-- Table -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm border-collapse text-center">
-        <thead>
-          <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
-            <th class="py-4 px-2 text-gray-500 font-semibold w-24 text-left">Giờ</th>
-            <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
-            <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
-            <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
-          </tr>
-        </thead>
-      <tbody id="scheduleBody"></tbody>
-    </table>
-  </div>
+    <!-- Table Wrapper with Left / Right Scroll Buttons -->
+    <div class="relative px-7 group">
+      <!-- Left Scroll Arrow -->
+      <button onclick="scrollScheduleTable(-300)" title="Cuộn sang trái" class="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+      </button>
+
+      <!-- Right Scroll Arrow -->
+      <button onclick="scrollScheduleTable(300)" title="Cuộn sang phải" class="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 bg-white hover:bg-primary hover:text-white text-navy border border-slate-200/90 rounded-full shadow-md flex items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+      </button>
+
+      <!-- Table Container -->
+      <div id="uiScheduleTableWrapper" class="overflow-x-auto scroll-smooth pb-2">
+        <table class="w-full text-sm border-collapse text-center">
+          <thead>
+            <tr id="uiTableHeaderRow" class="border-b-2 border-gray-100">
+              <th class="py-4 px-2 text-gray-500 font-semibold w-24 text-left">Giờ</th>
+              <th class="py-4 px-2 text-navy font-bold">Sân 1</th>
+              <th class="py-4 px-2 text-navy font-bold">Sân 2</th>
+              <th class="py-4 px-2 text-navy font-bold">Sân 3</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+    </div>
 </section>
 
 <!-- ===== PRICING ===== -->
@@ -967,6 +985,13 @@
       hour >= b.hour && hour < b.hour + (b.duration || 1)
     );
   }
+
+  window.scrollScheduleTable = function(direction) {
+    const wrapper = document.getElementById('uiScheduleTableWrapper');
+    if (wrapper) {
+      wrapper.scrollBy({ left: direction, behavior: 'smooth' });
+    }
+  };
 
   let showPastState = false;
 
