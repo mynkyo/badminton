@@ -1337,6 +1337,15 @@
       </div>`).join('');
     }
 
+    window.removeFromBookingModal = function(key) {
+      removeFromCart(key);
+      if (cart.length === 0) {
+        closeBookingModal();
+      } else {
+        openBookingModal();
+      }
+    };
+
     window.openBookingModal = function () {
       if (cart.length === 0) return;
       const count = cart.length;
@@ -1349,13 +1358,24 @@
 
       const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
       document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
-      <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 text-xs">
-        <i class="fa-solid fa-circle-check text-primary"></i>
-        <span class="font-medium text-gray-700">${CONFIG.courts[s.court]}</span>
-        <span class="text-gray-400">${String(s.hour).padStart(2, '0')}:00–${String(s.hour + 1).padStart(2, '0')}:00</span>
-        <span class="text-gray-400">${dayjs(s.date).format('DD/MM/YYYY')}</span>
-        ${isPeak(s.hour) ? '<span class="text-amber-500">⚡120K</span>' : '<span class="text-gray-400">80K</span>'}
+      <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs">
+        <div class="flex items-center gap-2 min-w-0">
+          <i class="fa-solid fa-circle-check text-primary flex-shrink-0"></i>
+          <span class="font-bold text-slate-800">${CONFIG.courts[s.court]}</span>
+          <span class="text-slate-500 font-medium">${String(s.hour).padStart(2, '0')}:00–${String(s.hour + 1).padStart(2, '0')}:00</span>
+          <span class="text-slate-400 font-medium">(${dayjs(s.date).format('DD/MM/YYYY')})</span>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="font-bold ${isPeak(s.hour) ? 'text-amber-600' : 'text-primary'}">${fmtMoney(s.price)} ${isPeak(s.hour) ? '⚡' : ''}</span>
+          <button type="button" onclick="removeFromBookingModal('${s.key}')" class="w-6 h-6 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-all" title="Xóa slot này">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
       </div>`).join('');
+
+      // Adjust float buttons z-index so they don't cover modal action buttons
+      const floatContainer = document.getElementById('uiFloatContactContainer');
+      if (floatContainer) floatContainer.style.zIndex = '30';
 
       document.getElementById('bookingModal').classList.remove('hidden');
       document.getElementById('bookingModal').classList.add('flex');
@@ -1365,6 +1385,8 @@
     window.closeBookingModal = function () {
       document.getElementById('bookingModal').classList.add('hidden');
       document.getElementById('bookingModal').classList.remove('flex');
+      const floatContainer = document.getElementById('uiFloatContactContainer');
+      if (floatContainer) floatContainer.style.zIndex = '50';
     };
     document.getElementById('bookingModal').addEventListener('click', function (e) {
       if (e.target === this) closeBookingModal();
