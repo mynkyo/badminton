@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sân Cầu Việt Đảng — Đặt Sân Online</title>
   <meta name="description" content="Đặt sân cầu lông nhanh chóng tại Sân Cầu Việt Đảng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
+  <link id="appFavicon" rel="icon" href="assets/logo.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -71,7 +72,9 @@
   <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
     <!-- Logo -->
     <a href="index.html" class="flex items-center gap-3">
-      <div class="text-primary text-3xl"><i class="fa-solid fa-shuttlecock"></i></div>
+      <div id="uiHeaderLogoContainer" class="flex-shrink-0">
+        <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+      </div>
       <div>
         <div id="uiCourtNameTitle" class="font-bold text-xl text-navy leading-tight">Sân Cầu Lông</div>
         <div id="uiCourtNameSub" class="text-lg text-primary leading-tight font-bold uppercase">THÀNH CÔNG</div>
@@ -98,38 +101,27 @@
 </nav>
 
 <!-- ===== HERO ===== -->
-<section id="home" class="relative overflow-hidden bg-gradient-to-br from-white to-blue-50 pt-16 pb-32">
-  <div class="absolute right-0 top-0 w-2/3 h-full bg-gradient-to-l from-blue-100/50 to-transparent skew-x-12 translate-x-32"></div>
-  <div class="max-w-6xl mx-auto px-4 relative z-10">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <!-- Left side: Text -->
-      <div>
-        <h1 class="text-5xl lg:text-6xl font-extrabold text-navy leading-[1.15] mb-5">Đặt sân dễ dàng<br/>Trải nghiệm trọn vẹn</h1>
-        <p class="text-lg text-slate-500 font-medium mb-8">Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm</p>
-        
-        <div class="flex flex-wrap gap-4 mb-8">
-          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
-            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></div>
-            3 Sân đạt chuẩn
-          </div>
-          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
-            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-money-bill"></i></div>
-            Giá hợp lý
-          </div>
-          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
-            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-shield-heart"></i></div>
-            Phục vụ tận tâm
-          </div>
-        </div>
+<section id="home" class="relative overflow-hidden bg-navy text-white pt-20 pb-36 bg-cover bg-center transition-all" style="background-image: linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg');">
+  <div class="max-w-6xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 drop-shadow-md">
+      Đặt sân dễ dàng<br/>Trải nghiệm trọn vẹn
+    </h1>
+    <p class="text-lg text-blue-100 font-medium mb-8 max-w-2xl drop-shadow">
+      Sân cầu lông chất lượng – Giá hợp lý – Phục vụ tận tâm
+    </p>
+    
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></div>
+        3 Sân đạt chuẩn
       </div>
-      <!-- Right side: Illustration -->
-      <div class="relative flex justify-center lg:justify-end">
-        <div class="w-[300px] h-[300px] lg:w-[450px] lg:h-[450px] rounded-full bg-blue-100/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl -z-10"></div>
-        <div class="text-[200px] lg:text-[250px] text-primary rotate-12 drop-shadow-2xl opacity-90 relative" style="filter: drop-shadow(10px 20px 20px rgba(0,0,0,0.15))">
-          <!-- Placeholder using icons -->
-          <i class="fa-solid fa-shuttlecock absolute -bottom-10 -left-20 text-[100px] lg:text-[130px] -rotate-45 drop-shadow-xl opacity-90 text-navy"></i>
-          <i class="fa-solid fa-table-tennis-paddle-ball text-gray-300"></i>
-        </div>
+      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-money-bill"></i></div>
+        Giá hợp lý
+      </div>
+      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-semibold text-white">
+        <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-shield-heart"></i></div>
+        Phục vụ tận tâm
       </div>
     </div>
   </div>
@@ -227,27 +219,25 @@
     </div>
 
     <!-- Wide Card: Dịch vụ đi kèm -->
-    <div class="bg-gradient-to-r from-blue-50/60 to-indigo-50/60 border border-blue-100/80 rounded-2xl p-5">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center gap-3 text-primary font-bold text-sm min-w-max">
-          <div class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center text-xs shadow-sm">
-            <i class="fa-solid fa-box-archive"></i>
-          </div>
-          Dịch vụ đi kèm
+    <div class="bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 border border-blue-100/80 rounded-3xl p-6 shadow-sm">
+      <div class="flex items-center gap-3 text-primary font-bold text-base mb-4 border-b border-blue-100/60 pb-3">
+        <div class="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center text-sm shadow-sm">
+          <i class="fa-solid fa-box-archive"></i>
         </div>
-        <div class="flex flex-wrap items-center gap-6 text-xs text-slate-600 font-semibold">
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center text-[9px]"><i class="fa-solid fa-check"></i></span>
-            Cho thuê vợt: 20.000đ/cây
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center text-[9px]"><i class="fa-solid fa-check"></i></span>
-            Nước suối miễn phí
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center text-[9px]"><i class="fa-solid fa-check"></i></span>
-            Thay dây vợt theo yêu cầu
-          </div>
+        <span>Dịch vụ đi kèm</span>
+      </div>
+      <div id="uiServicesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
+          <span>Cho thuê vợt: 20.000đ/cây</span>
+        </div>
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
+          <span>Nước suối miễn phí</span>
+        </div>
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs">
+          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
+          <span>Thay dây vợt theo yêu cầu</span>
         </div>
       </div>
     </div>
@@ -294,7 +284,9 @@
       <!-- Cột 1: Logo và tên -->
       <div>
         <div class="flex items-center gap-3 mb-6">
-          <div class="text-white text-3xl"><i class="fa-solid fa-shuttlecock"></i></div>
+          <div id="uiFooterLogoContainer" class="flex-shrink-0">
+            <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+          </div>
           <div>
             <div id="uiFooterBrandTitle" class="font-bold text-lg text-white leading-tight">Sân Cầu Lông</div>
             <div id="uiFooterBrandName" class="text-base text-white font-bold leading-tight uppercase">THÀNH CÔNG</div>
@@ -491,6 +483,26 @@
 
     if (document.getElementById('uiHeroCallBtn')) document.getElementById('uiHeroCallBtn').href = `tel:${CONFIG.phone.replace(/[\s.-]/g,'')}`;
 
+    // Apply Logo & Favicon
+    const logoBox = document.getElementById('uiHeaderLogoContainer');
+    const footerLogoBox = document.getElementById('uiFooterLogoContainer');
+    const favicon = document.getElementById('appFavicon');
+    const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : 'assets/logo.png';
+
+    if (favicon) favicon.href = logoSrc;
+    if (logoBox) logoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
+    if (footerLogoBox) footerLogoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
+
+    // Apply Hero Background
+    const heroSec = document.getElementById('home');
+    if (heroSec) {
+      if (CONFIG.useDefaultBg || !CONFIG.bgBase64) {
+        heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg')`;
+      } else {
+        heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('${CONFIG.bgBase64}')`;
+      }
+    }
+
     if (document.getElementById('uiGoogleMapsContainer')) {
       const mapBox = document.getElementById('uiGoogleMapsContainer');
       if (CONFIG.googleMaps && CONFIG.googleMaps.includes('<iframe')) {
@@ -546,6 +558,20 @@
       document.getElementById('uiPricePeakHours').textContent = `${String(CONFIG.peakStart).padStart(2,'0')}:00 – ${String(CONFIG.peakEnd).padStart(2,'0')}:00 hàng ngày`;
     }
     if (document.getElementById('uiPricePeakVal')) document.getElementById('uiPricePeakVal').textContent = (CONFIG.pricePeak/1000) + 'K';
+
+    // Services
+    if (document.getElementById('uiServicesContainer')) {
+      const servicesList = (CONFIG.services && CONFIG.services.length > 0)
+        ? CONFIG.services
+        : ['Cho thuê vợt: 20.000đ/cây', 'Nước suối miễn phí', 'Thay dây vợt theo yêu cầu'];
+
+      document.getElementById('uiServicesContainer').innerHTML = servicesList.map(s => `
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-xs text-navy font-semibold shadow-xs hover:border-primary/40 hover:shadow-sm transition-all">
+          <span class="w-5 h-5 bg-blue-50 text-primary rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"><i class="fa-solid fa-check"></i></span>
+          <span class="break-words">${s}</span>
+        </div>
+      `).join('');
+    }
 
     // Notice in Modal
     if (document.getElementById('modalBookingNotice')) document.getElementById('modalBookingNotice').textContent = CONFIG.notice;
