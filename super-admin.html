@@ -609,11 +609,14 @@
       });
     };
 
-    window.handleApprove = async function(id, encodedData) {
-      const data = JSON.parse(decodeURIComponent(encodedData));
+    window.handleApprove = async function(id, regData) {
+      let data = regData;
+      if (typeof regData === 'string') {
+        try { data = JSON.parse(decodeURIComponent(regData)); } catch(e) { data = {}; }
+      }
       const res = await Swal.fire({
         title: 'Xác nhận duyệt sân?',
-        html: `Kích hoạt sân <b>${data.courtName}</b><br/>Đường dẫn: <b>/${data.slug}</b>`,
+        html: `Kích hoạt sân <b>${data.courtName || data.slug || ''}</b><br/>Đường dẫn: <b>/${data.slug || ''}</b>`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#10b981',
