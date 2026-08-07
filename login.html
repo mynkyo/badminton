@@ -159,7 +159,12 @@
     if (user && !user.isAnonymous) {
       await handlePostLogin(user);
     } else {
-      // Khi chưa đăng nhập hoặc vừa đăng xuất thành công
+      // Khi chưa đăng nhập hoặc vừa đăng xuất thành công: Reset nút Google Login
+      const btn = document.getElementById('googleLoginBtn');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" /><span>Đăng nhập bằng Google</span>';
+      }
       loginActionSection.classList.remove('hidden');
       noAccessSection.classList.add('hidden');
     }
@@ -168,15 +173,14 @@
   // ===== Nút Đăng xuất =====
   btnLogoutUser.addEventListener('click', async () => {
     btnLogoutUser.disabled = true;
-    btnLogoutUser.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang đăng xuất...</span>';
+    btnLogoutUser.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i><span>Đang đăng xuất...</span>';
     try {
       await logoutUser();
-      // onAuthChange sẽ tự reset UI về nút Đăng nhập bằng Google
     } catch (err) {
       console.error(err);
     } finally {
       btnLogoutUser.disabled = false;
-      btnLogoutUser.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất tài khoản này</span>';
+      btnLogoutUser.innerHTML = '<i class="fa-solid fa-right-from-bracket mr-1"></i><span>Đăng xuất tài khoản này</span>';
     }
   });
 
@@ -189,12 +193,15 @@
       await loginWithGoogle();
     } catch (err) {
       console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Đăng nhập thất bại',
-        text: err.message,
-        confirmButtonColor: '#ef4444'
-      });
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Đăng nhập thất bại',
+          text: err.message,
+          confirmButtonColor: '#ef4444'
+        });
+      }
+    } finally {
       btn.disabled = false;
       btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"><span>Đăng nhập bằng Google</span>';
     }
