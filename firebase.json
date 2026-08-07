@@ -34,5 +34,8 @@
       { "source": "/**/manage", "destination": "/manage.html" },
       { "source": "/**", "destination": "/court.html" }
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
