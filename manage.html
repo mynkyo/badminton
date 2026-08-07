@@ -69,7 +69,7 @@
     <div class="px-5 py-5 border-b border-white/10">
       <a href="index.html" target="_blank" class="flex items-center gap-3 group">
         <div id="sidebarLogoContainer" class="flex-shrink-0">
-          <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+          <img src="/assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
         </div>
         <div>
           <div id="sidebarCourtBrandName" class="font-extrabold text-sm text-white tracking-tight truncate max-w-[160px] group-hover:text-blue-400 transition-colors"></div>
@@ -607,7 +607,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                 <div class="p-4 sm:p-5">
                   <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
                     <div id="logoPreviewContainer" class="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center text-primary text-3xl border-2 border-slate-200 flex-shrink-0 shadow-sm">
-                      <img src="assets/logo.png" alt="Logo" class="w-full h-full object-cover" />
+                      <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-cover" />
                     </div>
                     <div id="logoUploadBox" class="flex-1 w-full">
                       <p class="text-xs text-gray-600 font-medium mb-3 leading-relaxed">Tải ảnh logo riêng (<code class="bg-gray-100 px-1 rounded">.png</code>, <code class="bg-gray-100 px-1 rounded">.jpg</code>). Nên chọn hình vuông hoặc tròn để hiển thị đẹp.</p>
@@ -643,7 +643,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                 </div>
                 <div class="p-4 sm:p-5">
                   <div id="bgPreviewContainer" class="w-full h-36 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200 shadow-sm mb-4">
-                    <img src="assets/hero-bg.jpg" alt="Banner" class="w-full h-full object-cover" />
+                    <img src="/assets/hero-bg.jpg" alt="Banner" class="w-full h-full object-cover" />
                   </div>
                   <div id="bgUploadBox">
                     <p class="text-xs text-gray-600 font-medium mb-3 leading-relaxed">Tải ảnh nền banner (<code class="bg-gray-100 px-1 rounded">.jpg</code>, <code class="bg-gray-100 px-1 rounded">.png</code>). Nên chọn ảnh chụp góc rộng của sân để hiển thị đẹp.</p>
@@ -903,7 +903,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     email: '',
     facebook: '',
     googleMaps: '',
-    notice: ''
+    notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
   };
 
   async function loadConfig() {
@@ -956,6 +956,10 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     // Fill Settings form
     document.getElementById('cfgName').value = CONFIG.name || '';
     if (document.getElementById('sidebarCourtBrandName')) document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name || '';
+    const sidebarLogoImg = document.querySelector('#sidebarLogoContainer img');
+    if (sidebarLogoImg) {
+      sidebarLogoImg.src = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : '/assets/logo.png';
+    }
     document.getElementById('cfgPhone').value = CONFIG.phone || '';
     document.getElementById('cfgZalo').value = CONFIG.zalo || CONFIG.phone || '';
     const sameAs = CONFIG.sameAsPhone ?? (CONFIG.zalo === CONFIG.phone || !CONFIG.zalo);
@@ -1027,11 +1031,11 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
       const preview = document.getElementById('logoPreviewContainer');
       if (isDefault) {
-        if (preview) preview.innerHTML = `<img src="assets/logo.png" class="w-full h-full object-cover rounded-2xl">`;
+        if (preview) preview.innerHTML = `<img src="/assets/logo.png" class="w-full h-full object-cover rounded-2xl">`;
       } else {
         if (preview) {
           if (CONFIG.logoBase64) preview.innerHTML = `<img src="${CONFIG.logoBase64}" class="w-full h-full object-cover rounded-2xl">`;
-          else preview.innerHTML = `<img src="assets/logo.png" class="w-full h-full object-cover rounded-2xl">`;
+          else preview.innerHTML = `<img src="/assets/logo.png" class="w-full h-full object-cover rounded-2xl">`;
         }
       }
     };
@@ -1053,11 +1057,11 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
       const preview = document.getElementById('bgPreviewContainer');
       if (isDefault) {
-        if (preview) preview.innerHTML = `<img src="assets/hero-bg.jpg" class="w-full h-full object-cover rounded-2xl">`;
+        if (preview) preview.innerHTML = `<img src="/assets/hero-bg.jpg" class="w-full h-full object-cover rounded-2xl">`;
       } else {
         if (preview) {
           if (CONFIG.bgBase64) preview.innerHTML = `<img src="${CONFIG.bgBase64}" class="w-full h-full object-cover rounded-2xl">`;
-          else preview.innerHTML = `<img src="assets/hero-bg.jpg" class="w-full h-full object-cover rounded-2xl">`;
+          else preview.innerHTML = `<img src="/assets/hero-bg.jpg" class="w-full h-full object-cover rounded-2xl">`;
         }
       }
     };
@@ -1069,7 +1073,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     if (document.getElementById('cfgUseDefaultBg')) document.getElementById('cfgUseDefaultBg').checked = useDefaultBg;
 
     const favicon = document.getElementById('appFavicon');
-    const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : 'assets/logo.png';
+    const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : '/assets/logo.png';
     if (favicon) favicon.href = logoSrc;
 
     onLogoDefaultToggle(useDefaultLogo);

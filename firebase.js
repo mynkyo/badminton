@@ -254,7 +254,8 @@ export async function approveRegistration(regId, regData) {
       name: courtName || '',
       phone: phone || '',
       address: address || '',
-      description: description || ''
+      description: description || '',
+      notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
     }
   });
   await setUserRole(uid, {
