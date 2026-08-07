@@ -441,6 +441,119 @@ export async function updateUserRole(uid, roleData) {
   return await updateDoc(doc(db, 'users', uid), roleData);
 }
 
+/** Lấy danh sách nhân viên (admin + manager) của sân */
+export async function getCourtStaff(courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug) return [];
+  try {
+    const q = query(collection(db, 'users'), where('courtId', '==', slug));
+    const snap = await getDocs(q);
+    return snap.docs
+      .map(d => ({ uid: d.id, ...d.data() }))
+      .filter(u => u.role === 'admin' || u.role === 'manager');
+  } catch (e) {
+    console.error('getCourtStaff error:', e);
+    return [];
+  }
+}
+
+/** Lấy danh sách khách hàng đã từng truy cập sân */
+export async function getCourtCustomers(courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug) return [];
+  try {
+    const q = query(collection(db, 'users'), where('visitedCourts', 'array-contains', slug));
+    const snap = await getDocs(q);
+    return snap.docs
+      .map(d => ({ uid: d.id, ...d.data() }))
+      .filter(u => !u.role || u.role === 'customer');
+  } catch (e) {
+    console.error('getCourtCustomers error:', e);
+    return [];
+  }
+}
+
+/** Thêm Manager theo email (tìm trong Firestore hoặc tạo placeholder nếu chưa có) */
+export async function addManagerByEmail(email, courtSlug, courtName) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug || !email) throw new Error('Thiếu email hoặc courtSlug');
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Tìm user theo email trong Firestore
+  const q = query(collection(db, 'users'), where('email', '==', normalizedEmail));
+  const snap = await getDocs(q);
+
+  if (!snap.empty) {
+    // User đã tồn tại → cập nhật quyền
+    const userDoc = snap.docs[0];
+    const uid = userDoc.id;
+    await setDoc(doc(db, 'users', uid), {
+      role: 'manager',
+      courtId: slug,
+      managedCourts: arrayUnion(slug),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return { uid, existed: true, email: normalizedEmail, ...userDoc.data() };
+  } else {
+    // User chưa tồn tại → tạo placeholder với email
+    const placeholderRef = doc(collection(db, 'users'));
+    await setDoc(placeholderRef, {
+      email: normalizedEmail,
+      displayName: normalizedEmail.split('@')[0],
+      role: 'manager',
+      courtId: slug,
+      managedCourts: [slug],
+      isPlaceholder: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return { uid: placeholderRef.id, existed: false, email: normalizedEmail };
+  }
+}
+
+/** Xóa quyền Manager theo UID */
+export async function removeManagerByUid(uid, courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!uid) throw new Error('Thiếu UID');
+  const userRef = doc(db, 'users', uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) throw new Error('Không tìm thấy user');
+  const data = snap.data();
+
+  // Xóa slug khỏi managedCourts
+  const newManagedCourts = (data.managedCourts || []).filter(c => c !== slug);
+
+  // Nếu vẫn còn managed courts khác thì giữ role manager, ngược lại hạ về customer
+  const newRole = newManagedCourts.length > 0 ? 'manager' : 'customer';
+  const newCourtId = newManagedCourts.length > 0 ? newManagedCourts[0] : null;
+
+  await setDoc(userRef, {
+    role: newRole,
+    courtId: newCourtId,
+    managedCourts: newManagedCourts,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+}
+
+/** Gửi Email mời Manager mới */
+export async function sendManagerInviteEmail({ toEmail, managerName, courtName, courtSlug, addedByName }) {
+  if (!toEmail) return;
+  const manageUrl = `https://dat-san-cau-long.web.app/${courtSlug}/manage`;
+  const courtUrl  = `https://dat-san-cau-long.web.app/${courtSlug}`;
+  const tableData = {
+    'Xin Chào': managerName || toEmail.split('@')[0],
+    'Thông Báo': `Bạn đã được mời làm Nhân Viên Quản Lý tại sân cầu lông "${courtName || courtSlug}"!`,
+    'Tên Sân': courtName || courtSlug,
+    'Được Mời Bởi': addedByName || 'Chủ Sân',
+    'Trang Sân (Khách)': courtUrl,
+    'Trang Quản Lý (Nhân Viên)': manageUrl,
+    'Hướng Dẫn': 'Hãy đăng nhập bằng tài khoản Google có email này để vào trang Quản Lý và bắt đầu làm việc!'
+  };
+  const subject = `[Lời Mời] Bạn được mời làm Nhân Viên tại sân "${courtName || courtSlug}"`;
+  await sendEmailViaFormsubmit(toEmail, subject, tableData);
+}
+
 /** Kiểm tra user có quyền quản lý sân hiện tại không */
 export async function checkStaffAccess(uid, email) {
   if (!uid || !currentCourtSlug) return false;

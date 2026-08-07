@@ -87,6 +87,9 @@
       <button onclick="showSection('bookings')" id="nav-bookings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
         <i class="fa-solid fa-list-check w-5 text-center"></i> Danh sách đơn đặt
       </button>
+      <button onclick="showSection('staff')" id="nav-staff" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
+        <i class="fa-solid fa-users w-5 text-center"></i> Nhân viên &amp; Khách hàng
+      </button>
       <button onclick="showSection('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
         <i class="fa-solid fa-gear w-5 text-center"></i> Cài đặt thông tin sân
       </button>
@@ -386,6 +389,76 @@
           </div>
         </div>
       </section>
+
+      <!-- ======= STAFF & CUSTOMERS ======= -->
+      <section id="section-staff" class="hidden space-y-5">
+        <!-- Sub-tabs -->
+        <div class="flex gap-2 bg-gray-100 rounded-xl p-1 w-full sm:w-auto">
+          <button id="staffTab-staff" onclick="switchStaffTab('staff')" class="flex-1 sm:flex-none px-5 py-2 text-sm font-semibold rounded-lg bg-white text-primary shadow-sm transition-all"><i class="fa-solid fa-user-tie mr-1"></i>Nhân viên</button>
+          <button id="staffTab-customers" onclick="switchStaffTab('customers')" class="flex-1 sm:flex-none px-5 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:bg-white/60 transition-all"><i class="fa-solid fa-users mr-1"></i>Khách hàng</button>
+        </div>
+
+        <!-- Staff Panel -->
+        <div id="staffPanel-staff">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-user-tie text-primary mr-2"></i>Danh sách Nhân viên</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Nhân viên có thể xem và quản lý lịch đặt sân</p>
+              </div>
+              <button onclick="openAddManagerModal()" class="flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary-dark transition-all shadow-sm">
+                <i class="fa-solid fa-plus"></i> Thêm Nhân viên
+              </button>
+            </div>
+            <div id="staffList" class="divide-y divide-gray-50">
+              <div class="flex items-center justify-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customers Panel -->
+        <div id="staffPanel-customers" class="hidden">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-users text-indigo-500 mr-2"></i>Khách hàng</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Những người đã đăng nhập và truy cập sân này</p>
+              </div>
+              <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs"></i>
+                <input id="customerSearch" oninput="filterCustomers()" type="text" placeholder="Tìm theo tên, email..." class="bg-transparent text-sm outline-none w-48 placeholder-gray-400" />
+              </div>
+            </div>
+            <div id="customerList" class="divide-y divide-gray-50">
+              <div class="flex items-center justify-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Manager Modal -->
+      <div id="addManagerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" style="animation:slideUp .25s cubic-bezier(.34,1.56,.64,1);">
+          <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-user-plus text-primary mr-2"></i>Thêm Nhân viên</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Nhập địa chỉ email tài khoản Google của nhân viên</p>
+            </div>
+            <button onclick="closeAddManagerModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="px-6 py-5 space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email tài khoản Google</label>
+              <input id="managerEmailInput" type="email" placeholder="example@gmail.com" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+            </div>
+            <div id="addManagerStatus" class="hidden text-sm rounded-lg px-3 py-2"></div>
+          </div>
+          <div class="px-6 pb-5 flex gap-3">
+            <button onclick="closeAddManagerModal()" class="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-all">Hủy</button>
+            <button id="addManagerBtn" onclick="confirmAddManager()" class="flex-1 bg-primary text-white font-semibold py-2.5 rounded-xl text-sm hover:bg-primary-dark transition-all shadow-sm">Thêm nhân viên</button>
+          </div>
+        </div>
+      </div>
 
       <!-- ======= COURT SETTINGS ======= -->
       <section id="section-settings" class="hidden">
@@ -857,7 +930,8 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     updateBooking, deleteBooking, getSettings, saveSettings,
     logoutUser, onAuthChange,
     setCurrentCourt, getCourtSlug, checkStaffAccess, checkAdminAccess,
-    getCourtInfo, SUPER_ADMIN_UID
+    getCourtInfo, SUPER_ADMIN_UID,
+    getCourtStaff, getCourtCustomers, addManagerByEmail, removeManagerByUid, sendManagerInviteEmail, getUserRole
   } from "/firebase.js";
 
   // ===== MULTI-TENANT: Detect court slug =====
@@ -894,6 +968,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     }
     
     // Update admin info display
+    window._currentManageUser = user;
     const name = user.displayName || user.email || 'Admin';
     if (document.getElementById('sidebarAdminName')) document.getElementById('sidebarAdminName').textContent = name;
     if (document.getElementById('dropdownAdminName')) document.getElementById('dropdownAdminName').textContent = name;
@@ -1451,7 +1526,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   window.adminGoToday = function() { setAdminDate(dayjs()); };
   if (adminDP) adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
 
-  const sections = ['dashboard', 'schedule', 'bookings', 'settings'];
+  const sections = ['dashboard', 'schedule', 'bookings', 'staff', 'settings'];
   window.showSection = function(name) {
     sections.forEach(s => {
       document.getElementById('section-' + s)?.classList.add('hidden');
@@ -1459,13 +1534,14 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     });
     document.getElementById('section-' + name)?.classList.remove('hidden');
     document.getElementById('nav-' + name)?.classList.add('active');
-    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', settings: 'Cài đặt thông tin sân' };
+    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', staff: 'Nhân viên & Khách hàng', settings: 'Cài đặt thông tin sân' };
     if (document.getElementById('pageTitle')) {
       document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
     }
     if (name === 'schedule' && typeof renderAdminSchedule === 'function') renderAdminSchedule();
     if (name === 'bookings' && typeof renderAllBookings === 'function') renderAllBookings();
     if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
+    if (name === 'staff') { loadStaff(); loadCustomers(); }
     if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') toggleSidebar(false);
   };
 
@@ -2494,6 +2570,180 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
   loadConfig();
   renderDashboard();
+  // ===== STAFF & CUSTOMER MANAGEMENT =====
+
+  let allCustomersCache = [];
+
+  window.switchStaffTab = function(tab) {
+    ['staff', 'customers'].forEach(t => {
+      document.getElementById('staffPanel-' + t)?.classList.toggle('hidden', t !== tab);
+      const btn = document.getElementById('staffTab-' + t);
+      if (btn) {
+        btn.classList.toggle('bg-white', t === tab);
+        btn.classList.toggle('text-primary', t === tab);
+        btn.classList.toggle('shadow-sm', t === tab);
+        btn.classList.toggle('text-gray-500', t !== tab);
+      }
+    });
+  };
+
+  async function loadStaff() {
+    const container = document.getElementById('staffList');
+    if (!container) return;
+    container.innerHTML = '<div class="flex items-center justify-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    try {
+      const staff = await getCourtStaff(COURT_SLUG);
+      if (!staff.length) {
+        container.innerHTML = '<div class="flex flex-col items-center justify-center py-14 gap-3"><i class="fa-solid fa-users-slash text-4xl text-gray-200"></i><p class="text-gray-400 text-sm">Chưa có nhân viên nào. Hãy thêm nhân viên đầu tiên!</p></div>';
+        return;
+      }
+      container.innerHTML = staff.map(u => {
+        const name = u.displayName || u.email || 'Không tên';
+        const initial = name.charAt(0).toUpperCase();
+        const roleLabel = u.role === 'admin' ? '<span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">Admin</span>' : '<span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">Nhân viên</span>';
+        const isAdmin = u.role === 'admin';
+        return `<div class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden">
+            ${u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover" referrerpolicy="no-referrer">` : initial}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-gray-800 text-sm truncate">${name}</div>
+            <div class="text-xs text-gray-400 truncate">${u.email || ''}</div>
+          </div>
+          <div class="flex items-center gap-3">
+            ${roleLabel}
+            ${!isAdmin ? `<button onclick="removeManager('${u.uid}')" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors" title="Xóa nhân viên"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      container.innerHTML = '<div class="text-center py-10 text-red-400 text-sm">Lỗi tải danh sách nhân viên</div>';
+    }
+  }
+
+  async function loadCustomers() {
+    const container = document.getElementById('customerList');
+    if (!container) return;
+    container.innerHTML = '<div class="flex items-center justify-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    try {
+      const customers = await getCourtCustomers(COURT_SLUG);
+      allCustomersCache = customers;
+      renderCustomers(customers);
+    } catch(e) {
+      container.innerHTML = '<div class="text-center py-10 text-red-400 text-sm">Lỗi tải danh sách khách hàng</div>';
+    }
+  }
+
+  function renderCustomers(list) {
+    const container = document.getElementById('customerList');
+    if (!container) return;
+    if (!list.length) {
+      container.innerHTML = '<div class="flex flex-col items-center justify-center py-14 gap-3"><i class="fa-solid fa-user-slash text-4xl text-gray-200"></i><p class="text-gray-400 text-sm">Chưa có khách hàng nào đăng nhập.</p></div>';
+      return;
+    }
+    container.innerHTML = list.map(u => {
+      const name = u.displayName || u.email || 'Không tên';
+      const initial = name.charAt(0).toUpperCase();
+      const lastLogin = u.lastLoginAt && u.lastLoginAt.toDate ? dayjs(u.lastLoginAt.toDate()).format('DD/MM/YYYY HH:mm') : '—';
+      return `<div class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden">
+          ${u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover" referrerpolicy="no-referrer">` : initial}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-gray-800 text-sm truncate">${name}</div>
+          <div class="text-xs text-gray-400 truncate">${u.email || ''}</div>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <div class="text-xs text-gray-500">Lần cuối đăng nhập</div>
+          <div class="text-xs font-semibold text-gray-700">${lastLogin}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.filterCustomers = function() {
+    const q = (document.getElementById('customerSearch')?.value || '').toLowerCase();
+    const filtered = allCustomersCache.filter(u =>
+      (u.displayName || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone || '').includes(q)
+    );
+    renderCustomers(filtered);
+  };
+
+  window.openAddManagerModal = function() {
+    document.getElementById('managerEmailInput').value = '';
+    const status = document.getElementById('addManagerStatus');
+    status.classList.add('hidden'); status.textContent = '';
+    document.getElementById('addManagerModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('managerEmailInput')?.focus(), 100);
+  };
+
+  window.closeAddManagerModal = function() {
+    document.getElementById('addManagerModal').classList.add('hidden');
+  };
+
+  window.confirmAddManager = async function() {
+    const email = (document.getElementById('managerEmailInput')?.value || '').trim();
+    const status = document.getElementById('addManagerStatus');
+    const btn = document.getElementById('addManagerBtn');
+    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+      status.className = 'text-sm rounded-lg px-3 py-2 bg-red-50 text-red-600';
+      status.textContent = 'Vui lòng nhập địa chỉ Email hợp lệ!';
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Đang xử lý...';
+    status.className = 'text-sm rounded-lg px-3 py-2 bg-blue-50 text-blue-600';
+    status.textContent = 'Đang tìm kiếm tài khoản...';
+    try {
+      const result = await addManagerByEmail(email, COURT_SLUG, CONFIG.name);
+      // Send invite email
+      const currentUser = (window._currentManageUser) || null;
+      await sendManagerInviteEmail({
+        toEmail: email,
+        managerName: result.displayName || email.split('@')[0],
+        courtName: CONFIG.name || COURT_SLUG,
+        courtSlug: COURT_SLUG,
+        addedByName: currentUser?.displayName || 'Chủ Sân'
+      }).catch(e => console.warn('Email invite error:', e));
+
+      status.className = 'text-sm rounded-lg px-3 py-2 bg-green-50 text-green-700';
+      status.textContent = result.existed
+        ? `✅ Đã cấp quyền Nhân viên cho ${email}. Đã gửi email thông báo!`
+        : `✅ Đã tạo tài khoản chờ và gửi lời mời tới ${email}. Họ cần đăng nhập Google để kích hoạt!`;
+
+      setTimeout(() => { closeAddManagerModal(); loadStaff(); }, 2000);
+    } catch(e) {
+      status.className = 'text-sm rounded-lg px-3 py-2 bg-red-50 text-red-600';
+      status.textContent = 'Lỗi: ' + (e.message || 'Không thêm được nhân viên');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Thêm nhân viên';
+    }
+  };
+
+  window.removeManager = async function(uid) {
+    const result = await Swal.fire({
+      title: 'Xóa nhân viên?',
+      text: 'Tài khoản này sẽ mất quyền truy cập trang quản lý sân.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Xóa quyền',
+      cancelButtonText: 'Hủy'
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await removeManagerByUid(uid, COURT_SLUG);
+      Swal.fire({ icon: 'success', title: 'Đã xóa quyền nhân viên!', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+      loadStaff();
+    } catch(e) {
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message || 'Không thể xóa quyền nhân viên' });
+    }
+  };
+
 </script>
 </body>
 </html>
