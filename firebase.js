@@ -185,29 +185,71 @@ export async function createCourt(slug, courtData) {
 
 // ===== USER ROLE API =====
 
-/** Lấy thông tin role của user (tự động đồng bộ quyền theo email nếu UID bị thay đổi) */
+/** Lấy thông tin role của user (tự động đồng bộ quyền theo email, đơn đăng ký hoặc thông tin sân nếu UID bị thay đổi) */
 export async function getUserRole(uid, email) {
   if (!uid) return null;
   const userRef = doc(db, 'users', uid);
   const snap = await getDoc(userRef);
   let userData = snap.exists() ? snap.data() : null;
 
-  if ((!userData || !userData.role) && email) {
-    try {
-      const q = query(collection(db, 'users'), where('email', '==', email));
-      const querySnap = await getDocs(q);
-      const matchedDoc = querySnap.docs.find(d => d.id !== uid && d.data() && d.data().role);
-      if (matchedDoc) {
+  if (userData && userData.role && userData.courtId) {
+    return userData;
+  }
+
+  const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
+  if (!userEmail) return userData;
+
+  try {
+    // Fallback 1: Dò tìm trong collection 'users' xem email này đã từng có quyền ở UID khác chưa
+    const qUser = query(collection(db, 'users'), where('email', '==', userEmail));
+    const userSnap = await getDocs(qUser);
+    const matchedUserDoc = userSnap.docs.find(d => d.id !== uid && d.data() && d.data().role && d.data().courtId);
+
+    if (matchedUserDoc) {
+      const roleInfo = {
+        role: matchedUserDoc.data().role,
+        courtId: matchedUserDoc.data().courtId,
+        email: userEmail,
+        updatedAt: serverTimestamp()
+      };
+      await setDoc(userRef, roleInfo, { merge: true });
+      return { ...(userData || {}), ...roleInfo };
+    }
+
+    // Fallback 2: Dò tìm trong đơn đăng ký 'registrations' đã duyệt theo email
+    const qReg = query(collection(db, 'registrations'), where('email', '==', userEmail), where('status', '==', 'approved'));
+    const regSnap = await getDocs(qReg);
+    if (!regSnap.empty) {
+      const regData = regSnap.docs[0].data();
+      if (regData.slug) {
         const roleInfo = {
-          role: matchedDoc.data().role,
-          courtId: matchedDoc.data().courtId || null
+          role: 'admin',
+          courtId: regData.slug,
+          email: userEmail,
+          updatedAt: serverTimestamp()
         };
         await setDoc(userRef, roleInfo, { merge: true });
-        userData = { ...(userData || {}), ...roleInfo };
+        return { ...(userData || {}), ...roleInfo };
       }
-    } catch (e) {
-      console.error('Self-healing getUserRole error:', e);
     }
+
+    // Fallback 3: Dò tìm trong collection 'courts' nơi adminUid == uid
+    const qCourt = query(collection(db, 'courts'), where('adminUid', '==', uid));
+    const courtSnap = await getDocs(qCourt);
+    if (!courtSnap.empty) {
+      const courtDoc = courtSnap.docs[0];
+      const roleInfo = {
+        role: 'admin',
+        courtId: courtDoc.id,
+        email: userEmail,
+        updatedAt: serverTimestamp()
+      };
+      await setDoc(userRef, roleInfo, { merge: true });
+      return { ...(userData || {}), ...roleInfo };
+    }
+
+  } catch (e) {
+    console.error('Self-healing getUserRole error:', e);
   }
 
   return userData;
@@ -230,20 +272,22 @@ export async function updateUserRole(uid, roleData) {
 }
 
 /** Kiểm tra user có quyền quản lý sân hiện tại không */
-export async function checkStaffAccess(uid) {
+export async function checkStaffAccess(uid, email) {
   if (!uid || !currentCourtSlug) return false;
   if (uid === SUPER_ADMIN_UID) return true;
-  const userData = await getUserRole(uid);
+  const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
+  const userData = await getUserRole(uid, userEmail);
   if (!userData) return false;
   return (userData.role === 'admin' || userData.role === 'manager')
     && userData.courtId === currentCourtSlug;
 }
 
 /** Kiểm tra user có phải admin của sân không */
-export async function checkAdminAccess(uid) {
+export async function checkAdminAccess(uid, email) {
   if (!uid || !currentCourtSlug) return false;
   if (uid === SUPER_ADMIN_UID) return true;
-  const userData = await getUserRole(uid);
+  const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
+  const userData = await getUserRole(uid, userEmail);
   if (!userData) return false;
   return userData.role === 'admin' && userData.courtId === currentCourtSlug;
 }
