@@ -485,16 +485,29 @@ export async function addManagerByEmail(email, courtSlug, courtName) {
   const snap = await getDocs(q);
 
   if (!snap.empty) {
-    // User đã tồn tại → cập nhật quyền
     const userDoc = snap.docs[0];
+    const userData = userDoc.data();
     const uid = userDoc.id;
+
+    // Kiểm tra xem tài khoản này đã là Admin hoặc Manager của sân này chưa
+    const isSameCourtAdmin = userData.role === 'admin' && (userData.courtId === slug || (userData.managedCourts && userData.managedCourts.includes(slug)));
+    const isSameCourtManager = userData.role === 'manager' && (userData.courtId === slug || (userData.managedCourts && userData.managedCourts.includes(slug)));
+
+    if (isSameCourtAdmin) {
+      throw new Error(`Tài khoản ${normalizedEmail} đã là Chủ sân (Admin) của sân này rồi!`);
+    }
+    if (isSameCourtManager) {
+      throw new Error(`Tài khoản ${normalizedEmail} đã là Nhân viên (Manager) của sân này rồi!`);
+    }
+
+    // User đã tồn tại → cập nhật quyền
     await setDoc(doc(db, 'users', uid), {
-      role: 'manager',
-      courtId: slug,
+      role: userData.role === 'admin' ? 'admin' : 'manager',
+      courtId: userData.courtId || slug,
       managedCourts: arrayUnion(slug),
       updatedAt: serverTimestamp()
     }, { merge: true });
-    return { uid, existed: true, email: normalizedEmail, ...userDoc.data() };
+    return { uid, existed: true, email: normalizedEmail, ...userData };
   } else {
     // User chưa tồn tại → tạo placeholder với email
     const placeholderRef = doc(collection(db, 'users'));
