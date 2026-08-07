@@ -121,7 +121,16 @@ export async function getSettings() {
     if (snap.exists()) {
       const data = snap.data();
       const settings = data.settings || {};
+      const defaultCourts = ['Sân 1', 'Sân 2', 'Sân 3'];
       return {
+        courts: (settings.courts && settings.courts.length > 0) ? settings.courts : defaultCourts,
+        startHour: settings.startHour ?? 7,
+        endHour: settings.endHour ?? 23,
+        priceNormal: settings.priceNormal ?? 80000,
+        pricePeak: settings.pricePeak ?? 120000,
+        peakStart: settings.peakStart ?? 17,
+        peakEnd: settings.peakEnd ?? 20,
+        notice: settings.notice || 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!',
         ...settings,
         name: settings.name || data.name || '',
         phone: settings.phone || data.phone || '',
@@ -334,6 +343,13 @@ export async function approveRegistration(regId, regData) {
       phone: phone || '',
       address: address || '',
       description: description || '',
+      courts: ['Sân 1', 'Sân 2', 'Sân 3'],
+      startHour: 7,
+      endHour: 23,
+      priceNormal: 80000,
+      pricePeak: 120000,
+      peakStart: 17,
+      peakEnd: 20,
       notice: 'Sau khi gửi, chúng tôi sẽ liên hệ xác nhận trong vòng 15 phút. Vui lòng giữ máy!'
     }
   });
