@@ -2421,20 +2421,6 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
             <div class="flex items-center gap-2">
               ${statusBadge(order)}
-
-              <!-- Quick Approve Button (if pending) -->
-              ${isPending ? `
-                <button type="button" onclick="event.stopPropagation(); quickApproveOrder('${order.batchId}')"
-                  class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-2xs flex items-center gap-1" title="Duyệt đơn này">
-                  <i class="fa-solid fa-check"></i>Duyệt
-                </button>
-              ` : ''}
-
-              <!-- Delete Button -->
-              <button type="button" onclick="event.stopPropagation(); confirmDeleteOrder('${order.batchId}')"
-                class="w-8 h-8 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all flex items-center justify-center border border-gray-100 hover:border-red-200" title="Xóa đơn hàng">
-                <i class="fa-solid fa-trash text-xs"></i>
-              </button>
             </div>
           </div>
         </div>
