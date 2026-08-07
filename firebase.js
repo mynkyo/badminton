@@ -183,7 +183,35 @@ export async function saveSettings(data) {
   }, { merge: true });
 }
 
-// ===== COURT API =====
+// ===== RECURRING SCHEDULE API =====
+
+/** Lấy danh sách lịch cố định */
+export async function getRecurringSchedules(courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug) return [];
+  const snap = await getDocs(collection(db, 'courts', slug, 'recurringSchedules'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+/** Thêm lịch cố định */
+export async function addRecurringSchedule(data, courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug) throw new Error('Chưa có court slug');
+  const ref = await addDoc(collection(db, 'courts', slug, 'recurringSchedules'), {
+    ...data,
+    createdAt: serverTimestamp()
+  });
+  return ref.id;
+}
+
+/** Xóa lịch cố định */
+export async function deleteRecurringSchedule(id, courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug || !id) throw new Error('Thiếu tham số');
+  return await deleteDoc(doc(db, 'courts', slug, 'recurringSchedules', id));
+}
+
+
 
 /** Lấy thông tin sân */
 export async function getCourtInfo(slug) {

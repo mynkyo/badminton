@@ -197,7 +197,12 @@
       <section id="section-schedule" class="hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-4 sm:px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-center sm:text-left">
-            <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch</h3>
+            <div class="flex items-center gap-3">
+              <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch</h3>
+              <button onclick="openRecurringModal()" class="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95">
+                <i class="fa-solid fa-rotate text-xs"></i> Lịch cố định
+              </button>
+            </div>
             <div class="flex items-center justify-center gap-1.5 flex-wrap">
               <button onclick="adminChangeDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-left text-gray-500 text-xs"></i></button>
               <input type="date" id="adminDatePicker" class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary cursor-pointer" />
@@ -209,6 +214,7 @@
           <div class="px-5 py-3 flex flex-wrap gap-4 text-xs text-gray-500 bg-gray-50 border-b border-gray-100">
             <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-green-100 border border-green-400 inline-block"></span> Trống (click để chọn)</div>
             <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-100 border border-red-300 inline-block"></span> Đã đặt (click để sửa/xóa)</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-100 border border-purple-400 inline-block"></span> Cố định (click để xem)</div>
             <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-300 inline-block"></span> Cao điểm</div>
           </div>
           <div id="adminPastToggleContainer"></div>
@@ -270,6 +276,82 @@
           </div>
         </div>
       </section>
+
+      <!-- ======= RECURRING SCHEDULE MODAL ======= -->
+      <div id="recurringModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="display:none!important">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRecurringModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-rotate text-purple-600 text-sm"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-gray-800 text-sm">T\u1ea1o L\u1ecbch C\u1ed1 \u0110\u1ecbnh</h3>
+                <p class="text-xs text-gray-500">\u0110\u1eb7t l\u1ecbch t\u00e1i di\u1ec5n h\u00e0ng tu\u1ea7n cho kh\u00e1ch</p>
+              </div>
+            </div>
+            <button onclick="closeRecurringModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-xmark text-gray-500"></i>
+            </button>
+          </div>
+          <div class="overflow-y-auto flex-1 px-6 py-4 space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">T\u00ean kh\u00e1ch h\u00e0ng</label>
+                <input id="rcName" type="text" placeholder="Nguy\u1ec5n V\u0103n A" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">S\u1ed1 \u0111i\u1ec7n tho\u1ea1i</label>
+                <input id="rcPhone" type="tel" placeholder="0901234567" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">S\u00e2n</label>
+              <select id="rcCourt" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-2">Ng\u00e0y trong tu\u1ea7n</label>
+              <div class="flex gap-2 flex-wrap" id="rcDayPicker"></div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-2">Khung gi\u1edd</label>
+              <div class="flex gap-2 mb-3">
+                <button id="rcModeBtn-same" onclick="setRcMode('same')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 transition-all">\u23f1\ufe0f Gi\u1ed1ng nhau</button>
+                <button id="rcModeBtn-diff" onclick="setRcMode('diff')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-all">\ud83d\udd00 Kh\u00e1c nhau</button>
+              </div>
+              <div id="rcPanelSame" class="grid grid-cols-2 gap-3 p-3 bg-purple-50 border border-purple-200 rounded-xl">
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Gi\u1edd b\u1eaft \u0111\u1ea7u</label>
+                  <input id="rcSameStart" type="number" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Gi\u1edd k\u1ebft th\u00fac</label>
+                  <input id="rcSameEnd" type="number" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+                </div>
+              </div>
+              <div id="rcPanelDiff" class="hidden space-y-2"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Ng\u00e0y b\u1eaft \u0111\u1ea7u</label>
+                <input id="rcStartDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Ng\u00e0y k\u1ebft th\u00fac <span class="text-gray-400 font-normal">(\u2264 6 th\u00e1ng)</span></label>
+                <input id="rcEndDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+              </div>
+            </div>
+            <div id="rcPreview" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600"></div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
+            <button onclick="closeRecurringModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all">H\u1ee7y</button>
+            <button onclick="saveRecurringSchedule()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-rotate"></i> T\u1ea1o l\u1ecbch c\u1ed1 \u0111\u1ecbnh
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- ======= BOOKINGS LIST ======= -->
       <section id="section-bookings" class="hidden space-y-6">
@@ -942,7 +1024,8 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     logoutUser, onAuthChange,
     setCurrentCourt, getCourtSlug, checkStaffAccess, checkAdminAccess,
     getCourtInfo, SUPER_ADMIN_UID,
-    getCourtStaff, getCourtCustomers, addManagerByEmail, removeManagerByUid, sendManagerInviteEmail, getUserRole
+    getCourtStaff, getCourtCustomers, addManagerByEmail, removeManagerByUid, sendManagerInviteEmail, getUserRole,
+    getRecurringSchedules, addRecurringSchedule, deleteRecurringSchedule
   } from "/firebase.js";
 
   // ===== MULTI-TENANT: Detect court slug =====
@@ -1822,6 +1905,193 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     `).join('');
   }
 
+  // ===== RECURRING SCHEDULE LOGIC =====
+  const RC_DAYS = [
+    { label: 'T2', val: 1 }, { label: 'T3', val: 2 }, { label: 'T4', val: 3 },
+    { label: 'T5', val: 4 }, { label: 'T6', val: 5 }, { label: 'T7', val: 6 },
+    { label: 'CN', val: 0 }
+  ];
+  let rcSelectedDays = [];
+  let rcMode = 'same';
+
+  window.openRecurringModal = function() {
+    rcSelectedDays = [];
+    rcMode = 'same';
+    const modal = document.getElementById('recurringModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    const courtSel = document.getElementById('rcCourt');
+    if (courtSel) courtSel.innerHTML = (CONFIG.courts || ['San 1']).map((c, i) => `<option value="${i}">${c}</option>`).join('');
+    const dp = document.getElementById('rcDayPicker');
+    if (dp) dp.innerHTML = RC_DAYS.map(d =>
+      `<button type="button" onclick="toggleRcDay(${d.val})" id="rcDay-${d.val}" class="w-10 h-10 rounded-full border-2 border-gray-200 text-xs font-bold text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-all">${d.label}</button>`
+    ).join('');
+    const today = dayjs();
+    const rcSD = document.getElementById('rcStartDate');
+    const rcED = document.getElementById('rcEndDate');
+    if (rcSD) rcSD.value = today.format('YYYY-MM-DD');
+    if (rcED) rcED.value = today.add(3, 'month').format('YYYY-MM-DD');
+    ['rcName', 'rcPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const rcSS = document.getElementById('rcSameStart'); if (rcSS) rcSS.value = 17;
+    const rcSE = document.getElementById('rcSameEnd'); if (rcSE) rcSE.value = 19;
+    setRcMode('same');
+    const preview = document.getElementById('rcPreview');
+    if (preview) preview.classList.add('hidden');
+  };
+
+  window.closeRecurringModal = function() {
+    const modal = document.getElementById('recurringModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.toggleRcDay = function(val) {
+    const idx = rcSelectedDays.indexOf(val);
+    if (idx !== -1) rcSelectedDays.splice(idx, 1);
+    else rcSelectedDays.push(val);
+    RC_DAYS.forEach(d => {
+      const btn = document.getElementById('rcDay-' + d.val);
+      if (!btn) return;
+      if (rcSelectedDays.includes(d.val)) {
+        btn.classList.remove('border-gray-200', 'text-gray-500');
+        btn.classList.add('border-purple-500', 'bg-purple-600', 'text-white');
+      } else {
+        btn.classList.remove('border-purple-500', 'bg-purple-600', 'text-white');
+        btn.classList.add('border-gray-200', 'text-gray-500');
+      }
+    });
+    if (rcMode === 'diff') renderRcDiffPanel();
+  };
+
+  window.setRcMode = function(mode) {
+    rcMode = mode;
+    const btnSame = document.getElementById('rcModeBtn-same');
+    const btnDiff = document.getElementById('rcModeBtn-diff');
+    const panelSame = document.getElementById('rcPanelSame');
+    const panelDiff = document.getElementById('rcPanelDiff');
+    if (mode === 'same') {
+      if (btnSame) { btnSame.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnSame.classList.remove('border-gray-200', 'text-gray-500'); }
+      if (btnDiff) { btnDiff.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnDiff.classList.add('border-gray-200', 'text-gray-500'); }
+      if (panelSame) panelSame.classList.remove('hidden');
+      if (panelDiff) panelDiff.classList.add('hidden');
+    } else {
+      if (btnDiff) { btnDiff.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnDiff.classList.remove('border-gray-200', 'text-gray-500'); }
+      if (btnSame) { btnSame.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnSame.classList.add('border-gray-200', 'text-gray-500'); }
+      if (panelDiff) panelDiff.classList.remove('hidden');
+      if (panelSame) panelSame.classList.add('hidden');
+      renderRcDiffPanel();
+    }
+  };
+
+  function renderRcDiffPanel() {
+    const container = document.getElementById('rcPanelDiff');
+    if (!container) return;
+    const sorted = [...rcSelectedDays].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b));
+    container.innerHTML = sorted.map(v => {
+      const label = RC_DAYS.find(d => d.val === v) ? RC_DAYS.find(d => d.val === v).label : v;
+      return `<div class="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-xl">
+        <span class="w-8 h-8 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${label}</span>
+        <div class="flex-1 grid grid-cols-2 gap-2">
+          <div><label class="block text-[10px] text-gray-500 mb-1">Bat dau</label>
+            <input type="number" id="rcDiff-${v}-start" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
+          <div><label class="block text-[10px] text-gray-500 mb-1">Ket thuc</label>
+            <input type="number" id="rcDiff-${v}-end" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
+        </div>
+      </div>`;
+    }).join('');
+    if (!sorted.length) container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Chon ngay trong tuan truoc</p>';
+  }
+
+  window.saveRecurringSchedule = async function() {
+    const name = document.getElementById('rcName') ? document.getElementById('rcName').value.trim() : '';
+    const phone = document.getElementById('rcPhone') ? document.getElementById('rcPhone').value.trim() : '';
+    const courtIdx = parseInt((document.getElementById('rcCourt') || {}).value || 0);
+    const startDateStr = document.getElementById('rcStartDate') ? document.getElementById('rcStartDate').value : '';
+    const endDateStr = document.getElementById('rcEndDate') ? document.getElementById('rcEndDate').value : '';
+    if (!name) { Swal.fire({ icon: 'warning', title: 'Thieu ten khach hang', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chua chon ngay nao', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!startDateStr || !endDateStr) { Swal.fire({ icon: 'warning', title: 'Vui long chon ngay bat dau va ket thuc', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    const startDate = dayjs(startDateStr);
+    const endDate = dayjs(endDateStr);
+    if (endDate.diff(startDate, 'month') > 6) { Swal.fire({ icon: 'warning', title: 'Khoang thoi gian toi da 6 thang', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (endDate.isBefore(startDate)) { Swal.fire({ icon: 'warning', title: 'Ngay ket thuc phai sau ngay bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+
+    let dayHours = {};
+    if (rcMode === 'same') {
+      const s = parseInt((document.getElementById('rcSameStart') || {}).value || 17);
+      const e = parseInt((document.getElementById('rcSameEnd') || {}).value || 19);
+      if (e <= s) { Swal.fire({ icon: 'warning', title: 'Gio ket thuc phai sau gio bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      rcSelectedDays.forEach(d => { dayHours[d] = { start: s, end: e }; });
+    } else {
+      for (const d of rcSelectedDays) {
+        const s = parseInt((document.getElementById('rcDiff-' + d + '-start') || {}).value || 17);
+        const e = parseInt((document.getElementById('rcDiff-' + d + '-end') || {}).value || 19);
+        if (e <= s) { Swal.fire({ icon: 'warning', title: 'Gio ket thuc phai sau gio bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+        dayHours[d] = { start: s, end: e };
+      }
+    }
+
+    // Load all bookings for date range to check conflicts
+    let existingBookings = [];
+    try { existingBookings = await (typeof getAllBookings === 'function' ? getAllBookings() : Promise.resolve([])); } catch(e) {}
+
+    const bookingsToCreate = [];
+    const conflicts = [];
+    let cur = startDate.clone();
+    while (!cur.isAfter(endDate)) {
+      const dow = cur.day(); // JS: 0=Sun,1=Mon,...,6=Sat
+      if (rcSelectedDays.includes(dow)) {
+        const h = dayHours[dow];
+        const dateStr2 = cur.format('YYYY-MM-DD');
+        const existing = existingBookings.filter(b => b.date === dateStr2 && b.court === courtIdx);
+        const conflict = existing.some(b => h.start < b.hour + (b.duration || 1) && h.end > b.hour);
+        if (conflict) {
+          conflicts.push(dateStr2);
+        } else {
+          const duration = h.end - h.start;
+          bookingsToCreate.push({
+            name, phone, court: courtIdx,
+            date: dateStr2, hour: h.start, duration,
+            amount: calcPrice(h.start, duration),
+            status: 'confirmed', isPaid: false,
+            type: 'recurring',
+            note: 'Lich co dinh'
+          });
+        }
+      }
+      cur = cur.add(1, 'day');
+    }
+
+    if (bookingsToCreate.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'Khong co slot nao kha dung', text: conflicts.length ? (conflicts.length + ' ngay bi trung lich') : 'Kiem tra lai ngay', confirmButtonColor: '#7c3aed' }); return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Xac nhan tao lich co dinh?',
+      html: 'Tao <b>' + bookingsToCreate.length + ' slot</b> cho <b>' + name + '</b>' + (conflicts.length ? '<br><span style="color:#d97706">Bo qua ' + conflicts.length + ' ngay da bi trung lich</span>' : ''),
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#7c3aed',
+      confirmButtonText: 'Tao ' + bookingsToCreate.length + ' slot',
+      cancelButtonText: 'Huy'
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      const batchBase = 'RC_' + Date.now();
+      for (const b of bookingsToCreate) {
+        await addBookings([{ ...b, batchId: batchBase + '_' + b.date }]);
+      }
+      closeRecurringModal();
+      Swal.fire({ icon: 'success', title: 'Da tao ' + bookingsToCreate.length + ' lich co dinh!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+      allBookingsList = await getAllBookings();
+      renderAdminSchedule();
+    } catch(err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Loi khi tao lich', text: err.message });
+    }
+  };
+  // ===== END RECURRING SCHEDULE LOGIC =====
+
   async function renderAdminSchedule() {
     const dateStr = formatDate(adminDate);
     const todayStr = formatDate(dayjs());
@@ -1880,19 +2150,32 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
           const isStart = booking.hour === h;
           const dur = booking.duration || 1;
           const batchId = booking.batchId || `${booking.name}_${booking.phone}_${dayjs(booking.createdAt).format('YYYYMMDDHHmm')}`;
+          const isRecurring = booking.type === 'recurring';
           if (isStart) {
-            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs cursor-pointer hover:shadow-xs transition-all overflow-hidden flex flex-col justify-center items-center" onclick="openOrderModal('${batchId}')">
-                <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-user mr-1 text-[10px]"></i>${booking.name}</div>
-                <div class="flex items-center justify-center gap-1 mt-0.5">
-                  ${compactStatusBadge(booking)}
-                  ${dur > 1 ? `<span class="text-[10px] text-red-400 font-bold">${dur}h</span>` : ''}
+            if (isRecurring) {
+              rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+                <div class="bg-purple-50 border border-purple-300 rounded-lg h-[60px] py-1 px-1 text-xs cursor-pointer hover:shadow-xs transition-all overflow-hidden flex flex-col justify-center items-center" onclick="openOrderModal('${batchId}')">
+                  <div class="font-semibold text-purple-700 truncate text-xs w-full text-center"><i class="fa-solid fa-rotate mr-1 text-[10px]"></i>${booking.name}</div>
+                  <div class="flex items-center justify-center gap-1 mt-0.5">
+                    <span class="text-[10px] bg-purple-100 text-purple-600 px-1.5 rounded-full font-medium whitespace-nowrap">Co dinh</span>
+                    ${dur > 1 ? `<span class="text-[10px] text-purple-400 font-bold">${dur}h</span>` : ''}
+                  </div>
                 </div>
-              </div>
-            </td>`;
+              </td>`;
+            } else {
+              rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+                <div class="slot-booked bg-red-50 border border-red-200 rounded-lg h-[60px] py-1 px-1 text-xs cursor-pointer hover:shadow-xs transition-all overflow-hidden flex flex-col justify-center items-center" onclick="openOrderModal('${batchId}')">
+                  <div class="font-semibold text-red-600 truncate text-xs w-full text-center" title="${booking.name}"><i class="fa-solid fa-user mr-1 text-[10px]"></i>${booking.name}</div>
+                  <div class="flex items-center justify-center gap-1 mt-0.5">
+                    ${compactStatusBadge(booking)}
+                    ${dur > 1 ? `<span class="text-[10px] text-red-400 font-bold">${dur}h</span>` : ''}
+                  </div>
+                </div>
+              </td>`;
+            }
           } else {
             rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
-              <div class="slot-cont bg-red-50/50 border border-red-100 rounded-lg h-[60px] text-xs text-red-300 flex items-center justify-center cursor-pointer hover:bg-red-100/60 transition-all" onclick="openOrderModal('${batchId}')">
+              <div class="${isRecurring ? 'bg-purple-50/60 border border-purple-200' : 'slot-cont bg-red-50/50 border border-red-100'} rounded-lg h-[60px] text-xs ${isRecurring ? 'text-purple-300' : 'text-red-300'} flex items-center justify-center cursor-pointer hover:opacity-80 transition-all" onclick="openOrderModal('${batchId}')">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
