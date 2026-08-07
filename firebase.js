@@ -688,9 +688,12 @@ export async function getAllRegistrations(status) {
 /** Duyệt đơn đăng ký: tạo court + set role admin */
 export async function approveRegistration(regId, regData) {
   const { slug, uid, email, displayName, courtName, phone, address, description } = regData;
+  const adminEmail = email || '';
   await createCourt(slug, {
     name: courtName || '',
     adminUid: uid,
+    adminEmail: adminEmail,
+    email: adminEmail,
     managerUids: [],
     phone: phone || '',
     address: address || '',
@@ -698,6 +701,8 @@ export async function approveRegistration(regId, regData) {
     settings: {
       name: courtName || '',
       phone: phone || '',
+      email: adminEmail,
+      contactEmail: adminEmail,
       address: address || '',
       description: description || '',
       courts: ['Sân 1', 'Sân 2', 'Sân 3'],
