@@ -1921,7 +1921,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     if (!modal) return;
     modal.style.display = 'flex';
     const courtSel = document.getElementById('rcCourt');
-    if (courtSel) courtSel.innerHTML = (CONFIG.courts || ['San 1']).map((c, i) => `<option value="${i}">${c}</option>`).join('');
+    if (courtSel) courtSel.innerHTML = (CONFIG.courts || ['Sân 1']).map((c, i) => `<option value="${i}">${c}</option>`).join('');
     const dp = document.getElementById('rcDayPicker');
     if (dp) dp.innerHTML = RC_DAYS.map(d =>
       `<button type="button" onclick="toggleRcDay(${d.val})" id="rcDay-${d.val}" class="w-10 h-10 rounded-full border-2 border-gray-200 text-xs font-bold text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-all">${d.label}</button>`
@@ -1991,14 +1991,14 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       return `<div class="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-xl">
         <span class="w-8 h-8 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${label}</span>
         <div class="flex-1 grid grid-cols-2 gap-2">
-          <div><label class="block text-[10px] text-gray-500 mb-1">Bat dau</label>
+          <div><label class="block text-[10px] text-gray-500 mb-1">Giờ bắt đầu</label>
             <input type="number" id="rcDiff-${v}-start" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
-          <div><label class="block text-[10px] text-gray-500 mb-1">Ket thuc</label>
+          <div><label class="block text-[10px] text-gray-500 mb-1">Giờ kết thúc</label>
             <input type="number" id="rcDiff-${v}-end" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
         </div>
       </div>`;
     }).join('');
-    if (!sorted.length) container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Chon ngay trong tuan truoc</p>';
+    if (!sorted.length) container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Chọn ngày trong tuần trước</p>';
   }
 
   window.saveRecurringSchedule = async function() {
@@ -2007,25 +2007,25 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     const courtIdx = parseInt((document.getElementById('rcCourt') || {}).value || 0);
     const startDateStr = document.getElementById('rcStartDate') ? document.getElementById('rcStartDate').value : '';
     const endDateStr = document.getElementById('rcEndDate') ? document.getElementById('rcEndDate').value : '';
-    if (!name) { Swal.fire({ icon: 'warning', title: 'Thieu ten khach hang', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
-    if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chua chon ngay nao', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
-    if (!startDateStr || !endDateStr) { Swal.fire({ icon: 'warning', title: 'Vui long chon ngay bat dau va ket thuc', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!name) { Swal.fire({ icon: 'warning', title: 'Thiếu tên khách hàng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày nào', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!startDateStr || !endDateStr) { Swal.fire({ icon: 'warning', title: 'Vui lòng chọn ngày bắt đầu và kết thúc', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
     const startDate = dayjs(startDateStr);
     const endDate = dayjs(endDateStr);
-    if (endDate.diff(startDate, 'month') > 6) { Swal.fire({ icon: 'warning', title: 'Khoang thoi gian toi da 6 thang', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
-    if (endDate.isBefore(startDate)) { Swal.fire({ icon: 'warning', title: 'Ngay ket thuc phai sau ngay bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (endDate.diff(startDate, 'month') > 6) { Swal.fire({ icon: 'warning', title: 'Khoảng thời gian tối đa 6 tháng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (endDate.isBefore(startDate)) { Swal.fire({ icon: 'warning', title: 'Ngày kết thúc phải sau ngày bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
 
     let dayHours = {};
     if (rcMode === 'same') {
       const s = parseInt((document.getElementById('rcSameStart') || {}).value || 17);
       const e = parseInt((document.getElementById('rcSameEnd') || {}).value || 19);
-      if (e <= s) { Swal.fire({ icon: 'warning', title: 'Gio ket thuc phai sau gio bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
       rcSelectedDays.forEach(d => { dayHours[d] = { start: s, end: e }; });
     } else {
       for (const d of rcSelectedDays) {
         const s = parseInt((document.getElementById('rcDiff-' + d + '-start') || {}).value || 17);
         const e = parseInt((document.getElementById('rcDiff-' + d + '-end') || {}).value || 19);
-        if (e <= s) { Swal.fire({ icon: 'warning', title: 'Gio ket thuc phai sau gio bat dau', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+        if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
         dayHours[d] = { start: s, end: e };
       }
     }
@@ -2054,7 +2054,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
             amount: calcPrice(h.start, duration),
             status: 'confirmed', isPaid: false,
             type: 'recurring',
-            note: 'Lich co dinh'
+            note: 'Lịch cố định'
           });
         }
       }
@@ -2062,17 +2062,17 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     }
 
     if (bookingsToCreate.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Khong co slot nao kha dung', text: conflicts.length ? (conflicts.length + ' ngay bi trung lich') : 'Kiem tra lai ngay', confirmButtonColor: '#7c3aed' }); return;
+      Swal.fire({ icon: 'warning', title: 'Không có slot nào khả dụng', text: conflicts.length ? (conflicts.length + ' ngày bị trùng lịch') : 'Kiểm tra lại ngày', confirmButtonColor: '#7c3aed' }); return;
     }
 
     const result = await Swal.fire({
-      title: 'Xac nhan tao lich co dinh?',
-      html: 'Tao <b>' + bookingsToCreate.length + ' slot</b> cho <b>' + name + '</b>' + (conflicts.length ? '<br><span style="color:#d97706">Bo qua ' + conflicts.length + ' ngay da bi trung lich</span>' : ''),
+      title: 'Xác nhận tạo lịch cố định?',
+      html: 'Tạo <b>' + bookingsToCreate.length + ' slot</b> cho <b>' + name + '</b>' + (conflicts.length ? '<br><span style="color:#d97706">Bỏ qua ' + conflicts.length + ' ngày đã bị trùng lịch</span>' : ''),
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#7c3aed',
-      confirmButtonText: 'Tao ' + bookingsToCreate.length + ' slot',
-      cancelButtonText: 'Huy'
+      confirmButtonText: 'Tạo ' + bookingsToCreate.length + ' slot',
+      cancelButtonText: 'Hủy'
     });
     if (!result.isConfirmed) return;
 
@@ -2082,12 +2082,12 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
         await addBookings([{ ...b, batchId: batchBase + '_' + b.date }]);
       }
       closeRecurringModal();
-      Swal.fire({ icon: 'success', title: 'Da tao ' + bookingsToCreate.length + ' lich co dinh!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+      Swal.fire({ icon: 'success', title: 'Đã tạo ' + bookingsToCreate.length + ' lịch cố định!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
       allBookingsList = await getAllBookings();
       renderAdminSchedule();
     } catch(err) {
       console.error(err);
-      Swal.fire({ icon: 'error', title: 'Loi khi tao lich', text: err.message });
+      Swal.fire({ icon: 'error', title: 'Lỗi khi tạo lịch', text: err.message });
     }
   };
   // ===== END RECURRING SCHEDULE LOGIC =====
