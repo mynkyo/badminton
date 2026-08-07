@@ -357,7 +357,7 @@ export async function sendRegistrationApprovedEmail({ toEmail, displayName, cour
   const courtUrl  = `https://dat-san-cau-long.web.app/${courtSlug}`;
   const tableData = {
     'Xin Chào': displayName || 'Quý Khách',
-    'Thông Báo': 'Đơn đăng ký mở sân cầu lông của bạn đã được HIỆU DƯỢT!',
+    'Thông Báo': 'Đơn đăng ký mở sân cầu lông của bạn đã được PHÊ DUYỆT!',
     'Tên Sân Được Mở': courtName || courtSlug,
     'Đường Dẫn Trang Sân': courtUrl,
     'Trang Quản Lý Sân': manageUrl,
