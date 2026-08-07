@@ -855,6 +855,62 @@
       }
     });
 
+    function groupUserOrders(bookings) {
+      const map = new Map();
+      bookings.forEach(b => {
+        const key = b.batchId || `${b.date}_${b.phone || b.name || ''}_${b.status || 'pending'}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            batchId: key,
+            date: b.date,
+            name: b.name || '',
+            phone: b.phone || '',
+            status: b.status || 'pending',
+            items: []
+          });
+        }
+        map.get(key).items.push(b);
+      });
+
+      const orders = Array.from(map.values());
+      return orders.map(order => {
+        const totalAmount = order.items.reduce((sum, item) => sum + (item.amount || item.price || 0), 0);
+        
+        const courtSlotsMap = new Map();
+        order.items.forEach(item => {
+          const courtName = (CONFIG.courts && CONFIG.courts[item.court]) || (`Sân ${item.court + 1}`);
+          if (!courtSlotsMap.has(courtName)) courtSlotsMap.set(courtName, []);
+          courtSlotsMap.get(courtName).push(item.hour);
+        });
+
+        const slotSummaryArr = [];
+        courtSlotsMap.forEach((hours, courtName) => {
+          hours.sort((a, b) => a - b);
+          const timeRanges = [];
+          let start = hours[0];
+          let prev = hours[0];
+          for (let i = 1; i < hours.length; i++) {
+            if (hours[i] === prev + 1) {
+              prev = hours[i];
+            } else {
+              timeRanges.push(`${String(start).padStart(2, '0')}:00–${String(prev + 1).padStart(2, '0')}:00`);
+              start = hours[i];
+              prev = hours[i];
+            }
+          }
+          timeRanges.push(`${String(start).padStart(2, '0')}:00–${String(prev + 1).padStart(2, '0')}:00`);
+          slotSummaryArr.push(`${courtName}: ${timeRanges.join(', ')}`);
+        });
+
+        return {
+          ...order,
+          totalAmount,
+          slotSummary: slotSummaryArr.join(' | '),
+          totalSlots: order.items.length
+        };
+      });
+    }
+
     window.handleUserClick = async function () {
       if (!currentUser) {
         try {
@@ -874,34 +930,44 @@
         } catch (e) {
           console.warn('Cannot fetch user bookings:', e);
         }
+
         const isAnon = currentUser ? currentUser.isAnonymous : true;
         const userEmail = (currentUser && currentUser.email) ? currentUser.email : 'Tài khoản Ẩn danh';
 
+        const orders = groupUserOrders(bookings);
+
         let bookingsHtml = '';
-        if (bookings.length === 0) {
+        if (orders.length === 0) {
           bookingsHtml = `<div class="py-6 text-slate-400 text-xs text-center"><i class="fa-regular fa-calendar-xmark text-2xl mb-2 block opacity-40"></i>Chưa có lịch sử đặt sân nào trên thiết bị này.</div>`;
         } else {
-          bookings.sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.hour - a.hour);
+          orders.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
           bookingsHtml = `
             <div class="max-h-60 overflow-y-auto space-y-2 text-left pr-1 my-3 scroll-smooth">
-              ${bookings.map(b => {
-            let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
-            let badgeText = 'Chờ xác nhận';
-            if (b.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
-            if (b.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
-            return `
-                  <div class="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs flex items-center justify-between gap-2 shadow-2xs">
-                    <div>
-                      <div class="font-bold text-navy">${(CONFIG.courts && CONFIG.courts[b.court]) || ('Sân ' + (b.court + 1))} · ${String(b.hour).padStart(2, '0')}:00–${String(b.hour + 1).padStart(2, '0')}:00</div>
-                      <div class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${b.date} ${b.name ? `· KH: ${b.name}` : ''}</div>
+              ${orders.map(order => {
+                let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
+                let badgeText = 'Chờ xác nhận';
+                if (order.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
+                if (order.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
+                return `
+                  <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs flex flex-col gap-1.5 shadow-2xs">
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="font-bold text-navy text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt text-primary"></i>
+                        <span>Đơn đặt (${order.date})</span>
+                      </div>
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${badgeClass}">${badgeText}</span>
                     </div>
-                    <div class="text-right flex-shrink-0">
-                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold inline-block ${badgeClass}">${badgeText}</span>
-                      <div class="font-bold text-primary mt-1 text-[11px]">${fmtMoney(b.amount || 0)}</div>
+                    <div class="text-[11px] text-slate-700 font-semibold bg-white border border-slate-100 rounded-lg p-2 flex items-center justify-between gap-2">
+                      <span><i class="fa-solid fa-calendar-day text-slate-400 mr-1"></i>${order.slotSummary}</span>
+                      <span class="text-slate-400 text-[10px] flex-shrink-0">(${order.totalSlots} slot)</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                      <span>${order.name ? `KH: ${order.name}` : ''}</span>
+                      <span class="font-bold text-primary text-xs">Tổng: ${fmtMoney(order.totalAmount)}</span>
                     </div>
                   </div>
                 `;
-          }).join('')}
+              }).join('')}
             </div>
           `;
         }
@@ -913,15 +979,16 @@
               Trạng thái: <b class="${isAnon ? 'text-amber-600' : 'text-emerald-600'}">${isAnon ? '🔒 Khách (Ẩn danh)' : '✅ Đã xác thực Google'}</b> 
               ${!isAnon ? `<br/><span class="text-slate-700 font-semibold mt-0.5 inline-block">${userEmail}</span>` : '<br/><span class="text-slate-400 text-[11px]">Dữ liệu tự động lưu theo thiết bị của bạn</span>'}
             </div>
-            <div class="text-xs font-bold text-slate-700 text-left border-b border-slate-100 pb-1">Lịch sử đặt sân (${bookings.length}):</div>
+            <div class="text-xs font-bold text-slate-700 text-left border-b border-slate-100 pb-1">Lịch sử đặt sân (${orders.length} đơn):</div>
             ${bookingsHtml}
           `,
-          showCancelButton: true,
+          showConfirmButton: isAnon,
+          confirmButtonText: '<i class="fa-brands fa-google mr-1.5"></i>Đồng bộ Google',
           showDenyButton: !isAnon,
-          denyButtonText: 'Đăng xuất',
-          confirmButtonText: isAnon ? '<i class="fa-brands fa-google mr-1.5"></i>Đồng bộ Google' : 'Đóng',
+          denyButtonText: '<i class="fa-solid fa-right-from-bracket mr-1.5"></i>Đăng xuất',
+          showCancelButton: true,
           cancelButtonText: 'Đóng',
-          confirmButtonColor: isAnon ? '#1d4ed8' : '#64748b',
+          confirmButtonColor: '#1d4ed8',
           denyButtonColor: '#ef4444',
           cancelButtonColor: '#94a3b8',
           reverseButtons: true,
@@ -946,11 +1013,9 @@
           Swal.fire({ title: 'Đã đồng bộ thành công!', icon: 'success', timer: 1500, showConfirmButton: false });
         } else if (res.isDenied && !isAnon) {
           await logoutUser();
-          Swal.fire({ title: 'Đã đăng xuất!', icon: 'success', timer: 1500, showConfirmButton: false });
         }
-
-      } catch (err) {
-        Swal.fire('Lỗi', 'Không thể tải thông tin: ' + err.message, 'error');
+      } catch (e) {
+        console.error(e);
       }
     };
 
