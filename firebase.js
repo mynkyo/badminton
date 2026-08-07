@@ -202,6 +202,17 @@ export async function setUserRole(uid, data) {
   return await setDoc(doc(db, 'users', uid), data, { merge: true });
 }
 
+/** Lấy toàn bộ người dùng (Super Admin) */
+export async function getAllUsers() {
+  const snap = await getDocs(collection(db, 'users'));
+  return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+}
+
+/** Cập nhật quyền người dùng (Super Admin) */
+export async function updateUserRole(uid, roleData) {
+  return await updateDoc(doc(db, 'users', uid), roleData);
+}
+
 /** Kiểm tra user có quyền quản lý sân hiện tại không */
 export async function checkStaffAccess(uid) {
   if (!uid || !currentCourtSlug) return false;
@@ -287,12 +298,23 @@ export async function loginAnonymously() {
   return await signInAnonymously(auth);
 }
 
+async function syncUserToFirestore(user) {
+  if (!user) return;
+  await setDoc(doc(db, 'users', user.uid), {
+    email: user.email || '',
+    displayName: user.displayName || '',
+    photoURL: user.photoURL || '',
+    lastLoginAt: serverTimestamp()
+  }, { merge: true });
+}
+
 /** Đăng nhập Google (và đồng bộ nếu đang ẩn danh) */
 export async function loginWithGoogle() {
   const user = auth.currentUser;
   if (user && user.isAnonymous) {
     try {
       const result = await linkWithPopup(user, googleProvider);
+      await syncUserToFirestore(result.user);
       return result.user;
     } catch (error) {
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
@@ -302,14 +324,17 @@ export async function loginWithGoogle() {
         const credential = GoogleAuthProvider.credentialFromError(error);
         if (credential) {
           const result = await signInWithCredential(auth, credential);
+          await syncUserToFirestore(result.user);
           return result.user;
         }
       } catch (e) { /* ignore */ }
       const result = await signInWithPopup(auth, googleProvider);
+      await syncUserToFirestore(result.user);
       return result.user;
     }
   } else {
     const result = await signInWithPopup(auth, googleProvider);
+    await syncUserToFirestore(result.user);
     return result.user;
   }
 }

@@ -3,74 +3,266 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Super Admin - Nền Tảng Sân Cầu Lông</title>
+  <title>Super Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root { --color-primary: #1d4ed8; }
+    .nav-item.active { background-color: #1e293b; color: white; border-left: 4px solid #3b82f6; }
+    .nav-item { border-left: 4px solid transparent; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
 
   <!-- Loading View -->
-  <div id="loadingView" class="min-h-screen flex flex-col items-center justify-center p-4 space-y-3">
-    <div class="text-blue-500 text-3xl"><i class="fa-solid fa-spinner fa-spin"></i></div>
-    <div class="text-sm text-slate-400 font-medium">Đang kiểm tra quyền truy cập...</div>
+  <div id="loadingView" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-4 space-y-3">
+    <div class="text-blue-500 text-4xl"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+    <div class="text-sm text-slate-300 font-medium tracking-wide">Đang xác thực quyền Super Admin...</div>
   </div>
 
   <!-- Unauth View -->
-  <div id="unauthView" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="text-center space-y-4">
-      <h1 class="text-xl font-bold text-red-400">Quyền Truy Cập Bị Từ Chối</h1>
-      <p class="text-sm text-slate-400">Trang này dành riêng cho Super Admin hệ thống.</p>
-      <button id="btnLogin" class="bg-blue-600 px-4 py-2 rounded-xl text-sm font-semibold">Đăng nhập Super Admin</button>
-    </div>
-  </div>
-
-  <div id="adminView" class="hidden max-w-6xl mx-auto p-4 md:p-8 space-y-6">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+  <div id="unauthView" class="hidden fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+    <div class="text-center space-y-6 max-w-sm">
+      <div class="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500 text-4xl">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
       <div>
-        <h1 class="text-2xl font-bold text-white">Quản Trị Nền Tảng (Super Admin)</h1>
-        <p class="text-xs text-slate-400">Duyệt đăng ký mở sân & Quản lý toàn bộ danh sách sân</p>
+        <h1 class="text-2xl font-bold text-white mb-2">Truy Cập Bị Từ Chối</h1>
+        <p class="text-sm text-slate-400">Khu vực này được bảo mật và chỉ dành riêng cho Quản trị viên cấp cao (Super Admin).</p>
       </div>
-      <button id="btnLogout" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg">Đăng xuất</button>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-2 border-b border-slate-800">
-      <button id="tabPending" class="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400">Đơn Chờ Duyệt</button>
-      <button id="tabCourts" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200">Danh Sách Sân</button>
-    </div>
-
-    <!-- Section: Pending Registrations -->
-    <div id="secPending" class="space-y-4">
-      <div id="pendingList" class="grid gap-4">
-        <div class="text-center py-8 text-slate-500 text-sm">Đang tải dữ liệu...</div>
-      </div>
-    </div>
-
-    <!-- Section: Active Courts -->
-    <div id="secCourts" class="hidden space-y-4">
-      <div id="courtsList" class="grid gap-4">
-        <div class="text-center py-8 text-slate-500 text-sm">Đang tải danh sách sân...</div>
-      </div>
+      <button id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
+        <i class="fa-brands fa-google"></i> Đăng nhập bằng tài khoản khác
+      </button>
     </div>
   </div>
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col h-full hidden md:flex transition-all z-40 relative shadow-2xl" id="sidebar">
+    <div class="p-6 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/30">
+          SA
+        </div>
+        <div>
+          <h2 class="font-bold text-white leading-tight">Super Admin</h2>
+          <p class="text-[10px] text-blue-400 font-medium tracking-wider uppercase">System Control</p>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto space-y-1">
+      <button onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-sm font-medium hover:bg-slate-800/50 hover:text-white transition-colors">
+        <i class="fa-solid fa-chart-pie w-5"></i> Tổng quan
+      </button>
+      <button onclick="showSection('pending')" id="nav-pending" class="nav-item w-full flex items-center justify-between px-6 py-3 text-sm font-medium hover:bg-slate-800/50 hover:text-white transition-colors">
+        <div class="flex items-center gap-3"><i class="fa-solid fa-file-signature w-5"></i> Duyệt Đơn</div>
+        <span id="badgePending" class="hidden bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button onclick="showSection('courts')" id="nav-courts" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-sm font-medium hover:bg-slate-800/50 hover:text-white transition-colors">
+        <i class="fa-solid fa-building w-5"></i> Danh sách Sân
+      </button>
+      <button onclick="showSection('users')" id="nav-users" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-sm font-medium hover:bg-slate-800/50 hover:text-white transition-colors">
+        <i class="fa-solid fa-users w-5"></i> Người dùng
+      </button>
+    </nav>
+
+    <div class="p-4 border-t border-slate-800">
+      <div class="flex items-center gap-3 mb-4 px-2">
+        <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border border-slate-700">
+          <img id="sidebarAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="User" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+        </div>
+        <div class="flex-1 overflow-hidden">
+          <div class="text-xs font-bold text-white truncate" id="sidebarName">Admin</div>
+          <div class="text-[10px] text-slate-400 truncate" id="sidebarEmail">admin@system.com</div>
+        </div>
+      </div>
+      <button id="btnLogout" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-500/10 hover:text-rose-400 text-slate-400 rounded-lg text-xs font-semibold transition-colors">
+        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 z-30 flex items-center justify-between px-4">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">SA</div>
+      <span class="font-bold text-white text-sm">System</span>
+    </div>
+    <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="text-slate-300 p-2">
+      <i class="fa-solid fa-bars text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 h-full overflow-y-auto bg-slate-50 pt-16 md:pt-0 pb-10" id="mainContainer" style="display: none;">
+    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-6 md:space-y-8 mt-2 md:mt-0">
+      
+      <!-- Section: Dashboard -->
+      <section id="sec-dashboard" class="space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Tổng quan hệ thống</h1>
+          <p class="text-sm text-slate-500">Các chỉ số hoạt động chính của nền tảng.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 flex items-center gap-5 cursor-pointer hover:border-blue-200 transition-colors" onclick="showSection('courts')">
+            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm border border-blue-100">
+              <i class="fa-solid fa-building"></i>
+            </div>
+            <div>
+              <div class="text-sm text-slate-500 font-medium mb-1">Sân hoạt động</div>
+              <div class="text-3xl font-black text-slate-800 tracking-tight" id="statCourts">-</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(245,158,11,0.1)] border border-slate-100 flex items-center gap-5 cursor-pointer hover:border-amber-200 transition-colors" onclick="showSection('pending')">
+            <div class="w-14 h-14 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm border border-amber-100">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <div>
+              <div class="text-sm text-slate-500 font-medium mb-1">Đơn chờ duyệt</div>
+              <div class="text-3xl font-black text-slate-800 tracking-tight" id="statPending">-</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.1)] border border-slate-100 flex items-center gap-5 cursor-pointer hover:border-emerald-200 transition-colors" onclick="showSection('users')">
+            <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm border border-emerald-100">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <div class="text-sm text-slate-500 font-medium mb-1">Tổng số Users</div>
+              <div class="text-3xl font-black text-slate-800 tracking-tight" id="statUsers">-</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Pending -->
+      <section id="sec-pending" class="hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Đơn đăng ký chờ duyệt</h1>
+          <p class="text-sm text-slate-500">Xem xét và kích hoạt các sân cầu lông mới.</p>
+        </div>
+        <div id="pendingList" class="grid gap-4">
+          <div class="text-center py-8 text-slate-500 text-sm">Đang tải dữ liệu...</div>
+        </div>
+      </section>
+
+      <!-- Section: Courts -->
+      <section id="sec-courts" class="hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Danh sách sân hệ thống</h1>
+          <p class="text-sm text-slate-500">Quản lý tất cả các sân đang hoạt động.</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-100 text-[11px] text-slate-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 font-semibold w-1/3">Tên sân & Slug</th>
+                  <th class="px-6 py-4 font-semibold">Liên hệ</th>
+                  <th class="px-6 py-4 font-semibold">Trạng thái</th>
+                  <th class="px-6 py-4 font-semibold text-right">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="courtsList" class="divide-y divide-slate-100 text-sm">
+                <tr><td colspan="4" class="text-center py-8 text-slate-500 text-sm">Đang tải...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Users -->
+      <section id="sec-users" class="hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Quản lý Người dùng</h1>
+          <p class="text-sm text-slate-500">Danh sách người dùng và phân quyền quản trị.</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:justify-between items-center bg-slate-50/50">
+            <div class="relative w-full sm:w-72">
+              <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+              <input type="text" id="searchUserInput" placeholder="Tìm tên, email..." class="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white shadow-sm">
+            </div>
+            <button onclick="loadUsers()" class="text-slate-500 hover:text-blue-600 p-2.5 bg-white border border-slate-200 hover:border-blue-200 hover:bg-blue-50 rounded-xl shadow-sm transition-colors text-sm font-semibold flex items-center gap-2">
+              <i class="fa-solid fa-rotate-right"></i> Làm mới
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 font-semibold w-2/5">Người dùng</th>
+                  <th class="px-6 py-4 font-semibold">Vai trò</th>
+                  <th class="px-6 py-4 font-semibold text-right">Cấp quyền</th>
+                </tr>
+              </thead>
+              <tbody id="usersList" class="divide-y divide-slate-100 text-sm">
+                <tr><td colspan="3" class="text-center py-8 text-slate-500 text-sm">Đang tải...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
 
   <script type="module">
-    import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID } from "/firebase.js";
+    import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID, getAllUsers, updateUserRole } from "/firebase.js";
 
     const loadingView = document.getElementById('loadingView');
     const unauthView = document.getElementById('unauthView');
-    const adminView = document.getElementById('adminView');
+    const mainContainer = document.getElementById('mainContainer');
+    let courtsData = [];
+    let initialLoadDone = false;
+
+    // View Routing
+    const sections = ['dashboard', 'pending', 'courts', 'users'];
+    window.showSection = function(name) {
+      sections.forEach(s => {
+        document.getElementById('sec-' + s).classList.add('hidden');
+        document.getElementById('nav-' + s)?.classList.remove('active');
+      });
+      document.getElementById('sec-' + name).classList.remove('hidden');
+      document.getElementById('nav-' + name)?.classList.add('active');
+
+      if (window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.add('hidden');
+      }
+
+      // Load specific data
+      if (name === 'dashboard') loadDashboardStats();
+      if (name === 'users') loadUsers();
+      if (name === 'courts') loadActiveCourts();
+      if (name === 'pending') loadPendingRegistrations();
+    };
 
     onAuthChange(async (user) => {
       loadingView.classList.add('hidden');
       if (user) {
         if (user.uid === SUPER_ADMIN_UID) {
           unauthView.classList.add('hidden');
-          adminView.classList.remove('hidden');
-          loadPendingRegistrations();
+          mainContainer.style.display = 'block';
+          
+          // Profile UI
+          document.getElementById('sidebarName').textContent = user.displayName || 'Super Admin';
+          document.getElementById('sidebarEmail').textContent = user.email || '';
+          if (user.photoURL) document.getElementById('sidebarAvatar').src = user.photoURL;
+
+          if (!initialLoadDone) {
+            showSection('dashboard');
+            initialLoadDone = true;
+          }
         } else {
           unauthView.classList.remove('hidden');
+          mainContainer.style.display = 'none';
         }
       } else {
         window.location.href = '/login?redirect=' + encodeURIComponent('/super-admin');
@@ -83,103 +275,291 @@
       window.location.href = '/login';
     });
 
-    // Switch Tabs
-    const tabPending = document.getElementById('tabPending');
-    const tabCourts = document.getElementById('tabCourts');
-    const secPending = document.getElementById('secPending');
-    const secCourts = document.getElementById('secCourts');
+    async function loadDashboardStats() {
+      try {
+        const [courts, pending, users] = await Promise.all([
+          getAllActiveCourts(),
+          getAllRegistrations('pending'),
+          getAllUsers()
+        ]);
+        
+        courtsData = courts;
+        
+        document.getElementById('statCourts').textContent = courts.length;
+        document.getElementById('statPending').textContent = pending.length;
+        document.getElementById('statUsers').textContent = users.length;
 
-    tabPending.addEventListener('click', () => {
-      tabPending.className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
-      tabCourts.className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200";
-      secPending.classList.remove('hidden');
-      secCourts.classList.add('hidden');
-      loadPendingRegistrations();
-    });
-
-    tabCourts.addEventListener('click', () => {
-      tabCourts.className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
-      tabPending.className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200";
-      secCourts.classList.remove('hidden');
-      secPending.classList.add('hidden');
-      loadActiveCourts();
-    });
+        const badge = document.getElementById('badgePending');
+        if (pending.length > 0) {
+          badge.textContent = pending.length;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
 
     async function loadPendingRegistrations() {
       const container = document.getElementById('pendingList');
       container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Đang tải...</div>';
       try {
         const regs = await getAllRegistrations('pending');
+        
+        // Update badge dynamically
+        const badge = document.getElementById('badgePending');
+        if (regs.length > 0) {
+          badge.textContent = regs.length;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+
         if (regs.length === 0) {
-          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm bg-slate-800/40 rounded-xl">Không có đơn đăng ký nào chờ duyệt.</div>';
+          container.innerHTML = `
+            <div class="bg-white rounded-2xl border border-slate-100 p-12 text-center shadow-sm">
+              <div class="text-slate-200 text-6xl mb-4"><i class="fa-solid fa-box-open"></i></div>
+              <div class="text-slate-500 font-medium">Không có đơn đăng ký nào chờ duyệt.</div>
+            </div>`;
           return;
         }
         container.innerHTML = regs.map(r => `
-          <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="space-y-1">
+          <div class="bg-white border border-slate-200 hover:border-blue-300 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 transition-all shadow-sm hover:shadow-md group">
+            <div class="space-y-2.5 flex-1">
               <div class="flex items-center gap-2">
-                <h3 class="font-bold text-lg text-white">${r.courtName}</h3>
-                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">/${r.slug}</span>
+                <h3 class="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition-colors">${r.courtName}</h3>
+                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full border border-slate-200 font-mono">/${r.slug}</span>
               </div>
-              <p class="text-xs text-slate-300">Chủ sân: <strong class="text-white">${r.displayName}</strong> (${r.email})</p>
-              <p class="text-xs text-slate-400">SĐT: ${r.phone} | Địa chỉ: ${r.address || 'Chưa điền'}</p>
-              ${r.description ? `<p class="text-xs text-slate-400 italic">"${r.description}"</p>` : ''}
+              <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-600">
+                <p class="flex items-center gap-1.5"><i class="fa-solid fa-user text-slate-400"></i> <b class="text-slate-700">${r.displayName}</b> <span class="text-slate-400">(${r.email})</span></p>
+                <p class="flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> ${r.phone}</p>
+                <p class="flex items-start gap-1.5 w-full"><i class="fa-solid fa-location-dot text-slate-400 mt-0.5"></i> <span class="flex-1">${r.address || 'Chưa điền'}</span></p>
+              </div>
+              ${r.description ? `<p class="text-xs text-slate-500 italic bg-slate-50 border border-slate-100 p-2.5 rounded-xl">"${r.description}"</p>` : ''}
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="handleApprove('${r.id}', '${encodeURIComponent(JSON.stringify(r))}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-                <i class="fa-solid fa-check mr-1"></i> Duyệt Kích Hoạt
+            <div class="flex items-center gap-2 lg:flex-col xl:flex-row flex-shrink-0 w-full lg:w-auto">
+              <button onclick="handleApprove('${r.id}', '${encodeURIComponent(JSON.stringify(r))}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-emerald-600/20 flex-1 xl:flex-none text-center h-10">
+                <i class="fa-solid fa-check mr-1.5"></i> Duyệt Kích Hoạt
               </button>
-              <button onclick="handleReject('${r.id}')" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors border border-rose-500/30">
+              <button onclick="handleReject('${r.id}')" class="bg-white hover:bg-rose-50 text-rose-600 text-xs font-bold px-4 py-2.5 rounded-xl transition-all border border-rose-200 hover:border-rose-300 flex-1 xl:flex-none text-center h-10">
                 Từ chối
               </button>
             </div>
           </div>
         `).join('');
       } catch (err) {
-        container.innerHTML = `<div class="text-center py-4 text-red-400 text-sm">Lỗi: ${err.message}</div>`;
+        container.innerHTML = `<div class="text-center py-4 text-red-500 text-sm">Lỗi: ${err.message}</div>`;
       }
     }
 
     async function loadActiveCourts() {
       const container = document.getElementById('courtsList');
-      container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Đang tải...</div>';
+      container.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-500 text-sm">Đang tải...</td></tr>';
       try {
         const courts = await getAllActiveCourts();
         if (courts.length === 0) {
-          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm bg-slate-800/40 rounded-xl">Chưa có sân nào trên hệ thống.</div>';
+          container.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-500 text-sm">Chưa có sân nào trên hệ thống.</td></tr>';
           return;
         }
         container.innerHTML = courts.map(c => `
-          <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
-            <div>
-              <h3 class="font-bold text-white">${c.name}</h3>
-              <p class="text-xs text-slate-400">Slug: <a href="/${c.slug}" target="_blank" class="text-blue-400 underline">/${c.slug}</a> | SĐT: ${c.phone || 'N/A'}</p>
-            </div>
-            <a href="/${c.slug}/manage" target="_blank" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-slate-200">
-              Quản lý <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
-            </a>
-          </div>
+          <tr class="hover:bg-slate-50 transition-colors group">
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-800">${c.name}</div>
+              <a href="/${c.slug}" target="_blank" class="text-[11px] text-blue-500 hover:text-blue-700 font-mono mt-0.5 inline-block border-b border-transparent hover:border-blue-500 transition-colors">/${c.slug}</a>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-xs font-medium text-slate-600"><i class="fa-solid fa-phone text-slate-400 mr-1.5"></i>${c.phone || 'N/A'}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Hoạt động
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <a href="/${c.slug}/manage" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-white bg-blue-50 px-3 py-1.5 rounded-lg transition-colors border border-blue-200 hover:bg-blue-600">
+                Quản lý <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </td>
+          </tr>
         `).join('');
       } catch (err) {
-        container.innerHTML = `<div class="text-center py-4 text-red-400 text-sm">Lỗi: ${err.message}</div>`;
+        container.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500 text-sm">Lỗi: ${err.message}</td></tr>`;
       }
     }
+
+    let allUsers = [];
+    window.loadUsers = async function() {
+      const container = document.getElementById('usersList');
+      container.innerHTML = '<tr><td colspan="3" class="text-center py-8 text-slate-500 text-sm">Đang tải...</td></tr>';
+      try {
+        allUsers = await getAllUsers();
+        renderUsers(allUsers);
+        
+        // Ensure courts data is available for the dropdown
+        if (courtsData.length === 0) {
+          courtsData = await getAllActiveCourts();
+        }
+      } catch (err) {
+        container.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-500 text-sm">Lỗi: ${err.message}</td></tr>`;
+      }
+    };
+
+    function renderUsers(usersToRender) {
+      const container = document.getElementById('usersList');
+      if (usersToRender.length === 0) {
+        container.innerHTML = '<tr><td colspan="3" class="text-center py-8 text-slate-500 text-sm">Không tìm thấy người dùng nào.</td></tr>';
+        return;
+      }
+      
+      container.innerHTML = usersToRender.map(u => {
+        const isSuperAdmin = u.uid === SUPER_ADMIN_UID;
+        
+        let roleBadge = '<span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-200">Khách / User</span>';
+        if (isSuperAdmin) {
+          roleBadge = '<span class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-indigo-200"><i class="fa-solid fa-shield-halved mr-1.5"></i>Super Admin</span>';
+        } else if (u.role === 'admin' || u.role === 'manager') {
+          const roleText = u.role === 'admin' ? '<i class="fa-solid fa-user-tie mr-1.5"></i>Chủ Sân' : '<i class="fa-solid fa-user-gear mr-1.5"></i>Quản lý';
+          const courtInfo = u.courtId ? ` (/${u.courtId})` : '';
+          roleBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200">${roleText}${courtInfo}</span>`;
+        }
+        
+        const actionBtn = isSuperAdmin 
+          ? `<button disabled class="text-[11px] text-slate-400 font-semibold px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg cursor-not-allowed">Mặc định</button>`
+          : `<button onclick="openRoleModal('${u.uid}')" class="text-[11px] font-bold text-blue-600 hover:text-white bg-white hover:bg-blue-600 border border-blue-200 hover:border-blue-600 transition-colors shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 ml-auto"><i class="fa-solid fa-pen-to-square"></i> Cấp quyền</button>`;
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors group">
+            <td class="px-6 py-3">
+              <div class="flex items-center gap-3">
+                <img src="${u.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.email||'U')}" class="w-10 h-10 rounded-full bg-slate-200 object-cover border border-slate-200 shadow-sm" referrerpolicy="no-referrer" />
+                <div class="min-w-0">
+                  <div class="font-bold text-slate-800 truncate" title="${u.displayName || 'Không tên'}">${u.displayName || 'Không tên'}</div>
+                  <div class="text-xs text-slate-500 truncate" title="${u.email || u.uid}">${u.email || u.uid}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-3 whitespace-nowrap">
+              ${roleBadge}
+            </td>
+            <td class="px-6 py-3 text-right">
+              ${actionBtn}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('searchUserInput').addEventListener('input', (e) => {
+      const v = e.target.value.toLowerCase();
+      const filtered = allUsers.filter(u => 
+        (u.displayName && u.displayName.toLowerCase().includes(v)) || 
+        (u.email && u.email.toLowerCase().includes(v))
+      );
+      renderUsers(filtered);
+    });
+
+    window.openRoleModal = function(uid) {
+      const user = allUsers.find(u => u.uid === uid);
+      if (!user) return;
+      
+      const courtOptions = courtsData.map(c => 
+        `<option value="${c.slug}" ${user.courtId === c.slug ? 'selected' : ''}>Sân: ${c.name} (/${c.slug})</option>`
+      ).join('');
+
+      Swal.fire({
+        title: '<div class="text-lg font-black text-slate-800">Cập nhật phân quyền</div>',
+        html: `
+          <div class="text-left space-y-4 mt-2">
+            <div class="flex items-center gap-3 bg-slate-50 p-3 border border-slate-200 rounded-xl shadow-sm">
+               <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email||'U')}" class="w-12 h-12 rounded-full bg-white object-cover border border-slate-200 shadow-sm" referrerpolicy="no-referrer" />
+               <div class="overflow-hidden">
+                 <div class="font-bold text-slate-800 truncate">${user.displayName || 'Không tên'}</div>
+                 <div class="text-xs text-slate-500 truncate">${user.email || uid}</div>
+               </div>
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-2">Vai trò trong hệ thống:</label>
+              <select id="swal-role" class="w-full text-sm border border-slate-300 rounded-xl p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white transition-all shadow-sm">
+                <option value="">Khách (Thu hồi quyền)</option>
+                <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Quản lý sân (Nhân viên)</option>
+                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin sân (Chủ sân)</option>
+              </select>
+            </div>
+            
+            <div id="swal-court-div" style="display: ${user.role === 'admin' || user.role === 'manager' ? 'block' : 'none'};">
+              <label class="block text-xs font-bold text-slate-600 mb-2">Chỉ định sân quản lý:</label>
+              <select id="swal-courtId" class="w-full text-sm border border-slate-300 rounded-xl p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white transition-all shadow-sm">
+                <option value="">-- Vui lòng chọn sân --</option>
+                ${courtOptions}
+              </select>
+            </div>
+          </div>
+        `,
+        didOpen: () => {
+          const roleSel = document.getElementById('swal-role');
+          const courtDiv = document.getElementById('swal-court-div');
+          roleSel.addEventListener('change', () => {
+            courtDiv.style.display = roleSel.value ? 'block' : 'none';
+          });
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Lưu thay đổi',
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: '#1d4ed8',
+        customClass: {
+          confirmButton: 'font-bold rounded-xl px-5 py-2.5',
+          cancelButton: 'font-bold rounded-xl px-5 py-2.5 bg-slate-200 text-slate-700 hover:bg-slate-300'
+        },
+        preConfirm: () => {
+          const role = document.getElementById('swal-role').value;
+          const courtId = document.getElementById('swal-courtId').value;
+          if (role && !courtId) {
+            Swal.showValidationMessage('Vui lòng chọn Sân khi cấp quyền Admin/Manager!');
+            return false;
+          }
+          return { role: role || null, courtId: role ? courtId : null };
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.showLoading();
+            await updateUserRole(uid, {
+              role: result.value.role,
+              courtId: result.value.courtId
+            });
+            Swal.fire({icon: 'success', title: 'Cập nhật thành công', timer: 1500, showConfirmButton: false});
+            loadUsers(); // Refresh
+          } catch(e) {
+            Swal.fire('Lỗi', e.message, 'error');
+          }
+        }
+      });
+    };
 
     window.handleApprove = async function(id, encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
       const res = await Swal.fire({
         title: 'Xác nhận duyệt sân?',
-        text: `Kích hoạt sân "${data.courtName}" với đường dẫn /${data.slug}?`,
+        html: `Kích hoạt sân <b>${data.courtName}</b><br/>Đường dẫn: <b>/${data.slug}</b>`,
         icon: 'question',
         showCancelButton: true,
+        confirmButtonColor: '#10b981',
         confirmButtonText: 'Đồng ý Duyệt',
-        cancelButtonText: 'Hủy'
+        cancelButtonText: 'Hủy',
+        customClass: {
+          confirmButton: 'font-bold rounded-xl px-5 py-2.5 shadow-md shadow-emerald-500/30',
+          cancelButton: 'font-bold rounded-xl px-5 py-2.5 bg-slate-200 text-slate-700 hover:bg-slate-300'
+        }
       });
       if (res.isConfirmed) {
         try {
+          Swal.showLoading();
           await approveRegistration(id, data);
-          Swal.fire({ icon: 'success', title: 'Đã duyệt thành công!' });
+          Swal.fire({ icon: 'success', title: 'Đã duyệt thành công!', timer: 1500, showConfirmButton: false });
           loadPendingRegistrations();
+          loadDashboardStats();
         } catch(e) {
           Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message });
         }
@@ -190,15 +570,23 @@
       const res = await Swal.fire({
         title: 'Từ chối đơn?',
         input: 'text',
-        inputPlaceholder: 'Lý do từ chối (tùy chọn)',
+        inputPlaceholder: 'Nhập lý do từ chối (tùy chọn)...',
         showCancelButton: true,
-        confirmButtonText: 'Từ chối'
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Từ chối đơn này',
+        cancelButtonText: 'Hủy',
+        customClass: {
+          confirmButton: 'font-bold rounded-xl px-5 py-2.5 shadow-md shadow-rose-500/30',
+          cancelButton: 'font-bold rounded-xl px-5 py-2.5 bg-slate-200 text-slate-700 hover:bg-slate-300'
+        }
       });
       if (res.isConfirmed) {
         try {
+          Swal.showLoading();
           await rejectRegistration(id, res.value);
-          Swal.fire({ icon: 'success', title: 'Đã từ chối đơn' });
+          Swal.fire({ icon: 'success', title: 'Đã từ chối đơn', timer: 1500, showConfirmButton: false });
           loadPendingRegistrations();
+          loadDashboardStats();
         } catch(e) {
           Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message });
         }
