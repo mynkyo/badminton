@@ -684,9 +684,9 @@
   </div>
 
   <!-- ===== CART DRAWER (slide up) ===== -->
-  <div id="cartDrawerOverlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="closeCartDrawer()"></div>
+  <div id="cartDrawerOverlay" class="fixed inset-0 bg-black/50 z-[70] hidden" onclick="closeCartDrawer()"></div>
   <div id="cartDrawer"
-    class="drawer-hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[75vh] flex flex-col">
+    class="drawer-hidden fixed bottom-0 left-0 right-0 z-[70] bg-white/95 backdrop-blur-xl rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[75vh] flex flex-col">
     <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
       <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-cart-shopping text-primary mr-2"></i>Giỏ Đặt Sân
       </h3>
@@ -708,7 +708,7 @@
 
   <!-- ===== BOOKING MODAL ===== -->
   <div id="bookingModal"
-    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 modal-overlay">
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden items-center justify-center p-4 modal-overlay">
     <div
       class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg modal-content max-h-[90vh] flex flex-col border border-white/40">
       <div class="bg-primary text-white rounded-t-2xl px-6 py-4 flex items-center justify-between flex-shrink-0">
@@ -1010,7 +1010,7 @@
         });
 
         if (res.isConfirmed && isAnon) {
-          Swal.fire({ title: 'Đã đồng bộ thành công!', icon: 'success', timer: 1500, showConfirmButton: false });
+          Swal.fire({ title: 'Đăng nhập thành công!', icon: 'success', timer: 1500, showConfirmButton: false });
         } else if (res.isDenied && !isAnon) {
           await logoutUser();
         }
@@ -1399,12 +1399,16 @@
     window.openCartDrawer = function () {
       document.getElementById('cartDrawerOverlay').classList.remove('hidden');
       document.getElementById('cartDrawer').classList.remove('drawer-hidden');
+      const floatContainer = document.getElementById('uiFloatContactContainer');
+      if (floatContainer) floatContainer.classList.add('hidden');
       renderCartDrawer();
     };
 
     window.closeCartDrawer = function () {
       document.getElementById('cartDrawerOverlay').classList.add('hidden');
       document.getElementById('cartDrawer').classList.add('drawer-hidden');
+      const floatContainer = document.getElementById('uiFloatContactContainer');
+      if (floatContainer) floatContainer.classList.remove('hidden');
     };
 
     function renderCartDrawer() {
@@ -1483,11 +1487,12 @@
         </div>
       </div>`).join('');
 
-      // Adjust float buttons z-index so they don't cover modal action buttons
+      // Adjust float buttons so they don't cover modal action buttons
       const floatContainer = document.getElementById('uiFloatContactContainer');
-      if (floatContainer) floatContainer.style.zIndex = '30';
+      if (floatContainer) floatContainer.classList.add('hidden');
 
       document.getElementById('bookingModal').classList.remove('hidden');
+      document.getElementById('bookingModal').classList.length;
       document.getElementById('bookingModal').classList.add('flex');
       setTimeout(() => document.getElementById('guestName').focus(), 100);
     };
@@ -1496,7 +1501,8 @@
       document.getElementById('bookingModal').classList.add('hidden');
       document.getElementById('bookingModal').classList.remove('flex');
       const floatContainer = document.getElementById('uiFloatContactContainer');
-      if (floatContainer) floatContainer.style.zIndex = '50';
+      if (floatContainer) floatContainer.classList.remove('hidden');
+    };
     };
     document.getElementById('bookingModal').addEventListener('click', function (e) {
       if (e.target === this) closeBookingModal();
