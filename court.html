@@ -797,7 +797,7 @@
 
   <!-- Import Firebase Module -->
   <script type="module">
-    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole, SUPER_ADMIN_UID, getOwnerEmailByCourtId, sendBookingEmailNotification } from "/firebase.js";
+    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole, SUPER_ADMIN_UID, getOwnerEmailByCourtId, sendBookingEmailNotification, trackUserCourtVisit } from "/firebase.js";
 
     // ===== MULTI-TENANT: Detect court slug =====
     const COURT_SLUG = getCourtSlug();
@@ -978,6 +978,7 @@
 
         let userDoc = null;
         if (currentUser && !currentUser.isAnonymous) {
+          trackUserCourtVisit(currentUser.uid, COURT_SLUG).catch(e => console.warn('Track visit err:', e));
           try {
             userDoc = await getUserRole(currentUser.uid, currentUser.email);
           } catch (e) {

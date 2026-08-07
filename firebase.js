@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore, collection, addDoc, getDocs, getDoc, getDocFromServer, getDocsFromServer, doc,
   updateDoc, deleteDoc, query, where, orderBy, serverTimestamp,
-  setDoc, onSnapshot
+  setDoc, onSnapshot, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
@@ -367,9 +367,33 @@ export async function getUserRole(uid, email) {
   return userData;
 }
 
+/** Ghi nhận danh sách các sân mà tài khoản đã từng truy cập / sử dụng (dùng arrayUnion lưu thêm không đè) */
+export async function trackUserCourtVisit(uid, courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!uid || !slug) return;
+  try {
+    const userRef = doc(db, 'users', uid);
+    await setDoc(userRef, {
+      visitedCourts: arrayUnion(slug),
+      lastVisitedCourt: slug,
+      lastLoginAt: serverTimestamp()
+    }, { merge: true });
+  } catch (e) {
+    console.error("Error tracking user court visit:", e);
+  }
+}
+
 /** Lưu/cập nhật thông tin user */
 export async function setUserRole(uid, data) {
-  return await setDoc(doc(db, 'users', uid), data, { merge: true });
+  const updateData = { ...data };
+  if (data && data.courtId) {
+    updateData.managedCourts = arrayUnion(data.courtId);
+    updateData.visitedCourts = arrayUnion(data.courtId);
+  }
+  if (currentCourtSlug) {
+    updateData.visitedCourts = arrayUnion(currentCourtSlug);
+  }
+  return await setDoc(doc(db, 'users', uid), updateData, { merge: true });
 }
 
 /** Lấy toàn bộ người dùng (Super Admin) */
@@ -390,18 +414,27 @@ export async function checkStaffAccess(uid, email) {
   const userData = await getUserRole(uid, userEmail);
   if (!userData) return false;
   if (userData.role === 'super_admin') return true;
-  return (userData.role === 'admin' || userData.role === 'manager')
-    && userData.courtId === currentCourtSlug;
+
+  if (userData.role === 'admin' || userData.role === 'manager') {
+    if (userData.courtId === currentCourtSlug) return true;
+    if (Array.isArray(userData.managedCourts) && userData.managedCourts.includes(currentCourtSlug)) return true;
+    if (Array.isArray(userData.visitedCourts) && userData.visitedCourts.includes(currentCourtSlug)) return true;
+  }
+  return false;
 }
 
 /** Kiểm tra user có phải admin của sân không */
 export async function checkAdminAccess(uid, email) {
   if (!uid || !currentCourtSlug) return false;
-  if (uid === SUPER_ADMIN_UID) return true;
   const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
   const userData = await getUserRole(uid, userEmail);
   if (!userData) return false;
-  return userData.role === 'admin' && userData.courtId === currentCourtSlug;
+  if (userData.role === 'super_admin') return true;
+  if (userData.role === 'admin') {
+    if (userData.courtId === currentCourtSlug) return true;
+    if (Array.isArray(userData.managedCourts) && userData.managedCourts.includes(currentCourtSlug)) return true;
+  }
+  return false;
 }
 
 // ===== REGISTRATION API =====
