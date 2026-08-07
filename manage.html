@@ -958,13 +958,18 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       return;
     }
     
-    // Check if manager only (hide settings tab)
+    // Check if manager only (hide settings & staff tabs)
     const isAdmin = await checkAdminAccess(user.uid, user.email);
     if (!isAdmin) {
       const navSettings = document.getElementById('nav-settings');
       if (navSettings) navSettings.style.display = 'none';
       const secSettings = document.getElementById('section-settings');
       if (secSettings) secSettings.classList.add('hidden');
+
+      const navStaff = document.getElementById('nav-staff');
+      if (navStaff) navStaff.style.display = 'none';
+      const secStaff = document.getElementById('section-staff');
+      if (secStaff) secStaff.classList.add('hidden');
     }
     
     // Update admin info display
