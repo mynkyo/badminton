@@ -1352,14 +1352,30 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   const adminName = sessionStorage.getItem('adminName') || 'Admin';
   const adminPhoto = sessionStorage.getItem('adminPhoto');
 
-  document.getElementById('sidebarAdminName').textContent = adminName;
+  const elSidebarAdminName = document.getElementById('sidebarAdminName');
+  if (elSidebarAdminName) elSidebarAdminName.textContent = adminName;
+
+  const elDropdownAdminName = document.getElementById('dropdownAdminName');
+  if (elDropdownAdminName) elDropdownAdminName.textContent = adminName;
 
   if (adminPhoto) {
-    document.getElementById('sidebarAvatarContainer').innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
-    document.getElementById('topbarAvatarContainer').innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
+    const elSidebarAvatar = document.getElementById('sidebarAvatarContainer');
+    if (elSidebarAvatar) elSidebarAvatar.innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
+
+    const elTopbarAvatar = document.getElementById('topbarAvatarContainer');
+    if (elTopbarAvatar) elTopbarAvatar.innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
+
+    const elDropdownAvatar = document.getElementById('dropdownAvatarContainer');
+    if (elDropdownAvatar) elDropdownAvatar.innerHTML = `<img src="${adminPhoto}" class="w-full h-full object-cover">`;
   } else {
-    document.getElementById('sidebarAvatarText').textContent = adminName.charAt(0).toUpperCase();
-    document.getElementById('topbarAvatarText').textContent = adminName.charAt(0).toUpperCase();
+    const elSidebarText = document.getElementById('sidebarAvatarText');
+    if (elSidebarText) elSidebarText.textContent = adminName.charAt(0).toUpperCase();
+
+    const elTopbarText = document.getElementById('topbarAvatarText');
+    if (elTopbarText) elTopbarText.textContent = adminName.charAt(0).toUpperCase();
+
+    const elDropdownText = document.getElementById('dropdownAvatarText');
+    if (elDropdownText) elDropdownText.textContent = adminName.charAt(0).toUpperCase();
   }
 
   const VN_PHONE_PREFIXES = ['032','033','034','035','036','037','038','039','086','096','097','098','070','076','077','078','079','089','090','093','081','082','083','084','085','088','091','094','052','056','058','092','059','099','055','069'];
@@ -1427,12 +1443,12 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   
   window.setAdminDate = function(d) {
     adminDate = d;
-    adminDP.value = formatDate(d);
+    if (adminDP) adminDP.value = formatDate(d);
     renderAdminSchedule();
   };
   window.adminChangeDay = function(delta) { setAdminDate(adminDate.add(delta, 'day')); };
   window.adminGoToday = function() { setAdminDate(dayjs()); };
-  adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
+  if (adminDP) adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
 
   const sections = ['dashboard', 'schedule', 'bookings', 'settings'];
   window.showSection = function(name) {
