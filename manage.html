@@ -13,9 +13,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="assets/theme.js"></script>
+  <script src="/assets/theme.js"></script>
   <script>
-    if (!sessionStorage.getItem('isLoggedIn')) window.location.href = 'login.html';
     tailwind.config = {
       theme: {
         extend: {
@@ -847,7 +846,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     logoutUser, onAuthChange,
     setCurrentCourt, getCourtSlug, checkStaffAccess, checkAdminAccess,
     getCourtInfo, SUPER_ADMIN_UID
-  } from "./firebase.js";
+  } from "/firebase.js";
 
   // ===== MULTI-TENANT: Detect court slug =====
   const COURT_SLUG = getCourtSlug();
@@ -859,7 +858,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   onAuthChange(async (user) => {
     currentUser = user;
     if (!user || user.isAnonymous) {
-      window.location.href = '/login.html';
+      window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
       return;
     }
     const hasAccess = await checkStaffAccess(user.uid);
@@ -1427,7 +1426,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       if (r.isConfirmed) {
         try { await logoutUser(); } catch(e){}
         sessionStorage.clear();
-        window.location.href = 'login.html';
+        window.location.href = '/login';
       }
     });
   };

@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="assets/theme.js"></script>
+  <script src="/assets/theme.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -64,101 +64,40 @@
   </a>
 
   <!-- Login Card -->
-  <div class="glass-card rounded-3xl p-8 w-full max-w-sm card-enter">
-    <!-- Logo -->
-    <div class="text-center mb-8 flex flex-col items-center justify-center">
-      <div class="flex items-center gap-2 mb-4">
-        <div class="text-primary text-4xl drop-shadow-sm"><i class="fa-solid fa-shuttlecock"></i></div>
-        <div class="text-left">
-          <div class="font-bold text-sm text-navy leading-tight">Hệ Thống</div>
-          <div class="text-lg text-primary font-bold leading-tight uppercase">QUẢN LÝ SÂN</div>
-        </div>
-      </div>
+  <div class="glass-card rounded-3xl p-8 w-full max-w-sm card-enter text-center">
+    <!-- Header -->
+    <div class="mb-6 flex flex-col items-center justify-center">
+      <div class="text-primary text-4xl drop-shadow-sm mb-3"><i class="fa-solid fa-shuttlecock"></i></div>
       <h1 class="text-2xl font-bold text-navy">Quản lý sân</h1>
     </div>
 
-    <!-- Form Bypass (Login bằng pass/user bất kỳ) -->
-    <form id="loginForm" class="space-y-4">
-      <div class="relative">
-        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-          <i class="fa-regular fa-user"></i>
-        </div>
-        <input id="username" type="text" placeholder="Username" class="input-field w-full rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium" autocomplete="username" />
-      </div>
-      <div class="relative">
-        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-        <input id="password" type="password" placeholder="Password" class="input-field w-full rounded-xl pl-11 pr-11 py-3.5 text-sm font-medium" autocomplete="current-password" />
-        <button type="button" onclick="togglePwd()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
-          <i id="eyeIcon" class="fa-regular fa-eye text-sm"></i>
-        </button>
-      </div>
-
-      <button type="submit" id="loginBtn" class="btn-primary w-full text-white font-bold py-3.5 rounded-xl text-sm mt-4 flex items-center justify-center gap-2">
-        <span>Đăng nhập <i class="fa-solid fa-arrow-right-to-bracket ml-1"></i></span>
-      </button>
-    </form>
-
-    <!-- Divider -->
-    <div class="flex items-center gap-3 my-5">
-      <div class="flex-1 h-px bg-slate-200"></div>
-      <span class="text-slate-400 text-xs font-medium">hoặc</span>
-      <div class="flex-1 h-px bg-slate-200"></div>
-    </div>
-
     <!-- Google Sign-in Real -->
-    <button id="googleLoginBtn" class="btn-google w-full font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+    <button id="googleLoginBtn" class="btn-google w-full font-semibold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
       <span>Đăng nhập bằng Google</span>
     </button>
 
     <p class="text-center text-slate-400 font-medium text-xs mt-6">
-      Hệ thống quản lý nội bộ Sân Cầu Lông
+      Hệ thống quản lý sân cầu lông trực tuyến
     </p>
   </div>
 
 <script type="module">
-  import { loginWithGoogle, onAuthChange, getSettings } from "./firebase.js";
+  import { loginWithGoogle, onAuthChange, getSettings } from "/firebase.js";
 
   // Fetch and apply theme
   getSettings().then(settings => {
     if (settings && settings.theme) {
-      applyTheme(settings.theme);
+      if (typeof applyTheme === 'function') applyTheme(settings.theme);
     }
   });
 
-  // Check if logged in via sessionStorage or Firebase
-  if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    window.location.href = 'manager.html';
-  }
-
+  // Nếu đã đăng nhập rồi thì chuyển ngay
   onAuthChange(user => {
-    if (user) {
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('adminName', user.displayName || user.email);
-      sessionStorage.setItem('adminPhoto', user.photoURL || '');
-      window.location.href = 'manager.html';
+    if (user && !user.isAnonymous) {
+      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/';
+      window.location.href = redirect;
     }
-  });
-
-  window.togglePwd = function() {
-    const pwd = document.getElementById('password');
-    const icon = document.getElementById('eyeIcon');
-    pwd.type = pwd.type === 'password' ? 'text' : 'password';
-    icon.className = pwd.type === 'password' ? 'fa-regular fa-eye text-sm' : 'fa-regular fa-eye-slash text-sm';
-  };
-
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('loginBtn');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang xác thực...</span>';
-    btn.disabled = true;
-    setTimeout(() => {
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('adminName', document.getElementById('username').value.trim() || 'Admin');
-      window.location.href = 'manager.html';
-    }, 600);
   });
 
   document.getElementById('googleLoginBtn').addEventListener('click', async () => {
@@ -166,11 +105,8 @@
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang mở Google...';
     try {
-      const user = await loginWithGoogle();
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('adminName', user.displayName || user.email);
-      sessionStorage.setItem('adminPhoto', user.photoURL || '');
-      window.location.href = 'manager.html';
+      await loginWithGoogle();
+      // onAuthChange sẽ tự xử lý redirect sau khi đăng nhập thành công
     } catch (err) {
       console.error(err);
       Swal.fire({

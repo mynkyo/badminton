@@ -15,6 +15,9 @@
       { "source": "/migrate.html", "destination": "/migrate.html" },
       { "source": "/register", "destination": "/register.html" },
       { "source": "/super-admin", "destination": "/super-admin.html" },
+      { "source": "/login", "destination": "/login.html" },
+      { "source": "/**/login", "destination": "/login.html" },
+      { "source": "/**/login.html", "destination": "/login.html" },
       { "source": "/**/manage", "destination": "/manage.html" },
       { "source": "/**", "destination": "/court.html" }
     ]
