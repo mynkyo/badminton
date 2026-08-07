@@ -1373,9 +1373,22 @@
       const total = cartTotal();
       document.getElementById('modalSlotCount').textContent = count;
       document.getElementById('modalTotal').textContent = fmtMoney(total);
-      document.getElementById('guestName').value = localStorage.getItem('userName') || '';
-      document.getElementById('guestPhone').value = localStorage.getItem('userPhoneRaw') || '';
+      const savedName = localStorage.getItem('userName') || '';
+      const savedPhone = localStorage.getItem('userPhoneRaw') || '';
+
+      const defaultName = (currentUser && !currentUser.isAnonymous && currentUser.displayName)
+        ? currentUser.displayName
+        : savedName;
+
+      const defaultPhone = (currentUser && !currentUser.isAnonymous && (currentUser.phoneNumber || currentUser.phone))
+        ? (currentUser.phoneNumber || currentUser.phone)
+        : savedPhone;
+
+      document.getElementById('guestName').value = defaultName;
+      document.getElementById('guestPhone').value = defaultPhone;
       document.getElementById('guestNote').value = '';
+
+      if (typeof syncZaloIfSame === 'function') syncZaloIfSame();
 
       const sorted = [...cart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
       document.getElementById('modalSlotList').innerHTML = sorted.map(s => `
