@@ -2,7 +2,7 @@
 // Multi-tenant Firebase API for Badminton Court Platform
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, getDoc, doc,
+  getFirestore, collection, addDoc, getDocs, getDoc, getDocFromServer, doc,
   updateDoc, deleteDoc, query, where, orderBy, serverTimestamp,
   setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -189,7 +189,15 @@ export async function createCourt(slug, courtData) {
 export async function getUserRole(uid, email) {
   if (!uid) return null;
   const userRef = doc(db, 'users', uid);
-  const snap = await getDoc(userRef);
+  
+  let snap;
+  try {
+    // Đọc trực tiếp từ Server để bỏ qua Cache cũ của trình duyệt
+    snap = await getDocFromServer(userRef);
+  } catch (e) {
+    snap = await getDoc(userRef);
+  }
+
   let userData = snap.exists() ? snap.data() : null;
 
   if (userData && userData.role && userData.courtId) {
