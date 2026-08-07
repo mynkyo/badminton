@@ -255,54 +255,77 @@ export async function getCourtRecipientsBySlug(courtSlug) {
 // Backward compatibility alias
 export const getOwnerEmailByCourtId = getCourtRecipientsBySlug;
 
+/** Gửi Email thông báo chung qua Formsubmit */
+async function sendEmailViaFormsubmit(toEmail, subject, tableData) {
+  return fetch('https://formsubmit.co/ajax/' + encodeURIComponent(toEmail), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      _subject: subject,
+      _template: 'table',
+      _captcha: 'false',
+      _language: 'vi',
+      ...tableData
+    })
+  }).then(() => {
+    console.log('[Email] Đã gửi tới:', toEmail);
+  }).catch(err => {
+    console.error('[Email] Lỗi gửi tới:', toEmail, err);
+  });
+}
+
 /** Gửi Email thông báo đặt sân mới tới Chủ Sân và tất cả Nhân Viên Quản Lý */
 export async function sendBookingEmailNotification({ courtSlug, ownerEmail, recipientEmails, guestName, guestPhone, newBookings, totalAmount }) {
   let emails = recipientEmails;
   if (!emails || !Array.isArray(emails) || emails.length === 0) {
     emails = ownerEmail ? (Array.isArray(ownerEmail) ? ownerEmail : [ownerEmail]) : [];
   }
-  if (emails.length === 0) return;
+  if (emails.length === 0) {
+    console.warn('[Email] Không tìm thấy địa chỉ email người nhận cho sân:', courtSlug);
+    return;
+  }
 
-  const date = newBookings[0] ? newBookings[0].date : (typeof dayjs !== 'undefined' ? dayjs().format('YYYY-MM-DD') : '');
-  const courtName = (window.CONFIG && window.CONFIG.name) ? window.CONFIG.name : (courtSlug || 'Sân Cầu Lông');
+  const date = newBookings[0] ? newBookings[0].date : '';
+  const courtName = (typeof window !== 'undefined' && window.CONFIG && window.CONFIG.name) ? window.CONFIG.name : (courtSlug || 'Sân Cầu Lông');
 
   const itemsSummary = newBookings.map(b => {
-    const courtTitle = (window.CONFIG && window.CONFIG.courts && window.CONFIG.courts[b.court]) ? window.CONFIG.courts[b.court] : `Sân ${b.court + 1}`;
-    return `${courtTitle}: ${String(b.hour).padStart(2, '0')}:00–${String(b.hour + 1).padStart(2, '0')}:00 (${String(b.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ)`;
+    const courtTitle = (typeof window !== 'undefined' && window.CONFIG && window.CONFIG.courts && window.CONFIG.courts[b.court]) ? window.CONFIG.courts[b.court] : `Sân ${b.court + 1}`;
+    return `${courtTitle}: ${String(b.hour).padStart(2, '0')}:00„${String(b.hour + 1).padStart(2, '0')}:00 (${String(b.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ)`;
   }).join(' | ');
 
-  const manageUrl = `${window.location.protocol}//${window.location.host}/${courtSlug}/manage`;
+  const manageUrl = (typeof window !== 'undefined') ? `${window.location.protocol}//${window.location.host}/${courtSlug}/manage` : `https://dat-san-cau-long.web.app/${courtSlug}/manage`;
 
-  // Gửi song song cho tất cả Admin và Manager
-  const sendPromises = emails.map(targetEmail => {
-    return fetch('https://formsubmit.co/ajax/' + encodeURIComponent(targetEmail), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        _subject: `[Thông Báo Đặt Sân Mới] Khách hàng ${guestName} vừa đặt ${newBookings.length} khung giờ tại ${courtName}`,
-        _template: 'table',
-        _captcha: 'false',
-        _language: 'vi',
-        'Tên Sân Cầu Lông': courtName,
-        'Họ Và Tên Khách': guestName,
-        'Số Điện Thoại Khách': guestPhone,
-        'Ngày Đặt Sân': date,
-        'Chi Tiết Khung Giờ': itemsSummary,
-        'Tổng Tiền Đơn Đặt': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
-        'Trạng Thái Đơn': 'Chờ xác nhận',
-        'Đường Dẫn Quản Lý': manageUrl
-      })
-    }).then(() => {
-      console.log("Booking notification email sent to recipient:", targetEmail);
-    }).catch(err => {
-      console.error("Error sending email notification to recipient:", targetEmail, err);
-    });
-  });
+  const tableData = {
+    'Tên Sân Cầu Lông': courtName,
+    'Họ Và Tên Khách': guestName,
+    'Số Điện Thoại Khách': guestPhone,
+    'Ngày Đặt Sân': date,
+    'Chi Tiết Khung Giờ': itemsSummary,
+    'Tổng Tiền Đơn Đặt': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
+    'Trạng Thái Đơn': 'Chờ xác nhận',
+    'Đường Dẫn Quản Lý': manageUrl
+  };
 
-  await Promise.allSettled(sendPromises);
+  const subject = `[Đặt Sân Mới] Khách hàng ${guestName} vừa đặt ${newBookings.length} khung giờ tại ${courtName}`;
+
+  await Promise.allSettled(emails.map(email => sendEmailViaFormsubmit(email, subject, tableData)));
+}
+
+/** Gửi Email thông báo tới Chủ Sân khi đơn đăng ký được duyệt */
+export async function sendRegistrationApprovedEmail({ toEmail, displayName, courtName, courtSlug }) {
+  if (!toEmail) return;
+  const manageUrl = `https://dat-san-cau-long.web.app/${courtSlug}/manage`;
+  const courtUrl  = `https://dat-san-cau-long.web.app/${courtSlug}`;
+  const tableData = {
+    'Xin Chào': displayName || 'Quý Khách',
+    'Thông Báo': 'Đơn đăng ký mở sân cầu lông của bạn đã được HIỆU DƯợT!',
+    'Tên Sân Được Mở': courtName || courtSlug,
+    'Đường Dẫn Trang Sân': courtUrl,
+    'Trang Quản Lý Sân': manageUrl,
+    'Hướng Dẫn': 'Hãy đăng nhập vào Trang Quản Lý để cài đặt thông tin sân, bảng giá và bắt đầu nhận đơn đặt sân!'
+  };
+  const subject = `[Sân Cầu Lông] Đơn đăng ký mở sân "${courtName || courtSlug}" đã được duyệt!`;
+  await sendEmailViaFormsubmit(toEmail, subject, tableData);
 }
 
 // ===== USER ROLE API =====
@@ -492,6 +515,16 @@ export async function approveRegistration(regId, regData) {
     status: 'approved',
     approvedAt: serverTimestamp()
   });
+
+  // Gửi Email thông báo đến Chủ Sân sau khi duyệt đơn
+  if (email) {
+    sendRegistrationApprovedEmail({
+      toEmail: email,
+      displayName: displayName || 'Quý Khách',
+      courtName: courtName || slug,
+      courtSlug: slug
+    }).catch(e => console.error('[Email] Lỗi gửi mail duyệt đơn:', e));
+  }
 }
 
 /** Từ chối đơn đăng ký */
