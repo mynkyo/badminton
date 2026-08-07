@@ -282,15 +282,18 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, reci
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: `[Thông Báo Đặt Sân] ${guestName} vừa đặt ${newBookings.length} slot tại ${courtName}`,
+        _subject: `[Thông Báo Đặt Sân Mới] Khách hàng ${guestName} vừa đặt ${newBookings.length} khung giờ tại ${courtName}`,
         _template: 'table',
-        'Tên Sân': courtName,
-        'Khách Hàng': guestName,
-        'Số Điện Thoại': guestPhone,
-        'Ngày Chơi': date,
-        'Khung Giờ Đặt': itemsSummary,
-        'Tổng Tiền': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
-        'Link Duyệt Đơn': manageUrl
+        _captcha: 'false',
+        _language: 'vi',
+        'Tên Sân Cầu Lông': courtName,
+        'Họ Và Tên Khách': guestName,
+        'Số Điện Thoại Khách': guestPhone,
+        'Ngày Đặt Sân': date,
+        'Chi Tiết Khung Giờ': itemsSummary,
+        'Tổng Tiền Đơn Đặt': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
+        'Trạng Thái Đơn': 'Chờ xác nhận',
+        'Đường Dẫn Quản Lý': manageUrl
       })
     }).then(() => {
       console.log("Booking notification email sent to recipient:", targetEmail);
