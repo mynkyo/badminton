@@ -92,22 +92,7 @@
       </button>
     </nav>
 
-    <div class="px-3 py-4 border-t border-white/10" style="padding-bottom: 110px;">
-      <div class="flex items-center gap-3 px-3 py-2 mb-2">
-        <div id="sidebarAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
-          <span id="sidebarAvatarText">A</span>
-        </div>
-        <div class="min-w-0">
-          <div class="text-sm font-semibold text-white truncate" id="sidebarAdminName">Admin</div>
-          <div class="text-xs text-gray-400">Quản lý sân</div>
-        </div>
-      </div>
-      <button onclick="logout()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-400 hover:text-red-400">
-        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Đăng xuất
-      </button>
-      <a href="index.html" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 text-left text-gray-400 hover:text-white">
-        <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> Xem trang khách
-      </a>
+    <div class="px-3 py-4 border-t border-white/10" style="padding-bottom: 20px;">
     </div>
   </aside>
 
@@ -129,8 +114,35 @@
           <i class="fa-regular fa-calendar"></i>
           <span id="todayDate"></span>
         </div>
-        <div id="topbarAvatarContainer" class="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-sm font-bold shadow-sm">
-          <span id="topbarAvatarText">A</span>
+        <!-- Topbar User Dropdown -->
+        <div class="relative" id="userDropdownWrapper">
+          <button id="topbarAvatarBtn" type="button" class="w-10 h-10 rounded-full overflow-hidden bg-primary text-white text-sm font-bold shadow-md hover:ring-4 hover:ring-primary/20 transition-all focus:outline-none flex items-center justify-center cursor-pointer">
+            <span id="topbarAvatarContainer" class="w-full h-full flex items-center justify-center">A</span>
+          </button>
+
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 transition-all divide-y divide-gray-100">
+            <div class="px-4 py-3 flex items-center gap-3">
+              <div id="dropdownAvatarContainer" class="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                <span>A</span>
+              </div>
+              <div class="min-w-0">
+                <div class="text-sm font-bold text-gray-800 truncate" id="dropdownAdminName">Admin</div>
+                <div class="text-[11px] text-gray-500 font-medium">Quản lý sân</div>
+              </div>
+            </div>
+            
+            <div class="py-1">
+              <a href="index.html" id="btnViewCustomerPage" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square text-gray-400 w-4 text-center"></i> Xem trang khách
+              </a>
+            </div>
+
+            <div class="py-1">
+              <button onclick="logout()" type="button" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left">
+                <i class="fa-solid fa-right-from-bracket text-red-500 w-4 text-center"></i> Đăng xuất
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -883,9 +895,39 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     
     // Update admin info display
     const name = user.displayName || user.email || 'Admin';
-    document.getElementById('sidebarAdminName').textContent = name;
-    if (user.photoURL) {
-      document.getElementById('sidebarAvatarContainer').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer">`;
+    if (document.getElementById('sidebarAdminName')) document.getElementById('sidebarAdminName').textContent = name;
+    if (document.getElementById('dropdownAdminName')) document.getElementById('dropdownAdminName').textContent = name;
+    if (document.getElementById('pageTitle')) document.getElementById('pageTitle').textContent = `Xin chào, ${name} 👋`;
+
+    const avatarHtml = user.photoURL 
+      ? `<img src="${user.photoURL}" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer">`
+      : `<span class="font-bold text-white text-sm">${name.charAt(0).toUpperCase()}</span>`;
+
+    if (document.getElementById('topbarAvatarContainer')) document.getElementById('topbarAvatarContainer').innerHTML = avatarHtml;
+    if (document.getElementById('dropdownAvatarContainer')) document.getElementById('dropdownAvatarContainer').innerHTML = avatarHtml;
+
+    // Dropdown toggle logic
+    const topbarBtn = document.getElementById('topbarAvatarBtn');
+    const dropdown = document.getElementById('userDropdown');
+    if (topbarBtn && dropdown) {
+      topbarBtn.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      };
+      document.onclick = (e) => {
+        if (!dropdown.contains(e.target) && !topbarBtn.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
+      };
+    }
+
+    // Set customer page URL
+    const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const courtSlug = getCourtSlug();
+    if (courtSlug) {
+      const custUrl = isLocal ? `/court.html?slug=${courtSlug}` : `/${courtSlug}`;
+      const btnViewCust = document.getElementById('btnViewCustomerPage');
+      if (btnViewCust) btnViewCust.href = custUrl;
     }
   });
 
