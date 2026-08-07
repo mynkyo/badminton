@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Admin - Nền Tảng Sân Cầu Lông</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <div id="unauthView" class="min-h-screen flex items-center justify-center p-4">
+    <div class="text-center space-y-4">
+      <h1 class="text-xl font-bold text-red-400">Quyền Truy Cập Bị Từ Chối</h1>
+      <p class="text-sm text-slate-400">Trang này dành riêng cho Super Admin hệ thống.</p>
+      <button id="btnLogin" class="bg-blue-600 px-4 py-2 rounded-xl text-sm font-semibold">Đăng nhập Super Admin</button>
+    </div>
+  </div>
+
+  <div id="adminView" class="hidden max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-white">Quản Trị Nền Tảng (Super Admin)</h1>
+        <p class="text-xs text-slate-400">Duyệt đăng ký mở sân & Quản lý toàn bộ danh sách sân</p>
+      </div>
+      <button id="btnLogout" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg">Đăng xuất</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 border-b border-slate-800">
+      <button id="tabPending" class="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400">Đơn Chờ Duyệt</button>
+      <button id="tabCourts" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200">Danh Sách Sân</button>
+    </div>
+
+    <!-- Section: Pending Registrations -->
+    <div id="secPending" class="space-y-4">
+      <div id="pendingList" class="grid gap-4">
+        <div class="text-center py-8 text-slate-500 text-sm">Đang tải dữ liệu...</div>
+      </div>
+    </div>
+
+    <!-- Section: Active Courts -->
+    <div id="secCourts" class="hidden space-y-4">
+      <div id="courtsList" class="grid gap-4">
+        <div class="text-center py-8 text-slate-500 text-sm">Đang tải danh sách sân...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID } from "./firebase.js";
+
+    const unauthView = document.getElementById('unauthView');
+    const adminView = document.getElementById('adminView');
+
+    onAuthChange(async (user) => {
+      if (user && user.uid === SUPER_ADMIN_UID) {
+        unauthView.classList.add('hidden');
+        adminView.classList.remove('hidden');
+        loadPendingRegistrations();
+      } else {
+        unauthView.classList.remove('hidden');
+        adminView.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('btnLogin').addEventListener('click', () => loginWithGoogle());
+    document.getElementById('btnLogout').addEventListener('click', () => logoutUser());
+
+    // Switch Tabs
+    const tabPending = document.getElementById('tabPending');
+    const tabCourts = document.getElementById('tabCourts');
+    const secPending = document.getElementById('secPending');
+    const secCourts = document.getElementById('secCourts');
+
+    tabPending.addEventListener('click', () => {
+      tabPending.className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
+      tabCourts.className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200";
+      secPending.classList.remove('hidden');
+      secCourts.classList.add('hidden');
+      loadPendingRegistrations();
+    });
+
+    tabCourts.addEventListener('click', () => {
+      tabCourts.className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
+      tabPending.className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200";
+      secCourts.classList.remove('hidden');
+      secPending.classList.add('hidden');
+      loadActiveCourts();
+    });
+
+    async function loadPendingRegistrations() {
+      const container = document.getElementById('pendingList');
+      container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Đang tải...</div>';
+      try {
+        const regs = await getAllRegistrations('pending');
+        if (regs.length === 0) {
+          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm bg-slate-800/40 rounded-xl">Không có đơn đăng ký nào chờ duyệt.</div>';
+          return;
+        }
+        container.innerHTML = regs.map(r => `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-lg text-white">${r.courtName}</h3>
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">/${r.slug}</span>
+              </div>
+              <p class="text-xs text-slate-300">Chủ sân: <strong class="text-white">${r.displayName}</strong> (${r.email})</p>
+              <p class="text-xs text-slate-400">SĐT: ${r.phone} | Địa chỉ: ${r.address || 'Chưa điền'}</p>
+              ${r.description ? `<p class="text-xs text-slate-400 italic">"${r.description}"</p>` : ''}
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="handleApprove('${r.id}', '${encodeURIComponent(JSON.stringify(r))}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+                <i class="fa-solid fa-check mr-1"></i> Duyệt Kích Hoạt
+              </button>
+              <button onclick="handleReject('${r.id}')" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors border border-rose-500/30">
+                Từ chối
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<div class="text-center py-4 text-red-400 text-sm">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    async function loadActiveCourts() {
+      const container = document.getElementById('courtsList');
+      container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Đang tải...</div>';
+      try {
+        const courts = await getAllActiveCourts();
+        if (courts.length === 0) {
+          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm bg-slate-800/40 rounded-xl">Chưa có sân nào trên hệ thống.</div>';
+          return;
+        }
+        container.innerHTML = courts.map(c => `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-white">${c.name}</h3>
+              <p class="text-xs text-slate-400">Slug: <a href="/${c.slug}" target="_blank" class="text-blue-400 underline">/${c.slug}</a> | SĐT: ${c.phone || 'N/A'}</p>
+            </div>
+            <a href="/${c.slug}/manage" target="_blank" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-slate-200">
+              Quản lý <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+            </a>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<div class="text-center py-4 text-red-400 text-sm">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    window.handleApprove = async function(id, encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      const res = await Swal.fire({
+        title: 'Xác nhận duyệt sân?',
+        text: `Kích hoạt sân "${data.courtName}" với đường dẫn /${data.slug}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Đồng ý Duyệt',
+        cancelButtonText: 'Hủy'
+      });
+      if (res.isConfirmed) {
+        try {
+          await approveRegistration(id, data);
+          Swal.fire({ icon: 'success', title: 'Đã duyệt thành công!' });
+          loadPendingRegistrations();
+        } catch(e) {
+          Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message });
+        }
+      }
+    };
+
+    window.handleReject = async function(id) {
+      const res = await Swal.fire({
+        title: 'Từ chối đơn?',
+        input: 'text',
+        inputPlaceholder: 'Lý do từ chối (tùy chọn)',
+        showCancelButton: true,
+        confirmButtonText: 'Từ chối'
+      });
+      if (res.isConfirmed) {
+        try {
+          await rejectRegistration(id, res.value);
+          Swal.fire({ icon: 'success', title: 'Đã từ chối đơn' });
+          loadPendingRegistrations();
+        } catch(e) {
+          Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message });
+        }
+      }
+    };
+  </script>
+</body>
+</html>

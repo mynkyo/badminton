@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng Ký Mở Sân Cầu Lông</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl space-y-6">
+    <div class="text-center space-y-2">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 text-2xl mb-1">
+        <i class="fa-solid fa-cloud-bolt"></i>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">Đăng Ký Sân Cầu Lông</h1>
+      <p class="text-xs text-slate-400">Tạo trang đặt sân trực tuyến dành riêng cho chủ sân</p>
+    </div>
+
+    <!-- Step 1: Login -->
+    <div id="authSection" class="space-y-4">
+      <button id="btnLogin" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-sm">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        Đăng nhập Google để đăng ký
+      </button>
+    </div>
+
+    <!-- Step 2: Register Form (Hidden by default) -->
+    <form id="regForm" class="hidden space-y-4">
+      <div class="bg-slate-700/50 p-3 rounded-xl flex items-center justify-between border border-slate-600">
+        <div class="flex items-center gap-3">
+          <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="" />
+          <div>
+            <div id="userName" class="text-xs font-semibold text-white"></div>
+            <div id="userEmail" class="text-[10px] text-slate-400"></div>
+          </div>
+        </div>
+        <button type="button" id="btnLogout" class="text-xs text-slate-400 hover:text-red-400">Thoát</button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Tên sân cầu lông <span class="text-red-400">*</span></label>
+        <input type="text" id="courtName" required placeholder="Nhập tên sân của bạn..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Đường dẫn riêng (Slug URL) <span class="text-red-400">*</span></label>
+        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden px-3 py-2.5 focus-within:border-blue-500">
+          <span class="text-xs text-slate-500 select-none">dat-san-cau-long.web.app/</span>
+          <input type="text" id="slug" required placeholder="ten-san-cua-ban" class="bg-transparent border-none text-sm text-blue-400 focus:outline-none w-full ml-0.5" />
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Viết liền không dấu, dùng dấu gạch nối (tự động tạo từ tên sân)</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Số điện thoại <span class="text-red-400">*</span></label>
+          <input type="tel" id="phone" required placeholder="Nhập số điện thoại liên hệ..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Địa chỉ</label>
+          <input type="text" id="address" placeholder="Nhập địa chỉ sân..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Mô tả ngắn</label>
+        <textarea id="description" rows="2" placeholder="Thông tin thêm về sân (số lượng sân, loại thảm...)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
+      </div>
+
+      <button type="submit" id="btnSubmit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-colors text-sm shadow-lg shadow-blue-600/20">
+        Gửi yêu cầu đăng ký
+      </button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { loginWithGoogle, logoutUser, onAuthChange, submitRegistration } from "./firebase.js";
+
+    let currentUser = null;
+    const authSection = document.getElementById('authSection');
+    const regForm = document.getElementById('regForm');
+
+    onAuthChange((user) => {
+      currentUser = user;
+      if (user && !user.isAnonymous) {
+        authSection.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        document.getElementById('userName').textContent = user.displayName || user.email;
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.email);
+      } else {
+        authSection.classList.remove('hidden');
+        regForm.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+      try { await loginWithGoogle(); } catch(e) { console.error(e); }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => logoutUser());
+
+    // Auto slugify court name
+    document.getElementById('courtName').addEventListener('input', (e) => {
+      const slugInput = document.getElementById('slug');
+      if (!slugInput.dataset.manual) {
+        slugInput.value = e.target.value
+          .toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[đĐ]/g, 'd')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+      }
+    });
+
+    document.getElementById('slug').addEventListener('input', (e) => {
+      e.target.dataset.manual = "true";
+      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    });
+
+    regForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const slug = document.getElementById('slug').value.trim();
+      const courtName = document.getElementById('courtName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const description = document.getElementById('description').value.trim();
+
+      if (!slug || !courtName) {
+        Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng nhập tên sân và slug URL!' });
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Đang gửi...';
+
+      try {
+        await submitRegistration({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName || currentUser.email,
+          courtName,
+          slug,
+          phone,
+          address,
+          description
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Đăng ký thành công!',
+          text: 'Yêu cầu của bạn đang được duyệt. Ban quản trị sẽ kiểm tra và kích hoạt sân sớm nhất!',
+          confirmButtonText: 'Đã hiểu'
+        }).then(() => {
+          window.location.href = '/';
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: err.message });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Gửi yêu cầu đăng ký';
+      }
+    });
+  </script>
+</body>
+</html>

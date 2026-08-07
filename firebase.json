@@ -2,10 +2,21 @@
   "hosting": {
     "site": "dat-san-cau-long",
     "public": ".",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "migrate.js",
+      "firestore.rules"
+    ],
+    "rewrites": [
+      { "source": "/migrate", "destination": "/migrate.html" },
+      { "source": "/migrate.html", "destination": "/migrate.html" },
+      { "source": "/register", "destination": "/register.html" },
+      { "source": "/super-admin", "destination": "/super-admin.html" },
+      { "source": "/**/manage", "destination": "/manage.html" },
+      { "source": "/**", "destination": "/court.html" }
     ]
   }
 }

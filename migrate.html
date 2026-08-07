@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migration Script - Single to Multi-tenant</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 30px; background: #0f172a; color: #f8fafc; max-width: 600px; margin: 0 auto; }
+    button { padding: 12px 20px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; border-radius: 8px; margin: 6px 4px 6px 0; }
+    .btn-login { background: #3b82f6; color: white; }
+    .btn-run { background: #10b981; color: white; }
+    #log { background: #020617; border: 1px solid #334155; padding: 16px; border-radius: 12px; margin-top: 16px; min-height: 180px; white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.6; }
+    .ok { color: #4ade80; } .err { color: #f87171; } .info { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <h2>🔄 Migration: Single-tenant → Multi-tenant</h2>
+  <p style="font-size: 14px; color: #94a3b8;">Chuyển đổi dữ liệu sân cũ sang đường dẫn sân <code>/namtv</code> và thiết lập quyền Super Admin.</p>
+  
+  <div>
+    <button id="btnLogin" class="btn-login">🔑 Đăng nhập Google</button>
+    <button id="btnRun" class="btn-run">🚀 Chạy Migration</button>
+  </div>
+
+  <div id="log">Đang kiểm tra kết nối...</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, query, orderBy
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDBrWAhDiMHRD-T0daNSvJPP1MHuL7QmNg",
+  authDomain: "badminton-20d52.firebaseapp.com",
+  projectId: "badminton-20d52",
+  storageBucket: "badminton-20d52.firebasestorage.app",
+  messagingSenderId: "111258987522",
+  appId: "1:111258987522:web:2e1e7e9a8a0134d03b0b1b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const SUPER_ADMIN_UID = 'kxPAhAAG4rOK432QLoLFOgWcgwq2';
+const COURT_SLUG = 'namtv';
+const logEl = document.getElementById('log');
+
+function log(msg, cls='') { logEl.innerHTML += `<span class="${cls}">${msg}</span>\n`; }
+
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    log('Lỗi đăng nhập: ' + e.message, 'err');
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    logEl.innerHTML = '';
+    log(`✅ Đã đăng nhập: ${user.email} (UID: ${user.uid})`, 'ok');
+    if (user.uid === SUPER_ADMIN_UID) {
+      log('👑 Bạn là Super Admin. Nhấn "🚀 Chạy Migration" để bắt đầu.', 'info');
+    } else {
+      log('⚠️ UID tài khoản này khác với UID Super Admin đã cấu hình.', 'err');
+    }
+  } else {
+    logEl.innerHTML = 'Chưa đăng nhập. Hãy nhấn "🔑 Đăng nhập Google" trước.';
+  }
+});
+
+document.getElementById('btnRun').addEventListener('click', async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    alert('Vui lòng nhấn "🔑 Đăng nhập Google" trước!');
+    return;
+  }
+
+  log('\n--- BẮT ĐẦU MIGRATION ---', 'info');
+  try {
+    // 1. Lấy settings cũ
+    log('📋 Đọc settings cũ...', 'info');
+    const settingsSnap = await getDocs(collection(db, 'settings'));
+    let oldSettings = null;
+    settingsSnap.forEach(d => { if(d.id === 'config') oldSettings = d.data(); });
+
+    // 2. Tạo court document
+    log('🏸 Tạo courts/namtv...', 'info');
+    await setDoc(doc(db, 'courts', COURT_SLUG), {
+      name: (oldSettings && oldSettings.courtName) || 'Sân Cầu Lông Nam Tạ Văn',
+      slug: COURT_SLUG,
+      adminUid: user.uid,
+      managerUids: [],
+      status: 'active',
+      phone: (oldSettings && oldSettings.phone) || '',
+      address: (oldSettings && oldSettings.address) || '',
+      settings: oldSettings || {},
+      createdAt: serverTimestamp()
+    }, { merge: true });
+    log('  → ✅ Tạo/cập nhật courts/namtv thành công!', 'ok');
+
+    // 3. Copy bookings
+    log('📅 Chuyển lịch đặt sân cũ sang courts/namtv/bookings...', 'info');
+    const bookingsSnap = await getDocs(collection(db, 'bookings'));
+    let count = 0;
+    for (const bookingDoc of bookingsSnap.docs) {
+      await setDoc(doc(db, 'courts', COURT_SLUG, 'bookings', bookingDoc.id), bookingDoc.data());
+      count++;
+    }
+    log(`  → ✅ Đã chuyển ${count} lịch đặt sân!`, 'ok');
+
+    // 4. Set role super_admin & admin cho sân namtv
+    log('👑 Cập nhật quyền tài khoản...', 'info');
+    await setDoc(doc(db, 'users', user.uid), {
+      role: 'super_admin',
+      courtId: COURT_SLUG,
+      email: user.email,
+      displayName: user.displayName || user.email,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    log('  → ✅ Đã gán quyền Super Admin & Chủ sân namtv!', 'ok');
+
+    log('\n🎉 MIGRATION HOÀN TẤT THÀNH CÔNG!', 'ok');
+    log('\nBây giờ bạn có thể truy cập:', 'info');
+    log('• Trang đặt sân: https://dat-san-cau-long.web.app/namtv', 'ok');
+    log('• Trang quản lý: https://dat-san-cau-long.web.app/namtv/manage', 'ok');
+    log('• Trang Super Admin: https://dat-san-cau-long.web.app/super-admin', 'ok');
+
+  } catch(e) {
+    log('\n❌ Lỗi: ' + e.message, 'err');
+    console.error(e);
+  }
+});
+</script>
+</body>
+</html>
