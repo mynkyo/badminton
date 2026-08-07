@@ -64,7 +64,7 @@
   </a>
 
   <!-- Login Card -->
-  <div class="glass-card rounded-3xl p-8 w-full max-w-sm card-enter text-center">
+  <div class="glass-card rounded-3xl p-8 sm:p-9 w-full max-w-md card-enter text-center">
     <!-- Header -->
     <div class="mb-6 flex flex-col items-center justify-center">
       <div class="text-primary text-4xl drop-shadow-sm mb-3"><i class="fa-solid fa-shuttlecock"></i></div>
@@ -72,10 +72,40 @@
     </div>
 
     <!-- Google Sign-in Real -->
-    <button id="googleLoginBtn" class="btn-google w-full font-semibold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
-      <span>Đăng nhập bằng Google</span>
-    </button>
+    <div id="loginActionSection">
+      <button id="googleLoginBtn" class="btn-google w-full font-semibold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
+        <span>Đăng nhập bằng Google</span>
+      </button>
+    </div>
+
+    <!-- User Logged In But No Permission Info Panel -->
+    <div id="noAccessSection" class="hidden space-y-4">
+      <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left space-y-3">
+        <div class="flex items-center gap-3">
+          <img id="userAvatar" class="w-10 h-10 rounded-full border border-amber-400/40 shadow-sm" src="" alt="Avatar" />
+          <div class="overflow-hidden">
+            <div id="userName" class="text-xs font-bold text-slate-800 truncate"></div>
+            <div id="userEmail" class="text-[11px] text-slate-500 truncate"></div>
+          </div>
+        </div>
+        <div class="text-xs text-amber-700 font-medium flex items-start gap-1.5 pt-1 border-t border-amber-500/15">
+          <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+          <span>Tài khoản chưa được cấp quyền quản lý sân nào.</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <a href="register.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-sm">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Đăng ký mở sân mới</span>
+        </a>
+        <button id="btnLogoutUser" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Đăng xuất tài khoản này</span>
+        </button>
+      </div>
+    </div>
 
     <p class="text-center text-slate-400 font-medium text-xs mt-6">
       Hệ thống quản lý sân cầu lông trực tuyến
@@ -83,11 +113,17 @@
   </div>
 
 <script type="module">
-  import { loginWithGoogle, onAuthChange, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
+  import { loginWithGoogle, logoutUser, onAuthChange, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
 
-  // ===== Hàm xử lý redirect sau khi đã xác thực user =====
+  const loginActionSection = document.getElementById('loginActionSection');
+  const noAccessSection = document.getElementById('noAccessSection');
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+  const btnLogoutUser = document.getElementById('btnLogoutUser');
+
+  // ===== Hàm xử lý redirect hoặc hiển thị thông tin nếu chưa cấp quyền =====
   async function handlePostLogin(user) {
-    // Nếu có ?redirect= param (ví dụ từ trang /namtv/manage redirect sang) → ưu tiên tuyệt đối
     const redirectParam = new URLSearchParams(window.location.search).get('redirect');
 
     // Super admin → luôn đến super-admin panel
@@ -100,35 +136,42 @@
     const userData = await getUserRole(user.uid);
 
     if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
-      // Nếu có redirect param thì dùng, không thì tự build từ courtId
       window.location.href = redirectParam || `/${userData.courtId}/manage`;
       return;
     }
 
-    // Không có role → thông báo
-    document.getElementById('googleLoginBtn').disabled = false;
-    document.getElementById('googleLoginBtn').innerHTML =
-      '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"><span>Đăng nhập bằng Google</span>';
+    // Tài khoản đã đăng nhập nhưng CHƯA CÓ QUYỀN -> Hiển thị Panel Thông tin + Nút Đăng xuất
+    loginActionSection.classList.add('hidden');
+    noAccessSection.classList.remove('hidden');
 
-    Swal.fire({
-      icon: 'warning',
-      title: 'Tài khoản chưa được phân quyền',
-      html: `
-        <p class="text-slate-600 text-sm">Tài khoản <strong>${user.email}</strong> chưa được cấp quyền quản lý bất kỳ sân nào.</p>
-        <p class="text-slate-500 text-xs mt-2">Vui lòng liên hệ quản trị viên hệ thống để được cấp quyền.</p>
-      `,
-      confirmButtonText: 'Đã hiểu',
-      confirmButtonColor: '#2563eb'
-    });
+    userName.textContent = user.displayName || 'Tài khoản Google';
+    userEmail.textContent = user.email || '';
+    userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email || 'User');
   }
 
   // ===== Lắng nghe trạng thái auth =====
-  // Chỉ xử lý 1 lần khi vừa load trang (không loop redirect)
-  let handled = false;
   onAuthChange(async (user) => {
-    if (user && !user.isAnonymous && !handled) {
-      handled = true;
+    if (user && !user.isAnonymous) {
       await handlePostLogin(user);
+    } else {
+      // Khi chưa đăng nhập hoặc vừa đăng xuất thành công
+      loginActionSection.classList.remove('hidden');
+      noAccessSection.classList.add('hidden');
+    }
+  });
+
+  // ===== Nút Đăng xuất =====
+  btnLogoutUser.addEventListener('click', async () => {
+    btnLogoutUser.disabled = true;
+    btnLogoutUser.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Đang đăng xuất...</span>';
+    try {
+      await logoutUser();
+      // onAuthChange sẽ tự reset UI về nút Đăng nhập bằng Google
+    } catch (err) {
+      console.error(err);
+    } finally {
+      btnLogoutUser.disabled = false;
+      btnLogoutUser.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất tài khoản này</span>';
     }
   });
 
@@ -136,10 +179,9 @@
   document.getElementById('googleLoginBtn').addEventListener('click', async () => {
     const btn = document.getElementById('googleLoginBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang xác thực...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang mở Google...';
     try {
       await loginWithGoogle();
-      // onAuthChange sẽ tự gọi handlePostLogin
     } catch (err) {
       console.error(err);
       Swal.fire({

@@ -237,19 +237,19 @@ export async function getAllRegistrations(status) {
 export async function approveRegistration(regId, regData) {
   const { slug, uid, email, displayName, courtName, phone, address, description } = regData;
   await createCourt(slug, {
-    name: courtName,
+    name: courtName || '',
     adminUid: uid,
     managerUids: [],
-    phone,
-    address,
-    description,
+    phone: phone || '',
+    address: address || '',
+    description: description || '',
     settings: {}
   });
   await setUserRole(uid, {
     role: 'admin',
     courtId: slug,
-    email,
-    displayName,
+    email: email || '',
+    displayName: displayName || '',
     updatedAt: serverTimestamp()
   });
   await updateDoc(doc(db, 'registrations', regId), {
