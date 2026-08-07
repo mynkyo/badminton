@@ -49,7 +49,7 @@
   </div>
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col h-full fixed lg:static top-0 left-0 z-50 transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl" id="sidebar">
+  <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col h-full fixed md:static top-0 left-0 z-50 transition-transform duration-300 -translate-x-full md:translate-x-0 shadow-2xl" id="sidebar">
     <div class="p-5 border-b border-slate-800 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img src="/assets/logo.png" alt="Super Admin Logo" class="w-10 h-10 rounded-xl object-cover shadow-lg shadow-blue-500/30" />
@@ -58,7 +58,7 @@
           <p class="text-[10px] text-blue-400 font-medium tracking-wider uppercase">System Control</p>
         </div>
       </div>
-      <button onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1">
+      <button onclick="toggleSidebar(false)" class="md:hidden text-slate-400 hover:text-white p-1">
         <i class="fa-solid fa-xmark text-xl"></i>
       </button>
     </div>
@@ -81,14 +81,14 @@
   </aside>
 
   <!-- Overlay for Mobile Sidebar -->
-  <div id="sidebarOverlay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 hidden lg:hidden" onclick="toggleSidebar(false)"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 hidden md:hidden" onclick="toggleSidebar(false)"></div>
 
   <!-- Main Content Area -->
   <main class="flex-1 h-full overflow-y-auto bg-slate-50 flex flex-col min-w-0" id="mainContainer" style="display: none;">
     <!-- Topbar Header -->
     <header class="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-8 flex items-center justify-between z-30 sticky top-0 flex-shrink-0 shadow-2xs">
       <div class="flex items-center gap-2">
-        <button onclick="toggleSidebar(true)" class="lg:hidden text-slate-600 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center">
+        <button onclick="toggleSidebar(true)" class="md:hidden text-slate-600 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center">
           <i class="fa-solid fa-bars text-xl"></i>
         </button>
         <span class="font-extrabold text-slate-800 text-base sm:text-lg tracking-tight">Hệ Thống Super Admin</span>
@@ -246,18 +246,38 @@
     let courtsData = [];
     let initialLoadDone = false;
 
+    window.toggleSidebar = function(show) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (!sidebar) return;
+
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      const targetShow = (typeof show === 'boolean') ? show : isHidden;
+
+      sidebar.classList.remove('hidden');
+      if (targetShow) {
+        sidebar.classList.remove('-translate-x-full');
+        if (overlay) overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (overlay) overlay.classList.add('hidden');
+      }
+    };
+
     // View Routing
     const sections = ['dashboard', 'pending', 'courts', 'users'];
     window.showSection = function(name) {
       sections.forEach(s => {
-        document.getElementById('sec-' + s).classList.add('hidden');
+        const secEl = document.getElementById('sec-' + s);
+        if (secEl) secEl.classList.add('hidden');
         document.getElementById('nav-' + s)?.classList.remove('active');
       });
-      document.getElementById('sec-' + name).classList.remove('hidden');
+      const targetSec = document.getElementById('sec-' + name);
+      if (targetSec) targetSec.classList.remove('hidden');
       document.getElementById('nav-' + name)?.classList.add('active');
 
       if (window.innerWidth < 768) {
-        document.getElementById('sidebar').classList.add('hidden');
+        toggleSidebar(false);
       }
 
       // Load specific data
@@ -265,18 +285,6 @@
       if (name === 'users') loadUsers();
       if (name === 'courts') loadActiveCourts();
       if (name === 'pending') loadPendingRegistrations();
-    };
-
-    window.toggleSidebar = function(show) {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      if (show) {
-        sidebar.classList.remove('-translate-x-full');
-        if (overlay) overlay.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        if (overlay) overlay.classList.add('hidden');
-      }
     };
 
     // User Dropdown toggle
