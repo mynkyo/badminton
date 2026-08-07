@@ -49,7 +49,7 @@
   </div>
 
   <script type="module">
-    import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID } from "./firebase.js";
+    import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID } from "/firebase.js";
 
     const unauthView = document.getElementById('unauthView');
     const adminView = document.getElementById('adminView');
@@ -60,13 +60,16 @@
         adminView.classList.remove('hidden');
         loadPendingRegistrations();
       } else {
-        unauthView.classList.remove('hidden');
-        adminView.classList.add('hidden');
+        // Chưa đăng nhập hoặc không phải Super Admin -> Chuyển về trang đăng nhập
+        window.location.href = '/login?redirect=' + encodeURIComponent('/super-admin');
       }
     });
 
     document.getElementById('btnLogin').addEventListener('click', () => loginWithGoogle());
-    document.getElementById('btnLogout').addEventListener('click', () => logoutUser());
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      await logoutUser();
+      window.location.href = '/login';
+    });
 
     // Switch Tabs
     const tabPending = document.getElementById('tabPending');
