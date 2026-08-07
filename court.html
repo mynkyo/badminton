@@ -1196,7 +1196,7 @@
         const floatCall = document.getElementById('uiFloatCallBtn');
         floatCall.href = `tel:${phoneClean}`;
         if (document.getElementById('uiFloatCallText')) {
-          floatCallText.textContent = phoneFormatted;
+          document.getElementById('uiFloatCallText').textContent = phoneFormatted;
         }
       }
 
