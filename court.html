@@ -198,7 +198,29 @@
 
 <body class="bg-slate-50 text-gray-800 overflow-x-hidden">
 
-  <!-- ===== NAVBAR ===== -->
+  <!-- ===== SPLASH SCREEN ===== -->
+  <div id="splashScreen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-primary" style="">
+    <div class="text-center px-6">
+      <!-- Logo / icon -->
+      <div id="splashLogo" class="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6 shadow-2xl">
+        <i class="fa-solid fa-shuttlecock text-white text-3xl"></i>
+      </div>
+      <!-- Court name -->
+      <h1 id="splashName" class="text-white font-extrabold text-2xl tracking-tight mb-2">Đặt Sân Cầu Lông</h1>
+      <p class="text-white/60 text-sm mb-8">Đang tải thông tin sân...</p>
+      <!-- Spinner -->
+      <div class="flex items-center justify-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-white/80 animate-bounce" style="animation-delay:0s"></div>
+        <div class="w-2 h-2 rounded-full bg-white/80 animate-bounce" style="animation-delay:.15s"></div>
+        <div class="w-2 h-2 rounded-full bg-white/80 animate-bounce" style="animation-delay:.3s"></div>
+      </div>
+    </div>
+    <p class="absolute bottom-6 text-white/30 text-xs">Powered by DatSanCauLong</p>
+  </div>
+
+  <!-- Main content (hidden until splash done) -->
+  <div id="mainContent" style="opacity:0;pointer-events:none;transition:opacity .4s ease">
+
   <nav class="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 transition-all shadow-2xs">
     <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
       <!-- Logo & Brand Name -->
@@ -2248,10 +2270,44 @@
     // Immediately render default schedule table so it is never blank while waiting for network
     renderSchedule();
 
+    // Splash: update name if available early
+    function updateSplashName() {
+      if (CONFIG.name) {
+        const el = document.getElementById('splashName');
+        if (el) el.textContent = CONFIG.name;
+      }
+      if (CONFIG.logoUrl) {
+        const logoEl = document.getElementById('splashLogo');
+        if (logoEl) logoEl.innerHTML = `<img src="${CONFIG.logoUrl}" class="w-full h-full object-cover rounded-2xl" />`;
+      }
+    }
+
+    function hideSplash() {
+      const splash = document.getElementById('splashScreen');
+      const main = document.getElementById('mainContent');
+      if (!splash) return;
+      splash.style.transition = 'opacity .5s ease';
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 500);
+      if (main) {
+        main.style.opacity = '1';
+        main.style.pointerEvents = '';
+      }
+    }
+
     loadConfig().then(() => {
+      updateSplashName();
+      // Give at least 1.5s for splash to feel intentional, then hide
+      const minSplashMs = 1500;
+      const t0 = window._splashStart || Date.now();
+      const elapsed = Date.now() - t0;
+      setTimeout(hideSplash, Math.max(0, minSplashMs - elapsed));
       fetchBookingsAndRender();
       updateCartUI();
     });
+
+    window._splashStart = Date.now();
+
 
     // ScrollSpy for navbar active state
     function initScrollSpy() {
@@ -2332,6 +2388,8 @@
       <i class="fa-solid fa-phone text-lg flex-shrink-0"></i>
     </a>
   </div>
+
+  </div><!-- end #mainContent -->
 
 </body>
 
