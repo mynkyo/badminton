@@ -256,7 +256,7 @@
           return;
         }
 
-        const userData = await getUserRole(user.uid);
+        const userData = await getUserRole(user.uid, user.email);
         if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
           window.location.href = `/${userData.courtId}/manage`;
           return;

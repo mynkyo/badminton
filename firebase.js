@@ -183,18 +183,34 @@ export async function createCourt(slug, courtData) {
   });
 }
 
-/** Cập nhật trạng thái sân */
-export async function updateCourtStatus(slug, status) {
-  return await updateDoc(doc(db, 'courts', slug), { status, updatedAt: serverTimestamp() });
-}
-
 // ===== USER ROLE API =====
 
-/** Lấy thông tin role của user */
-export async function getUserRole(uid) {
+/** Lấy thông tin role của user (tự động đồng bộ quyền theo email nếu UID bị thay đổi) */
+export async function getUserRole(uid, email) {
   if (!uid) return null;
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
+  const userRef = doc(db, 'users', uid);
+  const snap = await getDoc(userRef);
+  let userData = snap.exists() ? snap.data() : null;
+
+  if ((!userData || !userData.role) && email) {
+    try {
+      const q = query(collection(db, 'users'), where('email', '==', email));
+      const querySnap = await getDocs(q);
+      const matchedDoc = querySnap.docs.find(d => d.id !== uid && d.data() && d.data().role);
+      if (matchedDoc) {
+        const roleInfo = {
+          role: matchedDoc.data().role,
+          courtId: matchedDoc.data().courtId || null
+        };
+        await setDoc(userRef, roleInfo, { merge: true });
+        userData = { ...(userData || {}), ...roleInfo };
+      }
+    } catch (e) {
+      console.error('Self-healing getUserRole error:', e);
+    }
+  }
+
+  return userData;
 }
 
 /** Lưu/cập nhật thông tin user */

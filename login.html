@@ -132,8 +132,8 @@
       return;
     }
 
-    // Lấy role từ Firestore
-    const userData = await getUserRole(user.uid);
+    // Lấy role từ Firestore (kèm email để tự động đồng bộ nếu UID thay đổi)
+    const userData = await getUserRole(user.uid, user.email);
 
     if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
       window.location.href = redirectParam || `/${userData.courtId}/manage`;
