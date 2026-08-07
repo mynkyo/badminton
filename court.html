@@ -875,7 +875,7 @@
       const orders = Array.from(map.values());
       return orders.map(order => {
         const totalAmount = order.items.reduce((sum, item) => sum + (item.amount || item.price || 0), 0);
-        
+
         const courtSlotsMap = new Map();
         order.items.forEach(item => {
           const courtName = (CONFIG.courts && CONFIG.courts[item.court]) || (`Sân ${item.court + 1}`);
@@ -944,11 +944,11 @@
           bookingsHtml = `
             <div class="max-h-60 overflow-y-auto space-y-2 text-left pr-1 my-3 scroll-smooth">
               ${orders.map(order => {
-                let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
-                let badgeText = 'Chờ xác nhận';
-                if (order.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
-                if (order.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
-                return `
+            let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
+            let badgeText = 'Chờ xác nhận';
+            if (order.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
+            if (order.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
+            return `
                   <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs flex flex-col gap-1.5 shadow-2xs">
                     <div class="flex items-center justify-between gap-2">
                       <div class="font-bold text-navy text-xs flex items-center gap-1.5">
@@ -967,7 +967,7 @@
                     </div>
                   </div>
                 `;
-              }).join('')}
+          }).join('')}
             </div>
           `;
         }
@@ -983,7 +983,7 @@
             ${bookingsHtml}
           `,
           showConfirmButton: isAnon,
-          confirmButtonText: '<i class="fa-brands fa-google mr-1.5"></i>Đồng bộ Google',
+          confirmButtonText: '<i class="fa-brands fa-google mr-1.5"></i>Đăng Nhập Google',
           showDenyButton: !isAnon,
           denyButtonText: '<i class="fa-solid fa-right-from-bracket mr-1.5"></i>Đăng xuất',
           showCancelButton: true,
