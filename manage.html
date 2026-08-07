@@ -287,8 +287,8 @@
                 <i class="fa-solid fa-rotate text-purple-600 text-sm"></i>
               </div>
               <div>
-                <h3 class="font-bold text-gray-800 text-sm">T\u1ea1o L\u1ecbch C\u1ed1 \u0110\u1ecbnh</h3>
-                <p class="text-xs text-gray-500">\u0110\u1eb7t l\u1ecbch t\u00e1i di\u1ec5n h\u00e0ng tu\u1ea7n cho kh\u00e1ch</p>
+                <h3 class="font-bold text-gray-800 text-sm">Tạo Lịch Cố Định</h3>
+                <p class="text-xs text-gray-500">Đặt lịch tái diễn hàng tuần cho khách</p>
               </div>
             </div>
             <button onclick="closeRecurringModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
@@ -298,35 +298,35 @@
           <div class="overflow-y-auto flex-1 px-6 py-4 space-y-4">
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">T\u00ean kh\u00e1ch h\u00e0ng</label>
-                <input id="rcName" type="text" placeholder="Nguy\u1ec5n V\u0103n A" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Tên khách hàng</label>
+                <input id="rcName" type="text" placeholder="Nguyễn Văn A" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">S\u1ed1 \u0111i\u1ec7n tho\u1ea1i</label>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại</label>
                 <input id="rcPhone" type="tel" placeholder="0901234567" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
               </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">S\u00e2n</label>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Sân</label>
               <select id="rcCourt" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"></select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-2">Ng\u00e0y trong tu\u1ea7n</label>
+              <label class="block text-xs font-semibold text-gray-700 mb-2">Ngày trong tuần</label>
               <div class="flex gap-2 flex-wrap" id="rcDayPicker"></div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-2">Khung gi\u1edd</label>
+              <label class="block text-xs font-semibold text-gray-700 mb-2">Khung giờ</label>
               <div class="flex gap-2 mb-3">
-                <button id="rcModeBtn-same" onclick="setRcMode('same')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 transition-all">\u23f1\ufe0f Gi\u1ed1ng nhau</button>
-                <button id="rcModeBtn-diff" onclick="setRcMode('diff')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-all">\ud83d\udd00 Kh\u00e1c nhau</button>
+                <button id="rcModeBtn-same" onclick="setRcMode('same')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 transition-all">⏱️ Giống nhau</button>
+                <button id="rcModeBtn-diff" onclick="setRcMode('diff')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-all">🔀 Khác nhau</button>
               </div>
               <div id="rcPanelSame" class="grid grid-cols-2 gap-3 p-3 bg-purple-50 border border-purple-200 rounded-xl">
                 <div>
-                  <label class="block text-xs text-gray-600 mb-1">Gi\u1edd b\u1eaft \u0111\u1ea7u</label>
+                  <label class="block text-xs text-gray-600 mb-1">Giờ bắt đầu</label>
                   <input id="rcSameStart" type="number" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-600 mb-1">Gi\u1edd k\u1ebft th\u00fac</label>
+                  <label class="block text-xs text-gray-600 mb-1">Giờ kết thúc</label>
                   <input id="rcSameEnd" type="number" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
                 </div>
               </div>
@@ -334,20 +334,20 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Ng\u00e0y b\u1eaft \u0111\u1ea7u</label>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Ngày bắt đầu</label>
                 <input id="rcStartDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Ng\u00e0y k\u1ebft th\u00fac <span class="text-gray-400 font-normal">(\u2264 6 th\u00e1ng)</span></label>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Ngày kết thúc <span class="text-gray-400 font-normal">(≤ 6 tháng)</span></label>
                 <input id="rcEndDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
               </div>
             </div>
             <div id="rcPreview" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600"></div>
           </div>
           <div class="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
-            <button onclick="closeRecurringModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all">H\u1ee7y</button>
+            <button onclick="closeRecurringModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all">Hủy</button>
             <button onclick="saveRecurringSchedule()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-rotate"></i> T\u1ea1o l\u1ecbch c\u1ed1 \u0111\u1ecbnh
+              <i class="fa-solid fa-rotate"></i> Tạo lịch cố định
             </button>
           </div>
         </div>
