@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đặt Sân Cầu Lông Online</title>
   <meta name="description" content="Đặt sân cầu lông nhanh chóng. Xem lịch trống, đặt sân trực tuyến dễ dàng." />
-  <link id="appFavicon" rel="icon" href="assets/logo.png" type="image/png" />
+  <link id="appFavicon" rel="icon" href="/assets/logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
@@ -79,7 +79,7 @@
 
     /* Hero */
     .hero-bg {
-      background-image: linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.7) 100%), url('assets/hero-bg.jpg');
+      background-image: linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.7) 100%), url('/assets/hero-bg.jpg');
       background-size: cover;
       background-position: center;
     }
@@ -204,7 +204,7 @@
       <!-- Logo & Brand Name -->
       <a href="index.html" class="flex items-center gap-2.5 min-w-0">
         <div id="uiHeaderLogoContainer" class="flex-shrink-0">
-          <img src="assets/logo.png" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-cover shadow-xs" />
+          <img src="/assets/logo.png" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-cover shadow-xs" />
         </div>
         <div id="uiHeaderBrandName"
           class="font-extrabold text-base sm:text-lg text-navy tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px] sm:max-w-[320px]">
@@ -239,7 +239,7 @@
   <!-- ===== HERO ===== -->
   <section id="home"
     class="relative overflow-hidden bg-navy text-white pt-10 pb-20 sm:pt-20 sm:pb-36 bg-cover bg-center transition-all"
-    style="background-image: linear-gradient(rgba(11, 26, 54, 0.45), rgba(11, 26, 54, 0.2)), url('assets/hero-bg.jpg');">
+    style="background-image: linear-gradient(rgba(11, 26, 54, 0.45), rgba(11, 26, 54, 0.2)), url('/assets/hero-bg.jpg');">
     <div class="max-w-6xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
       <h1 id="uiHeroTitle"
         class="text-2xl sm:text-4xl lg:text-6xl font-extrabold text-white leading-tight mb-2 sm:mb-4 drop-shadow-md min-h-[1.2em]">
@@ -592,7 +592,7 @@
         <div>
           <div class="flex items-center gap-3 mb-6">
             <div id="uiFooterLogoContainer" class="flex-shrink-0">
-              <img src="assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
+              <img src="/assets/logo.png" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />
             </div>
             <div id="uiFooterBrandName" class="font-extrabold text-lg text-white tracking-tight"></div>
           </div>
@@ -1084,7 +1084,7 @@
       const logoBox = document.getElementById('uiHeaderLogoContainer');
       const footerLogoBox = document.getElementById('uiFooterLogoContainer');
       const favicon = document.getElementById('appFavicon');
-      const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : 'assets/logo.png';
+      const logoSrc = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : '/assets/logo.png';
 
       if (favicon) favicon.href = logoSrc;
       if (logoBox) logoBox.innerHTML = `<img src="${logoSrc}" alt="Logo" class="h-10 w-10 rounded-xl object-cover shadow-sm" />`;
@@ -1094,7 +1094,7 @@
       const heroSec = document.getElementById('home');
       if (heroSec) {
         if (CONFIG.useDefaultBg || !CONFIG.bgBase64) {
-          heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('assets/hero-bg.jpg')`;
+          heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('/assets/hero-bg.jpg')`;
         } else {
           heroSec.style.backgroundImage = `linear-gradient(rgba(11, 26, 54, 0.4), rgba(11, 26, 54, 0.15)), url('${CONFIG.bgBase64}')`;
         }

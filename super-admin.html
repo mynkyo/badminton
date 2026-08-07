@@ -64,12 +64,15 @@
 
     onAuthChange(async (user) => {
       loadingView.classList.add('hidden');
-      if (user && user.uid === SUPER_ADMIN_UID) {
-        unauthView.classList.add('hidden');
-        adminView.classList.remove('hidden');
-        loadPendingRegistrations();
+      if (user) {
+        if (user.uid === SUPER_ADMIN_UID) {
+          unauthView.classList.add('hidden');
+          adminView.classList.remove('hidden');
+          loadPendingRegistrations();
+        } else {
+          unauthView.classList.remove('hidden');
+        }
       } else {
-        unauthView.classList.remove('hidden');
         window.location.href = '/login?redirect=' + encodeURIComponent('/super-admin');
       }
     });

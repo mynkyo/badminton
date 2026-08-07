@@ -122,11 +122,11 @@ export async function getSettings() {
       const data = snap.data();
       const settings = data.settings || {};
       return {
-        name: data.name || '',
-        phone: data.phone || '',
-        address: data.address || '',
-        description: data.description || '',
-        ...settings
+        ...settings,
+        name: settings.name || data.name || '',
+        phone: settings.phone || data.phone || '',
+        address: settings.address || data.address || '',
+        description: settings.description || data.description || ''
       };
     }
     return null;

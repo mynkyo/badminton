@@ -162,7 +162,7 @@
             <!-- User Status Header -->
             <div class="bg-slate-900/80 p-3 rounded-2xl flex items-center justify-between border border-slate-800">
               <div class="flex items-center gap-3">
-                <img id="userAvatar" class="w-9 h-9 rounded-full border border-blue-500/30" src="" alt="" />
+                <img id="userAvatar" class="w-9 h-9 rounded-full border border-blue-500/30" src="" alt="" referrerpolicy="no-referrer" />
                 <div>
                   <div id="userName" class="text-xs font-bold text-white"></div>
                   <div id="userEmail" class="text-[11px] text-slate-400"></div>
@@ -307,8 +307,8 @@
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
 
-      if (!slug || !courtName || !address) {
-        Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ Tên sân, Slug URL và Địa chỉ chi tiết!' });
+      if (!slug || !courtName || !phone || !address) {
+        Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ Tên sân, Số điện thoại, Slug URL và Địa chỉ chi tiết!' });
         return;
       }
 

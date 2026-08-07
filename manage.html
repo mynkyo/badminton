@@ -885,7 +885,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     const name = user.displayName || user.email || 'Admin';
     document.getElementById('sidebarAdminName').textContent = name;
     if (user.photoURL) {
-      document.getElementById('sidebarAvatarContainer').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover rounded-full">`;
+      document.getElementById('sidebarAvatarContainer').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer">`;
     }
   });
 
