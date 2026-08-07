@@ -638,13 +638,7 @@
         </div>
       </div>
 
-      <!-- Dòng admin góc dưới -->
-      <div class="border-t border-slate-800 pt-6 flex justify-end">
-        <a href="login.html" class="flex items-center gap-2 text-xs text-slate-500 hover:text-white transition-colors"
-          title="Quản lý">
-          <i class="fa-solid fa-lock"></i> Đăng nhập quản lý
-        </a>
-      </div>
+
     </div>
   </footer>
 
@@ -982,6 +976,38 @@
         const isAnon = currentUser ? currentUser.isAnonymous : true;
         const userEmail = (currentUser && currentUser.email) ? currentUser.email : 'Tài khoản Ẩn danh';
 
+        let userDoc = null;
+        if (currentUser && !currentUser.isAnonymous) {
+          try {
+            userDoc = await getUserRole(currentUser.uid, currentUser.email);
+          } catch (e) {
+            console.warn('Cannot fetch user role:', e);
+          }
+        }
+
+        const isSuperAdmin = currentUser && ((currentUser.uid === SUPER_ADMIN_UID) || (userDoc && userDoc.role === 'super_admin'));
+        const isAdminOrManager = userDoc && (userDoc.role === 'admin' || userDoc.role === 'manager');
+        const canManage = isSuperAdmin || isAdminOrManager;
+
+        let manageTargetUrl = 'manage.html';
+        let roleLabel = 'Quản Lý Sân';
+        const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        if (isSuperAdmin) {
+          roleLabel = 'Super Admin';
+          manageTargetUrl = isLocal ? 'super-admin.html' : '/super-admin';
+        } else if (userDoc && userDoc.role === 'admin') {
+          roleLabel = 'Chủ Sân (Admin)';
+          manageTargetUrl = isLocal 
+            ? (userDoc.courtId ? `manage.html?slug=${userDoc.courtId}` : 'manage.html')
+            : (userDoc.courtId ? `/${userDoc.courtId}/manage` : 'manage.html');
+        } else if (userDoc && userDoc.role === 'manager') {
+          roleLabel = 'Nhân Viên (Manager)';
+          manageTargetUrl = isLocal 
+            ? (userDoc.courtId ? `manage.html?slug=${userDoc.courtId}` : 'manage.html')
+            : (userDoc.courtId ? `/${userDoc.courtId}/manage` : 'manage.html');
+        }
+
         const orders = groupUserOrders(bookings);
 
         let bookingsHtml = '';
@@ -1027,6 +1053,15 @@
               Trạng thái: <b class="${isAnon ? 'text-amber-600' : 'text-emerald-600'}">${isAnon ? '🔒 Khách (Ẩn danh)' : '✅ Đã xác thực Google'}</b> 
               ${!isAnon ? `<br/><span class="text-slate-700 font-semibold mt-0.5 inline-block">${userEmail}</span>` : '<br/><span class="text-slate-400 text-[11px]">Dữ liệu tự động lưu theo thiết bị của bạn</span>'}
             </div>
+            ${canManage ? `
+              <div class="mb-3">
+                <a href="${manageTargetUrl}" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5">
+                  <i class="fa-solid fa-gauge-high text-sm"></i>
+                  <span>Trang Quản Lý (${roleLabel})</span>
+                  <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+              </div>
+            ` : ''}
             <div class="text-xs font-bold text-slate-700 text-left border-b border-slate-100 pb-1">Lịch sử đặt sân (${orders.length} đơn):</div>
             ${bookingsHtml}
           `,
