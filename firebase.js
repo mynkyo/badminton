@@ -159,10 +159,13 @@ export function onSettingsChange(callback) {
 /** Lưu cấu hình sân vào Firestore */
 export async function saveSettings(data) {
   if (!currentCourtSlug) throw new Error('Court slug chua duoc dat');
-  return await updateDoc(doc(db, 'courts', currentCourtSlug), {
+  return await setDoc(doc(db, 'courts', currentCourtSlug), {
+    name: data.name || currentCourtSlug,
+    slug: currentCourtSlug,
+    status: 'active',
     settings: { ...data },
     updatedAt: serverTimestamp()
-  });
+  }, { merge: true });
 }
 
 // ===== COURT API =====
