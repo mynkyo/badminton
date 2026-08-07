@@ -322,6 +322,34 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, reci
   await Promise.allSettled(emails.map(email => sendEmailViaFormsubmit(email, subject, tableData)));
 }
 
+/** Gửi Email thông báo tới Super Admin khi có đơn đăng ký mở sân mới */
+export async function sendNewRegistrationNotificationEmail({ regData }) {
+  // Tìm email của Super Admin từ collection users hoặc dùng mặc định
+  let superAdminEmail = 'namtv95.it@gmail.com';
+  try {
+    const userSnap = await getDoc(doc(db, 'users', SUPER_ADMIN_UID));
+    if (userSnap.exists() && userSnap.data().email) {
+      superAdminEmail = userSnap.data().email;
+    }
+  } catch (e) {
+    console.warn('Cannot fetch super admin email, using fallback:', e);
+  }
+
+  const tableData = {
+    'Thông Báo': 'Có đơn đăng ký mở sân mới cần duyệt trên hệ thống!',
+    'Tên Sân': regData.courtName || regData.slug,
+    'Họ Và Tên Chủ Sân': regData.displayName || regData.email,
+    'Email Liên Hệ': regData.email,
+    'Số Điện Thoại': regData.phone || 'Chưa cung cấp',
+    'Địa Chỉ Sân': regData.address || 'Chưa cung cấp',
+    'Slug URL Đường Dẫn': regData.slug,
+    'Trang Duyệt Đơn': 'https://dat-san-cau-long.web.app/super-admin'
+  };
+
+  const subject = `[Đăng Ký Mở Sân Mới] Yêu cầu duyệt sân "${regData.courtName || regData.slug}" từ ${regData.displayName || regData.email}`;
+  await sendEmailViaFormsubmit(superAdminEmail, subject, tableData);
+}
+
 /** Gửi Email thông báo tới Chủ Sân khi đơn đăng ký được duyệt */
 export async function sendRegistrationApprovedEmail({ toEmail, displayName, courtName, courtSlug }) {
   if (!toEmail) return;
@@ -329,7 +357,7 @@ export async function sendRegistrationApprovedEmail({ toEmail, displayName, cour
   const courtUrl  = `https://dat-san-cau-long.web.app/${courtSlug}`;
   const tableData = {
     'Xin Chào': displayName || 'Quý Khách',
-    'Thông Báo': 'Đơn đăng ký mở sân cầu lông của bạn đã được HIỆU DƯợT!',
+    'Thông Báo': 'Đơn đăng ký mở sân cầu lông của bạn đã được HIỆU DƯỢT!',
     'Tên Sân Được Mở': courtName || courtSlug,
     'Đường Dẫn Trang Sân': courtUrl,
     'Trang Quản Lý Sân': manageUrl,
@@ -620,11 +648,18 @@ export async function checkAdminAccess(uid, email) {
 
 /** Nộp đơn đăng ký sân mới */
 export async function submitRegistration(data) {
-  return await addDoc(collection(db, 'registrations'), {
+  const regRef = await addDoc(collection(db, 'registrations'), {
     ...data,
     status: 'pending',
     createdAt: serverTimestamp()
   });
+
+  // Gửi Email thông báo đơn đăng ký mới tới Super Admin (chạy nền)
+  sendNewRegistrationNotificationEmail({ regData: data }).catch(e => {
+    console.error('[Email] Lỗi gửi thông báo đăng ký mới tới Super Admin:', e);
+  });
+
+  return regRef;
 }
 
 /** Lấy tất cả đơn đăng ký (super_admin) */
