@@ -120,7 +120,14 @@ export async function getSettings() {
     const snap = await getDoc(doc(db, 'courts', currentCourtSlug));
     if (snap.exists()) {
       const data = snap.data();
-      return data.settings || null;
+      const settings = data.settings || {};
+      return {
+        name: data.name || '',
+        phone: data.phone || '',
+        address: data.address || '',
+        description: data.description || '',
+        ...settings
+      };
     }
     return null;
   } catch (e) {
@@ -243,7 +250,12 @@ export async function approveRegistration(regId, regData) {
     phone: phone || '',
     address: address || '',
     description: description || '',
-    settings: {}
+    settings: {
+      name: courtName || '',
+      phone: phone || '',
+      address: address || '',
+      description: description || ''
+    }
   });
   await setUserRole(uid, {
     role: 'admin',
