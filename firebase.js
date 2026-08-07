@@ -489,22 +489,22 @@ export async function addManagerByEmail(email, courtSlug, courtName) {
     const userData = userDoc.data();
     const uid = userDoc.id;
 
-    // Kiểm tra xem tài khoản này đã là Admin hoặc Manager của sân này chưa
-    const isSameCourtAdmin = userData.role === 'admin' && (userData.courtId === slug || (userData.managedCourts && userData.managedCourts.includes(slug)));
-    const isSameCourtManager = userData.role === 'manager' && (userData.courtId === slug || (userData.managedCourts && userData.managedCourts.includes(slug)));
-
-    if (isSameCourtAdmin) {
-      throw new Error(`Tài khoản ${normalizedEmail} đã là Chủ sân (Admin) của sân này rồi!`);
+    // Quy tắc: 1 tài khoản chỉ được phép quản lý tối đa 1 sân
+    if (userData.role === 'admin') {
+      throw new Error(`Tài khoản ${normalizedEmail} đã là Chủ sân (Admin) của một sân khác! Mỗi tài khoản chỉ được quản lý 1 sân.`);
     }
-    if (isSameCourtManager) {
-      throw new Error(`Tài khoản ${normalizedEmail} đã là Nhân viên (Manager) của sân này rồi!`);
+    if (userData.role === 'manager') {
+      if (userData.courtId === slug || (userData.managedCourts && userData.managedCourts.includes(slug))) {
+        throw new Error(`Tài khoản ${normalizedEmail} đã là Nhân viên (Manager) của sân này rồi!`);
+      }
+      throw new Error(`Tài khoản ${normalizedEmail} đã là Quản lý của sân "${userData.courtId || 'khác'}". Mỗi tài khoản chỉ được quản lý 1 sân!`);
     }
 
-    // User đã tồn tại → cập nhật quyền
+    // User chưa thuộc sân nào → cập nhật quyền manager
     await setDoc(doc(db, 'users', uid), {
-      role: userData.role === 'admin' ? 'admin' : 'manager',
-      courtId: userData.courtId || slug,
-      managedCourts: arrayUnion(slug),
+      role: 'manager',
+      courtId: slug,
+      managedCourts: [slug],
       updatedAt: serverTimestamp()
     }, { merge: true });
     return { uid, existed: true, email: normalizedEmail, ...userData };
