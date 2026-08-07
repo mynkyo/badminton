@@ -102,7 +102,7 @@
   <!-- ===== MAIN ===== -->
   <main class="flex-1 lg:ml-64 flex flex-col min-w-0 overflow-x-hidden">
 
-    <header class="bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 lg:px-6 py-4 flex items-center justify-between fixed top-0 left-0 right-0 lg:left-64 z-30 shadow-sm">
+    <header class="bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 lg:px-6 py-4 flex items-center justify-between sticky lg:fixed top-0 left-0 right-0 lg:left-64 z-30 shadow-sm" style="top: 0 !important;">
       <div class="flex items-center gap-3">
         <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
           <i class="fa-solid fa-bars text-gray-600"></i>
@@ -150,7 +150,7 @@
       </div>
     </header>
 
-    <div class="flex-1 p-4 lg:p-6 space-y-6 pt-24">
+    <div class="flex-1 p-4 lg:p-6 space-y-6 lg:pt-24 pt-20">
 
       <!-- ======= DASHBOARD ======= -->
       <section id="section-dashboard">
