@@ -377,7 +377,7 @@
         </div>
 
         <!-- Card 2: Giá Cao Điểm -->
-        <div
+        <div id="uiHeaderPeakBox"
           class="bg-rose-50/70 border border-rose-100/90 rounded-2xl px-4 py-3 flex items-center justify-between shadow-2xs">
           <div class="flex items-center gap-2 text-xs font-semibold text-rose-700 min-w-0">
             <div
@@ -1318,8 +1318,20 @@
       // Stats & Prices
       if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts || []).length;
       if (document.getElementById('uiStatPriceNormal')) document.getElementById('uiStatPriceNormal').textContent = CONFIG.priceNormal.toLocaleString('vi-VN') + 'đ/h';
-        // Pricing Cards — chỉ hiển thị peak card khi peakEnabled
+      
       const peakEnabled = CONFIG.peakEnabled !== false;
+
+      // Schedule Header Peak Info Box
+      const peakHeaderBox = document.getElementById('uiHeaderPeakBox');
+      if (peakHeaderBox) peakHeaderBox.style.display = peakEnabled ? '' : 'none';
+      if (peakEnabled) {
+        if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = CONFIG.pricePeak.toLocaleString('vi-VN') + 'đ/h';
+        if (document.getElementById('uiHeaderPeakHours')) {
+          document.getElementById('uiHeaderPeakHours').textContent = `${String(CONFIG.peakStart).padStart(2, '0')}:00 - ${String(CONFIG.peakEnd).padStart(2, '0')}:00`;
+        }
+      }
+
+      // Pricing Cards — chỉ hiển thị peak card khi peakEnabled
       const peakCard = document.getElementById('peakPriceCard');
       const pricingGrid = document.getElementById('pricingCardsGrid');
       if (peakCard) peakCard.style.display = peakEnabled ? '' : 'none';
