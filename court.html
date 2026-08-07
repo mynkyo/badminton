@@ -339,23 +339,23 @@
           </div>
         </div>
 
-        <!-- Bottom Row: Centered Date Picker -->
-        <div class="flex justify-center mt-2">
-          <div class="flex items-center bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
+        <!-- Bottom Row: Full Width Date Picker -->
+        <div class="w-full mt-2">
+          <div class="w-full flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-2xl shadow-xs p-1">
             <button
-              class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
+              class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600 flex-shrink-0"
               onclick="changeDay(-1)">
-              <i class="fa-solid fa-chevron-left text-xs"></i>
+              <i class="fa-solid fa-chevron-left text-sm"></i>
             </button>
-            <div class="relative flex items-center px-1">
+            <div class="relative flex-1 flex items-center justify-center px-2">
               <input type="date" id="datePicker"
-                class="w-[120px] border-none font-bold text-sm text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10"
+                class="w-full border-none font-extrabold text-base sm:text-lg text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10 py-1"
                 onclick="this.showPicker()" />
             </div>
             <button
-              class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600"
+              class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xs transition-all text-slate-600 flex-shrink-0"
               onclick="changeDay(1)">
-              <i class="fa-solid fa-chevron-right text-xs"></i>
+              <i class="fa-solid fa-chevron-right text-sm"></i>
             </button>
           </div>
         </div>
