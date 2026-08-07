@@ -203,15 +203,27 @@
   </footer>
 
   <script type="module">
-    import { loginWithGoogle, logoutUser, onAuthChange, submitRegistration } from "/firebase.js";
+    import { loginWithGoogle, logoutUser, onAuthChange, submitRegistration, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
 
     let currentUser = null;
     const authSection = document.getElementById('authSection');
     const regForm = document.getElementById('regForm');
 
-    onAuthChange((user) => {
+    onAuthChange(async (user) => {
       currentUser = user;
       if (user && !user.isAnonymous) {
+        // Kiểm tra xem tài khoản đã có vai trò quản lý sân nào hoặc là Super Admin chưa
+        if (user.uid === SUPER_ADMIN_UID) {
+          window.location.href = '/super-admin';
+          return;
+        }
+
+        const userData = await getUserRole(user.uid);
+        if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
+          window.location.href = `/${userData.courtId}/manage`;
+          return;
+        }
+
         authSection.classList.add('hidden');
         regForm.classList.remove('hidden');
         document.getElementById('userName').textContent = user.displayName || user.email;
