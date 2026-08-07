@@ -391,7 +391,10 @@
             </div>`;
           return;
         }
-        container.innerHTML = regs.map(r => `
+        window._pendingRegs = {};
+        container.innerHTML = regs.map(r => {
+          window._pendingRegs[r.id] = r;
+          return `
           <div class="bg-white border border-slate-200 hover:border-blue-300 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 transition-all shadow-sm hover:shadow-md group">
             <div class="space-y-2.5 flex-1">
               <div class="flex items-center gap-2">
@@ -406,15 +409,16 @@
               ${r.description ? `<p class="text-xs text-slate-500 italic bg-slate-50 border border-slate-100 p-2.5 rounded-xl">"${r.description}"</p>` : ''}
             </div>
             <div class="flex items-center gap-2 lg:flex-col xl:flex-row flex-shrink-0 w-full lg:w-auto">
-              <button onclick="handleApprove('${r.id}', '${encodeURIComponent(JSON.stringify(r))}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-emerald-600/20 flex-1 xl:flex-none text-center h-10">
+              <button onclick="handleApprove('${r.id}', window._pendingRegs['${r.id}'])" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-emerald-600/20 flex-1 xl:flex-none text-center h-10">
                 <i class="fa-solid fa-check mr-1.5"></i> Duyệt Kích Hoạt
               </button>
-              <button onclick="handleReject('${r.id}')" class="bg-white hover:bg-rose-50 text-rose-600 text-xs font-bold px-4 py-2.5 rounded-xl transition-all border border-rose-200 hover:border-rose-300 flex-1 xl:flex-none text-center h-10">
+              <button onclick="handleReject('${r.id}', window._pendingRegs['${r.id}'])" class="bg-white hover:bg-rose-50 text-rose-600 text-xs font-bold px-4 py-2.5 rounded-xl transition-all border border-rose-200 hover:border-rose-300 flex-1 xl:flex-none text-center h-10">
                 Từ chối
               </button>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       } catch (err) {
         container.innerHTML = `<div class="text-center py-4 text-red-500 text-sm">Lỗi: ${err.message}</div>`;
       }
@@ -633,7 +637,7 @@
       }
     };
 
-    window.handleReject = async function(id) {
+    window.handleReject = async function(id, data) {
       const res = await Swal.fire({
         title: 'Từ chối đơn?',
         input: 'text',
@@ -650,7 +654,7 @@
       if (res.isConfirmed) {
         try {
           Swal.showLoading();
-          await rejectRegistration(id, res.value);
+          await rejectRegistration(id, res.value, data);
           Swal.fire({ icon: 'success', title: 'Đã từ chối đơn', timer: 1500, showConfirmButton: false });
           loadPendingRegistrations();
           loadDashboardStats();

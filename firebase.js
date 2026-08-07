@@ -733,13 +733,39 @@ export async function approveRegistration(regId, regData) {
   }
 }
 
+/** Gửi Email thông báo tới Chủ Sân khi đơn đăng ký bị từ chối */
+export async function sendRegistrationRejectedEmail({ toEmail, displayName, courtName, reason }) {
+  if (!toEmail) return;
+  const tableData = {
+    'Xin Chào': displayName || 'Quý Khách',
+    'Thông Báo': 'Rất tiếc! Đơn đăng ký mở sân cầu lông của bạn KHÔNG ĐƯỢC CHẤP NHẬN.',
+    'Tên Sân Đăng Ký': courtName || 'Sân Cầu Lông',
+    'Lý Do Từ Chối': reason || 'Thông tin chưa đầy đủ hoặc không hợp lệ.',
+    'Hướng Dẫn': 'Vui lòng kiểm tra lại thông tin và nộp lại đơn đăng ký mới tại trang chủ nếu cần thiết.'
+  };
+  const subject = `[Thông Báo] Đơn đăng ký mở sân "${courtName || 'Cầu Lông'}" không được phê duyệt`;
+  await sendEmailViaFormsubmit(toEmail, subject, tableData);
+}
+
 /** Từ chối đơn đăng ký */
-export async function rejectRegistration(regId, reason) {
-  return await updateDoc(doc(db, 'registrations', regId), {
+export async function rejectRegistration(regId, reason, regData) {
+  const result = await updateDoc(doc(db, 'registrations', regId), {
     status: 'rejected',
     rejectedAt: serverTimestamp(),
     rejectReason: reason || ''
   });
+
+  // Gửi email thông báo từ chối nếu có thông tin regData hoặc email
+  if (regData && regData.email) {
+    sendRegistrationRejectedEmail({
+      toEmail: regData.email,
+      displayName: regData.displayName || regData.email,
+      courtName: regData.courtName || regData.slug,
+      reason: reason
+    }).catch(e => console.error('[Email] Lỗi gửi mail từ chối đơn:', e));
+  }
+
+  return result;
 }
 
 // ===== AUTH API =====
