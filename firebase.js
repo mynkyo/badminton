@@ -195,46 +195,58 @@ export async function createCourt(slug, courtData) {
   });
 }
 
-/** Dò tìm email của chủ sân / admin dựa vào courtId (slug) */
-export async function getOwnerEmailByCourtId(courtSlug) {
+/** Dò tìm danh sách email của Chủ sân (Admin) và tất cả Nhân viên (Manager) dựa vào courtId (slug) */
+export async function getCourtRecipientsBySlug(courtSlug) {
   const slug = courtSlug || currentCourtSlug;
-  if (!slug) return null;
+  if (!slug) return [];
+
+  const emailsSet = new Set();
 
   try {
     // 1. Dò từ document courts/{slug}
     const courtDoc = await getCourtInfo(slug);
     if (courtDoc) {
       if (courtDoc.settings && courtDoc.settings.contactEmail) {
-        return courtDoc.settings.contactEmail;
+        emailsSet.add(courtDoc.settings.contactEmail.trim());
       }
-      if (courtDoc.email) return courtDoc.email;
-      if (courtDoc.adminEmail) return courtDoc.adminEmail;
+      if (courtDoc.email) emailsSet.add(courtDoc.email.trim());
+      if (courtDoc.adminEmail) emailsSet.add(courtDoc.adminEmail.trim());
     }
 
-    // 2. Dò từ collection 'users' với courtId == slug & role == 'admin'
-    const qUser = query(collection(db, 'users'), where('courtId', '==', slug), where('role', '==', 'admin'));
-    const userSnap = await getDocs(qUser);
-    if (!userSnap.empty) {
-      const adminDoc = userSnap.docs[0].data();
-      if (adminDoc.email) return adminDoc.email;
-    }
+    // 2. Dò từ collection 'users' với courtId == slug & role IN ['admin', 'manager']
+    const qUsers = query(collection(db, 'users'), where('courtId', '==', slug));
+    const usersSnap = await getDocs(qUsers);
+    usersSnap.docs.forEach(docSnap => {
+      const uData = docSnap.data();
+      if (uData && (uData.role === 'admin' || uData.role === 'manager') && uData.email) {
+        emailsSet.add(uData.email.trim());
+      }
+    });
 
     // 3. Dò từ collection 'registrations' với slug == slug & status == 'approved'
     const qReg = query(collection(db, 'registrations'), where('slug', '==', slug), where('status', '==', 'approved'));
     const regSnap = await getDocs(qReg);
     if (!regSnap.empty) {
       const regData = regSnap.docs[0].data();
-      if (regData.email) return regData.email;
+      if (regData.email) emailsSet.add(regData.email.trim());
     }
   } catch (e) {
-    console.error("Error looking up owner email for court:", slug, e);
+    console.error("Error looking up recipient emails for court:", slug, e);
   }
-  return null;
+
+  return Array.from(emailsSet).filter(Boolean);
 }
 
-/** Gửi Email thông báo đặt sân mới tới chủ sân */
-export async function sendBookingEmailNotification({ courtSlug, ownerEmail, guestName, guestPhone, newBookings, totalAmount }) {
-  if (!ownerEmail) return;
+// Backward compatibility alias
+export const getOwnerEmailByCourtId = getCourtRecipientsBySlug;
+
+/** Gửi Email thông báo đặt sân mới tới Chủ Sân và tất cả Nhân Viên Quản Lý */
+export async function sendBookingEmailNotification({ courtSlug, ownerEmail, recipientEmails, guestName, guestPhone, newBookings, totalAmount }) {
+  let emails = recipientEmails;
+  if (!emails || !Array.isArray(emails) || emails.length === 0) {
+    emails = ownerEmail ? (Array.isArray(ownerEmail) ? ownerEmail : [ownerEmail]) : [];
+  }
+  if (emails.length === 0) return;
 
   const date = newBookings[0] ? newBookings[0].date : (typeof dayjs !== 'undefined' ? dayjs().format('YYYY-MM-DD') : '');
   const courtName = (window.CONFIG && window.CONFIG.name) ? window.CONFIG.name : (courtSlug || 'Sân Cầu Lông');
@@ -246,8 +258,9 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, gues
 
   const manageUrl = `${window.location.protocol}//${window.location.host}/${courtSlug}/manage`;
 
-  try {
-    await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(ownerEmail), {
+  // Gửi song song cho tất cả Admin và Manager
+  const sendPromises = emails.map(targetEmail => {
+    return fetch('https://formsubmit.co/ajax/' + encodeURIComponent(targetEmail), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -264,11 +277,14 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, gues
         'Tổng Tiền': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
         'Link Duyệt Đơn': manageUrl
       })
+    }).then(() => {
+      console.log("Booking notification email sent to recipient:", targetEmail);
+    }).catch(err => {
+      console.error("Error sending email notification to recipient:", targetEmail, err);
     });
-    console.log("Booking notification email sent successfully to court owner:", ownerEmail);
-  } catch (err) {
-    console.error("Error sending email notification to court owner:", err);
-  }
+  });
+
+  await Promise.allSettled(sendPromises);
 }
 
 // ===== USER ROLE API =====
