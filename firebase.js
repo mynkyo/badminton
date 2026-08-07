@@ -2,7 +2,7 @@
 // Multi-tenant Firebase API for Badminton Court Platform
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, getDoc, getDocFromServer, doc,
+  getFirestore, collection, addDoc, getDocs, getDoc, getDocFromServer, getDocsFromServer, doc,
   updateDoc, deleteDoc, query, where, orderBy, serverTimestamp,
   setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -66,14 +66,24 @@ function bookingsCol() {
 /** Lấy lịch đặt theo ngày */
 export async function getBookingsByDate(date) {
   const q = query(bookingsCol(), where('date', '==', date));
-  const snap = await getDocs(q);
+  let snap;
+  try {
+    snap = await getDocsFromServer(q);
+  } catch (e) {
+    snap = await getDocs(q);
+  }
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 /** Lấy tất cả lịch đặt (dùng cho admin) */
 export async function getAllBookings() {
   const q = query(bookingsCol(), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
+  let snap;
+  try {
+    snap = await getDocsFromServer(q);
+  } catch (e) {
+    snap = await getDocs(q);
+  }
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
@@ -81,7 +91,12 @@ export async function getAllBookings() {
 export async function getUserBookings(userId) {
   if (!userId) return [];
   const q = query(bookingsCol(), where('userId', '==', userId));
-  const snap = await getDocs(q);
+  let snap;
+  try {
+    snap = await getDocsFromServer(q);
+  } catch (e) {
+    snap = await getDocs(q);
+  }
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
