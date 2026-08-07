@@ -1492,7 +1492,6 @@
       if (floatContainer) floatContainer.classList.add('hidden');
 
       document.getElementById('bookingModal').classList.remove('hidden');
-      document.getElementById('bookingModal').classList.length;
       document.getElementById('bookingModal').classList.add('flex');
       setTimeout(() => document.getElementById('guestName').focus(), 100);
     };
@@ -1502,7 +1501,6 @@
       document.getElementById('bookingModal').classList.remove('flex');
       const floatContainer = document.getElementById('uiFloatContactContainer');
       if (floatContainer) floatContainer.classList.remove('hidden');
-    };
     };
     document.getElementById('bookingModal').addEventListener('click', function (e) {
       if (e.target === this) closeBookingModal();
