@@ -174,8 +174,8 @@
 
             <!-- Field 3: Address (Textarea) -->
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1.5">Địa chỉ chi tiết của sân</label>
-              <textarea id="address" rows="3" placeholder="Nhập địa chỉ đầy đủ (Ví dụ: Số 123 Đường ABC, Phường X, Quận Y, TP.HCM)..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Địa chỉ chi tiết của sân <span class="text-rose-400">*</span></label>
+              <textarea id="address" required rows="3" placeholder="Nhập địa chỉ đầy đủ (Ví dụ: Số 123 Đường ABC, Phường X, Quận Y, TP.HCM)..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
             </div>
 
             <!-- Submit Button -->
@@ -257,8 +257,8 @@
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
 
-      if (!slug || !courtName) {
-        Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng nhập tên sân và slug URL!' });
+      if (!slug || !courtName || !address) {
+        Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ Tên sân, Slug URL và Địa chỉ chi tiết!' });
         return;
       }
 
