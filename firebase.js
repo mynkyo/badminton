@@ -372,6 +372,19 @@ export async function sendRegistrationApprovedEmail({ toEmail, displayName, cour
 /** Lấy thông tin role của user (đọc trực tiếp từ Firebase Firestore Server) */
 export async function getUserRole(uid, email) {
   if (!uid) return null;
+
+  // Bảo vệ tuyệt đối tài khoản Super Admin (không bao giờ bị khôi phục nhầm thành admin)
+  if (uid === SUPER_ADMIN_UID) {
+    const userRef = doc(db, 'users', uid);
+    const superAdminData = { role: 'super_admin', email: email || '' };
+    try {
+      await setDoc(userRef, superAdminData, { merge: true });
+    } catch (e) {
+      console.warn('Super admin setDoc error:', e);
+    }
+    return superAdminData;
+  }
+
   const userRef = doc(db, 'users', uid);
   
   let snap;
@@ -391,8 +404,8 @@ export async function getUserRole(uid, email) {
   const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
 
   try {
-    // Fallback 1: Dò tìm trong collection 'courts' theo adminUid
-    if (uid) {
+    // Fallback 1: Dò tìm trong collection 'courts' theo adminUid (bỏ qua nếu là Super Admin)
+    if (uid && uid !== SUPER_ADMIN_UID) {
       const qCourt = query(collection(db, 'courts'), where('adminUid', '==', uid));
       const cSnap = await getDocs(qCourt);
       if (!cSnap.empty) {
@@ -414,7 +427,7 @@ export async function getUserRole(uid, email) {
       const uSnap = await getDocs(qUser);
       if (!uSnap.empty) {
         const existingUser = uSnap.docs[0].data();
-        if (existingUser && existingUser.role) {
+        if (existingUser && existingUser.role && existingUser.role !== 'super_admin') {
           const roleInfo = {
             role: existingUser.role,
             courtId: existingUser.courtId || null,
@@ -426,20 +439,22 @@ export async function getUserRole(uid, email) {
         }
       }
 
-      // Fallback 3: Dò tìm trong collection 'registrations' đã approved
-      const qReg = query(collection(db, 'registrations'), where('email', '==', userEmail.toLowerCase()), where('status', '==', 'approved'));
-      const rSnap = await getDocs(qReg);
-      if (!rSnap.empty) {
-        const regData = rSnap.docs[0].data();
-        const roleInfo = {
-          role: 'admin',
-          courtId: regData.slug,
-          managedCourts: [regData.slug],
-          email: userEmail,
-          courtName: regData.courtName
-        };
-        await setDoc(userRef, roleInfo, { merge: true });
-        return { ...(userData || {}), ...roleInfo };
+      // Fallback 3: Dò tìm trong collection 'registrations' đã approved (bỏ qua nếu là Super Admin)
+      if (uid !== SUPER_ADMIN_UID) {
+        const qReg = query(collection(db, 'registrations'), where('email', '==', userEmail.toLowerCase()), where('status', '==', 'approved'));
+        const rSnap = await getDocs(qReg);
+        if (!rSnap.empty) {
+          const regData = rSnap.docs[0].data();
+          const roleInfo = {
+            role: 'admin',
+            courtId: regData.slug,
+            managedCourts: [regData.slug],
+            email: userEmail,
+            courtName: regData.courtName
+          };
+          await setDoc(userRef, roleInfo, { merge: true });
+          return { ...(userData || {}), ...roleInfo };
+        }
       }
     }
   } catch (e) {
