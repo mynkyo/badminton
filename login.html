@@ -83,30 +83,63 @@
   </div>
 
 <script type="module">
-  import { loginWithGoogle, onAuthChange, getSettings } from "/firebase.js";
+  import { loginWithGoogle, onAuthChange, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
 
-  // Fetch and apply theme
-  getSettings().then(settings => {
-    if (settings && settings.theme) {
-      if (typeof applyTheme === 'function') applyTheme(settings.theme);
+  // ===== Hàm xử lý redirect sau khi đã xác thực user =====
+  async function handlePostLogin(user) {
+    // Nếu có ?redirect= param (ví dụ từ trang /namtv/manage redirect sang) → ưu tiên tuyệt đối
+    const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+
+    // Super admin → luôn đến super-admin panel
+    if (user.uid === SUPER_ADMIN_UID) {
+      window.location.href = redirectParam || '/super-admin';
+      return;
+    }
+
+    // Lấy role từ Firestore
+    const userData = await getUserRole(user.uid);
+
+    if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
+      // Nếu có redirect param thì dùng, không thì tự build từ courtId
+      window.location.href = redirectParam || `/${userData.courtId}/manage`;
+      return;
+    }
+
+    // Không có role → thông báo
+    document.getElementById('googleLoginBtn').disabled = false;
+    document.getElementById('googleLoginBtn').innerHTML =
+      '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"><span>Đăng nhập bằng Google</span>';
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Tài khoản chưa được phân quyền',
+      html: `
+        <p class="text-slate-600 text-sm">Tài khoản <strong>${user.email}</strong> chưa được cấp quyền quản lý bất kỳ sân nào.</p>
+        <p class="text-slate-500 text-xs mt-2">Vui lòng liên hệ quản trị viên hệ thống để được cấp quyền.</p>
+      `,
+      confirmButtonText: 'Đã hiểu',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
+  // ===== Lắng nghe trạng thái auth =====
+  // Chỉ xử lý 1 lần khi vừa load trang (không loop redirect)
+  let handled = false;
+  onAuthChange(async (user) => {
+    if (user && !user.isAnonymous && !handled) {
+      handled = true;
+      await handlePostLogin(user);
     }
   });
 
-  // Nếu đã đăng nhập rồi thì chuyển ngay
-  onAuthChange(user => {
-    if (user && !user.isAnonymous) {
-      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/';
-      window.location.href = redirect;
-    }
-  });
-
+  // ===== Nút đăng nhập Google =====
   document.getElementById('googleLoginBtn').addEventListener('click', async () => {
     const btn = document.getElementById('googleLoginBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang mở Google...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang xác thực...';
     try {
       await loginWithGoogle();
-      // onAuthChange sẽ tự xử lý redirect sau khi đăng nhập thành công
+      // onAuthChange sẽ tự gọi handlePostLogin
     } catch (err) {
       console.error(err);
       Swal.fire({
