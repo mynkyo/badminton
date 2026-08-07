@@ -873,7 +873,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
       return;
     }
-    const hasAccess = await checkStaffAccess(user.uid);
+    const hasAccess = await checkStaffAccess(user.uid, user.email);
     if (!hasAccess) {
       document.body.innerHTML = `
         <div style="min-h-screen; display:flex; flex-direction:column; align-items:center; justify-center:center; padding:40px; font-family:sans-serif; text-align:center; background:#f8fafc;">
@@ -885,12 +885,12 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     }
     
     // Check if manager only (hide settings tab)
-    const isAdmin = await checkAdminAccess(user.uid);
+    const isAdmin = await checkAdminAccess(user.uid, user.email);
     if (!isAdmin) {
       const navSettings = document.getElementById('nav-settings');
       if (navSettings) navSettings.style.display = 'none';
       const secSettings = document.getElementById('section-settings');
-      if (secSettings) secSettings.remove();
+      if (secSettings) secSettings.classList.add('hidden');
     }
     
     // Update admin info display
@@ -995,32 +995,35 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       }
     };
 
-    // Fill Settings form
-    document.getElementById('cfgName').value = CONFIG.name || '';
+    // Safe Fill Settings form
+    function setVal(id, val) { const el = document.getElementById(id); if (el) el.value = val ?? ''; }
+    function setChecked(id, val) { const el = document.getElementById(id); if (el) el.checked = !!val; }
+
+    setVal('cfgName', CONFIG.name);
     if (document.getElementById('sidebarCourtBrandName')) document.getElementById('sidebarCourtBrandName').textContent = CONFIG.name || '';
     const sidebarLogoImg = document.querySelector('#sidebarLogoContainer img');
     if (sidebarLogoImg) {
       sidebarLogoImg.src = (!CONFIG.useDefaultLogo && CONFIG.logoBase64) ? CONFIG.logoBase64 : '/assets/logo.png';
     }
-    document.getElementById('cfgPhone').value = CONFIG.phone || '';
-    document.getElementById('cfgZalo').value = CONFIG.zalo || CONFIG.phone || '';
+    setVal('cfgPhone', CONFIG.phone);
+    setVal('cfgZalo', CONFIG.zalo || CONFIG.phone);
     const sameAs = CONFIG.sameAsPhone ?? (CONFIG.zalo === CONFIG.phone || !CONFIG.zalo);
-    document.getElementById('cfgSameAsPhone').checked = sameAs;
+    setChecked('cfgSameAsPhone', sameAs);
     toggleSameAsPhone(sameAs);
-    document.getElementById('cfgEmail').value = CONFIG.email || '';
-    document.getElementById('cfgFacebookName').value = CONFIG.facebookName || '';
-    document.getElementById('cfgFacebook').value = CONFIG.facebook || '';
-    document.getElementById('cfgAddress').value = CONFIG.address || '';
-    document.getElementById('cfgGoogleMaps').value = CONFIG.googleMaps || '';
-    document.getElementById('cfgStartHour').value = CONFIG.startHour;
-    document.getElementById('cfgEndHour').value = CONFIG.endHour;
-    document.getElementById('cfgCourts').value = (CONFIG.courts || []).join(', ');
-    document.getElementById('cfgPriceNormal').value = CONFIG.priceNormal;
-    document.getElementById('cfgPricePeak').value = CONFIG.pricePeak;
-    document.getElementById('cfgPeakStart').value = CONFIG.peakStart;
-    document.getElementById('cfgPeakEnd').value = CONFIG.peakEnd;
-    document.getElementById('cfgServices').value = (CONFIG.services || ['Cho thuê vợt: 20.000đ/cây', 'Nước suối miễn phí', 'Thay dây vợt theo yêu cầu']).join('\n');
-    document.getElementById('cfgNotice').value = CONFIG.notice || '';
+    setVal('cfgEmail', CONFIG.email);
+    setVal('cfgFacebookName', CONFIG.facebookName);
+    setVal('cfgFacebook', CONFIG.facebook);
+    setVal('cfgAddress', CONFIG.address);
+    setVal('cfgGoogleMaps', CONFIG.googleMaps);
+    setVal('cfgStartHour', CONFIG.startHour);
+    setVal('cfgEndHour', CONFIG.endHour);
+    setVal('cfgCourts', (CONFIG.courts || []).join(', '));
+    setVal('cfgPriceNormal', CONFIG.priceNormal);
+    setVal('cfgPricePeak', CONFIG.pricePeak);
+    setVal('cfgPeakStart', CONFIG.peakStart);
+    setVal('cfgPeakEnd', CONFIG.peakEnd);
+    setVal('cfgServices', (CONFIG.services || ['Cho thuê vợt: 20.000đ/cây', 'Nước suối miễn phí', 'Thay dây vợt theo yêu cầu']).join('\n'));
+    setVal('cfgNotice', CONFIG.notice);
 
     window.onLogoFileSelected = function(input) {
       if (input.files && input.files[0]) {
@@ -1434,17 +1437,19 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   const sections = ['dashboard', 'schedule', 'bookings', 'settings'];
   window.showSection = function(name) {
     sections.forEach(s => {
-      document.getElementById('section-' + s).classList.add('hidden');
+      document.getElementById('section-' + s)?.classList.add('hidden');
       document.getElementById('nav-' + s)?.classList.remove('active');
     });
-    document.getElementById('section-' + name).classList.remove('hidden');
+    document.getElementById('section-' + name)?.classList.remove('hidden');
     document.getElementById('nav-' + name)?.classList.add('active');
     const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', settings: 'Cài đặt thông tin sân' };
-    document.getElementById('pageTitle').textContent = titles[name];
-    if (name === 'schedule') renderAdminSchedule();
-    if (name === 'bookings') renderAllBookings();
-    if (name === 'dashboard') renderDashboard();
-    if (window.innerWidth < 1024) toggleSidebar(false);
+    if (document.getElementById('pageTitle')) {
+      document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
+    }
+    if (name === 'schedule' && typeof renderAdminSchedule === 'function') renderAdminSchedule();
+    if (name === 'bookings' && typeof renderAllBookings === 'function') renderAllBookings();
+    if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
+    if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') toggleSidebar(false);
   };
 
   let sidebarOpen = false;
