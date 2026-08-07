@@ -11,6 +11,8 @@
       "firestore.rules"
     ],
     "rewrites": [
+      { "source": "/", "destination": "/index.html" },
+      { "source": "/index.html", "destination": "/index.html" },
       { "source": "/migrate", "destination": "/migrate.html" },
       { "source": "/migrate.html", "destination": "/migrate.html" },
       { "source": "/register", "destination": "/register.html" },
