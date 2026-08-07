@@ -346,6 +346,11 @@ export async function logoutUser() {
 
 /** Lắng nghe trạng thái đăng nhập */
 export function onAuthChange(callback) {
-  return onAuthStateChanged(auth, callback);
+  return onAuthStateChanged(auth, (user) => {
+    if (user && !user.isAnonymous) {
+      // Background sync cho user đã đăng nhập từ trước
+      syncUserToFirestore(user).catch(e => console.error('Sync user error:', e));
+    }
+    callback(user);
+  });
 }
-
