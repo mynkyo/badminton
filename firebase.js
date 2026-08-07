@@ -361,38 +361,58 @@ export async function getUserRole(uid, email) {
   }
 
   const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
-  if (!userEmail) return userData;
 
   try {
-    // Fallback 1: Dò tìm trong collection 'users' theo email
-    const qUser = query(collection(db, 'users'), where('email', '==', userEmail));
-    const uSnap = await getDocs(qUser);
-    if (!uSnap.empty) {
-      const existingUser = uSnap.docs[0].data();
-      if (existingUser && existingUser.role) {
+    // Fallback 1: Dò tìm trong collection 'courts' theo adminUid
+    if (uid) {
+      const qCourt = query(collection(db, 'courts'), where('adminUid', '==', uid));
+      const cSnap = await getDocs(qCourt);
+      if (!cSnap.empty) {
+        const courtData = cSnap.docs[0].data();
         const roleInfo = {
-          role: existingUser.role,
-          courtId: existingUser.courtId || null,
-          email: userEmail
+          role: 'admin',
+          courtId: cSnap.docs[0].id,
+          managedCourts: [cSnap.docs[0].id],
+          email: userEmail || ''
         };
         await setDoc(userRef, roleInfo, { merge: true });
         return { ...(userData || {}), ...roleInfo };
       }
     }
 
-    // Fallback 2: Dò tìm trong collection 'registrations' đã approved
-    const qReg = query(collection(db, 'registrations'), where('email', '==', userEmail), where('status', '==', 'approved'));
-    const rSnap = await getDocs(qReg);
-    if (!rSnap.empty) {
-      const regData = rSnap.docs[0].data();
-      const roleInfo = {
-        role: 'admin',
-        courtId: regData.slug,
-        email: userEmail,
-        courtName: regData.courtName
-      };
-      await setDoc(userRef, roleInfo, { merge: true });
-      return { ...(userData || {}), ...roleInfo };
+    if (userEmail) {
+      // Fallback 2: Dò tìm trong collection 'users' theo email có chứa role
+      const qUser = query(collection(db, 'users'), where('email', '==', userEmail.toLowerCase()));
+      const uSnap = await getDocs(qUser);
+      if (!uSnap.empty) {
+        const existingUser = uSnap.docs[0].data();
+        if (existingUser && existingUser.role) {
+          const roleInfo = {
+            role: existingUser.role,
+            courtId: existingUser.courtId || null,
+            managedCourts: existingUser.managedCourts || (existingUser.courtId ? [existingUser.courtId] : []),
+            email: userEmail
+          };
+          await setDoc(userRef, roleInfo, { merge: true });
+          return { ...(userData || {}), ...roleInfo };
+        }
+      }
+
+      // Fallback 3: Dò tìm trong collection 'registrations' đã approved
+      const qReg = query(collection(db, 'registrations'), where('email', '==', userEmail.toLowerCase()), where('status', '==', 'approved'));
+      const rSnap = await getDocs(qReg);
+      if (!rSnap.empty) {
+        const regData = rSnap.docs[0].data();
+        const roleInfo = {
+          role: 'admin',
+          courtId: regData.slug,
+          managedCourts: [regData.slug],
+          email: userEmail,
+          courtName: regData.courtName
+        };
+        await setDoc(userRef, roleInfo, { merge: true });
+        return { ...(userData || {}), ...roleInfo };
+      }
     }
   } catch (e) {
     console.error('Self-healing getUserRole error:', e);
@@ -578,7 +598,6 @@ export async function checkStaffAccess(uid, email) {
   if (userData.role === 'admin' || userData.role === 'manager') {
     if (userData.courtId === currentCourtSlug) return true;
     if (Array.isArray(userData.managedCourts) && userData.managedCourts.includes(currentCourtSlug)) return true;
-    if (Array.isArray(userData.visitedCourts) && userData.visitedCourts.includes(currentCourtSlug)) return true;
   }
   return false;
 }
