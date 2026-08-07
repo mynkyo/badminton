@@ -1437,7 +1437,12 @@
     const rcED = document.getElementById('clientRcEndDate');
     if (rcSD) rcSD.value = today.format('YYYY-MM-DD');
     if (rcED) rcED.value = today.add(1, 'month').format('YYYY-MM-DD');
-    ['clientRcName', 'clientRcPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const savedName = localStorage.getItem('userName') || '';
+    const savedPhone = localStorage.getItem('userPhoneRaw') || '';
+    const nameEl = document.getElementById('clientRcName');
+    const phoneEl = document.getElementById('clientRcPhone');
+    if (nameEl) nameEl.value = savedName;
+    if (phoneEl) phoneEl.value = savedPhone;
     const rcSS = document.getElementById('clientRcSameStart'); if (rcSS) rcSS.value = 17;
     const rcSE = document.getElementById('clientRcSameEnd'); if (rcSE) rcSE.value = 19;
     setClientRcMode('same');
@@ -1580,6 +1585,8 @@
       for (const b of bookingsToCreate) {
         await addBookings([{ ...b, batchId: batchBase + '_' + b.date }]);
       }
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userPhoneRaw', phone);
       closeClientRecurringModal();
       Swal.fire({ icon: 'success', title: 'Đã gửi yêu cầu đặt lịch cố định!', text: 'Sân sẽ liên hệ xác nhận trong thời gian sớm nhất.', confirmButtonColor: '#7c3aed' });
       if (typeof loadBookings === 'function') loadBookings();
