@@ -1588,7 +1588,22 @@
       localStorage.setItem('userName', name);
       localStorage.setItem('userPhoneRaw', phone);
       closeClientRecurringModal();
-      Swal.fire({ icon: 'success', title: 'Đã gửi yêu cầu đặt lịch cố định!', text: 'Sân sẽ liên hệ xác nhận trong thời gian sớm nhất.', confirmButtonColor: '#7c3aed' });
+      const rcCourtPhone = (CONFIG.phone || '').replace(/[\s\-.()]/g, '');
+      Swal.fire({
+        icon: 'success',
+        title: 'Đã gửi yêu cầu lịch cố định! 🎉',
+        html: `Cảm ơn <b>${name}</b>!<br/>Yêu cầu <b>${bookingsToCreate.length} buổi</b> đã được ghi nhận.<br/><span class="text-gray-500 text-sm">Sân sẽ liên hệ xác nhận sớm nhất có thể.</span>`,
+        showCancelButton: true,
+        confirmButtonColor: '#7c3aed',
+        cancelButtonColor: '#16a34a',
+        confirmButtonText: 'Đã hiểu',
+        cancelButtonText: `<i class="fa-solid fa-phone mr-1"></i> Liên hệ ngay`,
+        reverseButtons: true
+      }).then(r => {
+        if (r.dismiss === Swal.DismissReason.cancel && rcCourtPhone) {
+          window.open('tel:' + rcCourtPhone, '_self');
+        }
+      });
       if (typeof loadBookings === 'function') loadBookings();
     } catch(err) {
       console.error(err);
@@ -1988,14 +2003,23 @@
         await fetchBookingsAndRender();
         updateCartUI();
 
+        const bookingCourtPhone = (CONFIG.phone || '').replace(/[\s\-.()]/g, '');
         Swal.fire({
           icon: 'success',
           title: 'Đặt sân thành công! 🎉',
           html: `Cảm ơn <b>${name}</b>!<br/>
                Đã đặt <b>${count} slot</b> · Tổng: <b>${fmtMoney(total)}</b><br/>
                <span class="text-gray-500 text-sm">Chúng tôi sẽ gọi lại <b>${phone}</b> để xác nhận trong 15 phút.</span>`,
+          showCancelButton: true,
           confirmButtonColor: '#16a34a',
-          confirmButtonText: 'Đã hiểu'
+          cancelButtonColor: '#7c3aed',
+          confirmButtonText: 'Đã hiểu',
+          cancelButtonText: `<i class="fa-solid fa-phone mr-1"></i> Liên hệ ngay`,
+          reverseButtons: true
+        }).then(r => {
+          if (r.dismiss === Swal.DismissReason.cancel && bookingCourtPhone) {
+            window.open('tel:' + bookingCourtPhone, '_self');
+          }
         });
       } catch (err) {
         console.error(err);
