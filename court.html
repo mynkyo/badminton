@@ -803,7 +803,7 @@
 
   <!-- Import Firebase Module -->
   <script type="module">
-    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug } from "/firebase.js";
+    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole } from "/firebase.js";
 
     // ===== MULTI-TENANT: Detect court slug =====
     const COURT_SLUG = getCourtSlug();
@@ -818,7 +818,7 @@
     });
 
     let currentUser = null;
-    onAuthChange((user) => {
+    onAuthChange(async (user) => {
       currentUser = user;
       const icon = document.getElementById('userIcon');
       const avatar = document.getElementById('userAvatar');
@@ -832,6 +832,17 @@
             avatar.src = user.photoURL;
             avatar.classList.remove('hidden');
           }
+        }
+        // Load additional user info (phone, etc.) from Firestore if available
+        try {
+          const userDoc = await getUserRole(user.uid, user.email);
+          if (userDoc) {
+            if (userDoc.phoneRaw) currentUser.phoneRaw = userDoc.phoneRaw;
+            if (userDoc.phone) currentUser.phone = userDoc.phone;
+            if (userDoc.displayName) currentUser.displayName = userDoc.displayName;
+          }
+        } catch (e) {
+          console.error("Error loading user profile:", e);
         }
       } else {
         if (badge) badge.classList.add('hidden');
@@ -1452,6 +1463,20 @@
       localStorage.setItem('userName', name);
       localStorage.setItem('userPhone', phone);
       localStorage.setItem('userPhoneRaw', phoneRaw);
+
+      // Save/update user profile info into Firestore if user is logged in
+      if (currentUser && !currentUser.isAnonymous) {
+        currentUser.displayName = name;
+        currentUser.phoneRaw = phoneRaw;
+        currentUser.phone = phone;
+        setUserRole(currentUser.uid, {
+          displayName: name,
+          phone: phone,
+          phoneRaw: phoneRaw,
+          zalo: zalo,
+          email: currentUser.email || ''
+        }).catch(e => console.error("Error saving user profile to Firestore:", e));
+      }
 
       // Zalo
       const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
