@@ -797,7 +797,7 @@
 
   <!-- Import Firebase Module -->
   <script type="module">
-    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
+    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole, SUPER_ADMIN_UID, getOwnerEmailByCourtId, sendBookingEmailNotification } from "/firebase.js";
 
     // ===== MULTI-TENANT: Detect court slug =====
     const COURT_SLUG = getCourtSlug();
@@ -1665,6 +1665,21 @@
 
         const count = cart.length;
         const total = cartTotal();
+
+        // Gửi Email thông báo tự động tới Chủ Sân theo courtId trong nền (Async Background)
+        getOwnerEmailByCourtId(COURT_SLUG).then(ownerEmail => {
+          if (ownerEmail) {
+            sendBookingEmailNotification({
+              courtSlug: COURT_SLUG,
+              ownerEmail: ownerEmail,
+              guestName: name,
+              guestPhone: phoneRaw || phone,
+              newBookings: newBookings,
+              totalAmount: total
+            }).catch(e => console.error("Email notification background error:", e));
+          }
+        }).catch(e => console.error("Owner email lookup background error:", e));
+
         cart = [];
         closeBookingModal();
         await fetchBookingsAndRender();

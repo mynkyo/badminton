@@ -195,6 +195,82 @@ export async function createCourt(slug, courtData) {
   });
 }
 
+/** Dò tìm email của chủ sân / admin dựa vào courtId (slug) */
+export async function getOwnerEmailByCourtId(courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug) return null;
+
+  try {
+    // 1. Dò từ document courts/{slug}
+    const courtDoc = await getCourtInfo(slug);
+    if (courtDoc) {
+      if (courtDoc.settings && courtDoc.settings.contactEmail) {
+        return courtDoc.settings.contactEmail;
+      }
+      if (courtDoc.email) return courtDoc.email;
+      if (courtDoc.adminEmail) return courtDoc.adminEmail;
+    }
+
+    // 2. Dò từ collection 'users' với courtId == slug & role == 'admin'
+    const qUser = query(collection(db, 'users'), where('courtId', '==', slug), where('role', '==', 'admin'));
+    const userSnap = await getDocs(qUser);
+    if (!userSnap.empty) {
+      const adminDoc = userSnap.docs[0].data();
+      if (adminDoc.email) return adminDoc.email;
+    }
+
+    // 3. Dò từ collection 'registrations' với slug == slug & status == 'approved'
+    const qReg = query(collection(db, 'registrations'), where('slug', '==', slug), where('status', '==', 'approved'));
+    const regSnap = await getDocs(qReg);
+    if (!regSnap.empty) {
+      const regData = regSnap.docs[0].data();
+      if (regData.email) return regData.email;
+    }
+  } catch (e) {
+    console.error("Error looking up owner email for court:", slug, e);
+  }
+  return null;
+}
+
+/** Gửi Email thông báo đặt sân mới tới chủ sân */
+export async function sendBookingEmailNotification({ courtSlug, ownerEmail, guestName, guestPhone, newBookings, totalAmount }) {
+  if (!ownerEmail) return;
+
+  const date = newBookings[0] ? newBookings[0].date : (typeof dayjs !== 'undefined' ? dayjs().format('YYYY-MM-DD') : '');
+  const courtName = (window.CONFIG && window.CONFIG.name) ? window.CONFIG.name : (courtSlug || 'Sân Cầu Lông');
+
+  const itemsSummary = newBookings.map(b => {
+    const courtTitle = (window.CONFIG && window.CONFIG.courts && window.CONFIG.courts[b.court]) ? window.CONFIG.courts[b.court] : `Sân ${b.court + 1}`;
+    return `${courtTitle}: ${String(b.hour).padStart(2, '0')}:00–${String(b.hour + 1).padStart(2, '0')}:00 (${String(b.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ)`;
+  }).join(' | ');
+
+  const manageUrl = `${window.location.protocol}//${window.location.host}/${courtSlug}/manage`;
+
+  try {
+    await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(ownerEmail), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        _subject: `[Thông Báo Đặt Sân] ${guestName} vừa đặt ${newBookings.length} slot tại ${courtName}`,
+        _template: 'table',
+        'Tên Sân': courtName,
+        'Khách Hàng': guestName,
+        'Số Điện Thoại': guestPhone,
+        'Ngày Chơi': date,
+        'Khung Giờ Đặt': itemsSummary,
+        'Tổng Tiền': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
+        'Link Duyệt Đơn': manageUrl
+      })
+    });
+    console.log("Booking notification email sent successfully to court owner:", ownerEmail);
+  } catch (err) {
+    console.error("Error sending email notification to court owner:", err);
+  }
+}
+
 // ===== USER ROLE API =====
 
 /** Lấy thông tin role của user (tự động đồng bộ quyền theo email, đơn đăng ký hoặc thông tin sân nếu UID bị thay đổi) */
