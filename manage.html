@@ -1202,6 +1202,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
     if (CONFIG.theme) {
       applyTheme(CONFIG.theme);
+      const themeRadio = document.querySelector(`input[name="cfgTheme"][value="${CONFIG.theme}"]`);
       if (themeRadio) themeRadio.checked = true;
     }
   }
