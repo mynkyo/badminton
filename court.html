@@ -803,7 +803,7 @@
 
   <!-- Import Firebase Module -->
   <script type="module">
-    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole } from "/firebase.js";
+    import { getBookingsByDate, addBookings, getSettings, onSettingsChange, loginAnonymously, loginWithGoogle, logoutUser, onAuthChange, getUserBookings, setCurrentCourt, getCourtInfo, getCourtSlug, setUserRole, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
 
     // ===== MULTI-TENANT: Detect court slug =====
     const COURT_SLUG = getCourtSlug();
@@ -840,6 +840,54 @@
             if (userDoc.phoneRaw) currentUser.phoneRaw = userDoc.phoneRaw;
             if (userDoc.phone) currentUser.phone = userDoc.phone;
             if (userDoc.displayName) currentUser.displayName = userDoc.displayName;
+          }
+
+          // Kiểm tra xem user có phải Super Admin, Admin (Chủ sân) hoặc Manager (Nhân viên) không
+          const isSuperAdmin = (user.uid === SUPER_ADMIN_UID) || (userDoc && userDoc.role === 'super_admin');
+          const isAdminOrManager = userDoc && (userDoc.role === 'admin' || userDoc.role === 'manager');
+
+          if (isSuperAdmin || isAdminOrManager) {
+            const promptKey = 'adminRedirectPrompted_' + user.uid;
+            if (!sessionStorage.getItem(promptKey)) {
+              sessionStorage.setItem(promptKey, 'true');
+
+              let roleTitle = 'Quản Lý Sân';
+              let targetUrl = 'manage.html';
+              const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+              if (isSuperAdmin) {
+                roleTitle = 'Super Admin (Quản trị viên cấp cao)';
+                targetUrl = isLocal ? 'super-admin.html' : '/super-admin';
+              } else if (userDoc.role === 'admin') {
+                roleTitle = 'Chủ Sân (Admin)';
+                targetUrl = isLocal 
+                  ? (userDoc.courtId ? `manage.html?slug=${userDoc.courtId}` : 'manage.html')
+                  : (userDoc.courtId ? `/${userDoc.courtId}/manage` : 'manage.html');
+              } else if (userDoc.role === 'manager') {
+                roleTitle = 'Nhân Viên Quản Lý (Manager)';
+                targetUrl = isLocal 
+                  ? (userDoc.courtId ? `manage.html?slug=${userDoc.courtId}` : 'manage.html')
+                  : (userDoc.courtId ? `/${userDoc.courtId}/manage` : 'manage.html');
+              }
+
+              setTimeout(() => {
+                Swal.fire({
+                  title: 'Phát Hiện Tài Khoản Quản Lý!',
+                  html: `Xin chào <b>${user.displayName || user.email}</b>,<br/>Tài khoản của bạn có quyền <b>${roleTitle}</b>.<br/><br/>Bạn có muốn chuyển đến <b>Trang Quản Lý</b> không?`,
+                  icon: 'question',
+                  showCancelButton: true,
+                  confirmButtonText: '<i class="fa-solid fa-gauge-high mr-1.5"></i>Chuyển đến Quản Lý',
+                  cancelButtonText: 'Ở lại trang này',
+                  confirmButtonColor: '#1d4ed8',
+                  cancelButtonColor: '#64748b',
+                  reverseButtons: true
+                }).then((res) => {
+                  if (res.isConfirmed) {
+                    window.location.href = targetUrl;
+                  }
+                });
+              }, 500);
+            }
           }
         } catch (e) {
           console.error("Error loading user profile:", e);
