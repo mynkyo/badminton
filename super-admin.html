@@ -10,7 +10,14 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-  <div id="unauthView" class="min-h-screen flex items-center justify-center p-4">
+  <!-- Loading View -->
+  <div id="loadingView" class="min-h-screen flex flex-col items-center justify-center p-4 space-y-3">
+    <div class="text-blue-500 text-3xl"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    <div class="text-sm text-slate-400 font-medium">Đang kiểm tra quyền truy cập...</div>
+  </div>
+
+  <!-- Unauth View -->
+  <div id="unauthView" class="hidden min-h-screen flex items-center justify-center p-4">
     <div class="text-center space-y-4">
       <h1 class="text-xl font-bold text-red-400">Quyền Truy Cập Bị Từ Chối</h1>
       <p class="text-sm text-slate-400">Trang này dành riêng cho Super Admin hệ thống.</p>
@@ -51,16 +58,18 @@
   <script type="module">
     import { onAuthChange, loginWithGoogle, logoutUser, getAllRegistrations, approveRegistration, rejectRegistration, getAllActiveCourts, SUPER_ADMIN_UID } from "/firebase.js";
 
+    const loadingView = document.getElementById('loadingView');
     const unauthView = document.getElementById('unauthView');
     const adminView = document.getElementById('adminView');
 
     onAuthChange(async (user) => {
+      loadingView.classList.add('hidden');
       if (user && user.uid === SUPER_ADMIN_UID) {
         unauthView.classList.add('hidden');
         adminView.classList.remove('hidden');
         loadPendingRegistrations();
       } else {
-        // Chưa đăng nhập hoặc không phải Super Admin -> Chuyển về trang đăng nhập
+        unauthView.classList.remove('hidden');
         window.location.href = '/login?redirect=' + encodeURIComponent('/super-admin');
       }
     });
