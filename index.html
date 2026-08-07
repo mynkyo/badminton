@@ -1,68 +1,395 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nền Tảng Đặt Sân Cầu Lông Trực Tuyến</title>
+  <title>DatSanCauLong - Nền Tảng Đặt Sân & Quản Lý Sân Cầu Lông Đa Năng</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .bg-grid-pattern {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.2);
+    }
+    .glow-bg {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-blue-500 selection:text-white">
+
+  <!-- Glowing Orbs Atmosphere -->
+  <div class="glow-bg w-[500px] h-[500px] bg-blue-600/20 -top-32 -left-32"></div>
+  <div class="glow-bg w-[400px] h-[400px] bg-purple-600/15 top-1/3 -right-32"></div>
+  <div class="glow-bg w-[600px] h-[600px] bg-indigo-600/15 bottom-10 left-1/4"></div>
 
   <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-blue-600/30">
+  <header class="border-b border-white/10 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-50 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform">
           <i class="fa-solid fa-shuttlecock"></i>
         </div>
-        <span class="font-extrabold text-lg text-white tracking-tight">DatSanCauLong</span>
+        <div class="flex flex-col">
+          <span class="font-extrabold text-lg text-white tracking-tight leading-none group-hover:text-blue-400 transition-colors">DatSanCauLong</span>
+          <span class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Multi-Court SaaS</span>
+        </div>
       </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-300">
+        <a href="#features" class="hover:text-white transition-colors">Tính năng nổi bật</a>
+        <a href="#how-it-works" class="hover:text-white transition-colors">3 Bước tạo trang</a>
+        <a href="#courts-section" class="hover:text-white transition-colors">Sân đang mở</a>
+        <a href="#faq" class="hover:text-white transition-colors">Hỏi đáp</a>
+      </nav>
+
       <div class="flex items-center gap-3">
-        <a href="/register" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-600/20">
-          <i class="fa-solid fa-plus mr-1.5"></i> Đăng ký mở sân
+        <a href="register.html" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold px-4 sm:px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-600/25 flex items-center gap-2 transform hover:-translate-y-0.5">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Đăng ký mở sân</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="py-16 md:py-24 px-4 text-center max-w-4xl mx-auto space-y-6">
-    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
-      <i class="fa-solid fa-bolt"></i> Nền Tảng Quản Lý Sân Cầu Lông Hiện Đại
-    </span>
-    <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight">
-      Giải Pháp Đặt Sân & Quản Lý Sân Cầu Lông 4.0
-    </h1>
-    <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-      Dành cho chủ sân tối ưu hóa lịch đặt, tránh trùng giờ. Dành cho người chơi tìm sân và đặt chỗ trực tuyến dễ dàng trong vài giây.
-    </p>
-    <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
-      <a href="/register" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-xl transition-all shadow-xl shadow-blue-600/30 text-sm">
-        Dành Cho Chủ Sân — Tạo Trang Ngay
-      </a>
+  <section class="relative pt-12 pb-20 md:pt-20 md:pb-28 px-4 bg-grid-pattern z-10">
+    <div class="max-w-5xl mx-auto text-center space-y-6">
+      
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-blue-500/30 text-blue-400 text-xs font-bold tracking-wide shadow-inner">
+        <span class="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
+        Nền Tảng Quản Lý Sân Cầu Lông Thế Hệ Mới 4.0
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.15]">
+        Số Hóa Sân Cầu Lông Của Bạn<br class="hidden sm:inline" />
+        <span class="text-gradient">Chỉ Trong 30 Giây</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-normal">
+        Tự động hóa lịch đặt sân, loại bỏ hoàn toàn tình trạng trùng giờ hay ghi chép thủ công. Cung cấp trang đặt sân trực tuyến chuyên nghiệp dành riêng cho chủ sân.
+      </p>
+
+      <!-- CTA Action Buttons -->
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="register.html" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold px-8 py-4 rounded-xl transition-all shadow-2xl shadow-blue-600/40 text-sm flex items-center justify-center gap-3 transform hover:-translate-y-1">
+          <span>Tạo Trang Đặt Sân Ngay</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a href="#courts-section" class="w-full sm:w-auto glass-card hover:bg-slate-900/80 text-slate-300 hover:text-white font-bold px-6 py-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2 border border-slate-700">
+          <i class="fa-solid fa-eye text-blue-400"></i>
+          <span>Khám phá danh sách sân</span>
+        </a>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl font-black text-white">100%</div>
+          <div class="text-[11px] text-slate-400 font-medium">Tránh trùng lịch</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl font-black text-gradient">30 giây</div>
+          <div class="text-[11px] text-slate-400 font-medium">Đăng ký & Kích hoạt</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl font-black text-white">24/7</div>
+          <div class="text-[11px] text-slate-400 font-medium">Đặt sân tự động</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl font-black text-emerald-400">Tối ưu 0đ</div>
+          <div class="text-[11px] text-slate-400 font-medium">Bắt đầu miễn phí</div>
+        </div>
+      </div>
+
+      <!-- App Preview Mockup Container -->
+      <div class="pt-10 max-w-5xl mx-auto">
+        <div class="glass-card p-2 sm:p-3 rounded-2xl md:rounded-3xl border border-white/15 shadow-2xl shadow-blue-500/10">
+          <div class="bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden border border-slate-800 text-left">
+            
+            <!-- Window header -->
+            <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                <span class="ml-2 text-xs font-mono text-slate-500 hidden sm:inline">dat-san-cau-long.web.app/ten-san-cua-ban</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold px-2 py-0.5 rounded-md">LIVE DEMO PREVIEW</span>
+              </div>
+            </div>
+
+            <!-- Fake Dashboard Header & Grid Mock -->
+            <div class="p-4 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-sm">🏸</div>
+                  <div>
+                    <div class="font-bold text-white text-sm">Sân Cầu Lông Modern Sport</div>
+                    <div class="text-xs text-slate-400">Bảng điều khiển lịch đặt theo thời gian thực</div>
+                  </div>
+                </div>
+                <div class="hidden sm:flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-lg bg-blue-600/20 text-blue-400 text-xs font-semibold border border-blue-500/30">Hôm nay</span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold">Ngày mai</span>
+                </div>
+              </div>
+
+              <!-- Schedule Grid Demo -->
+              <div class="grid grid-cols-4 sm:grid-cols-5 gap-2 text-xs">
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-slate-400 font-mono">08:00 - 09:00</div>
+                <div class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-lg font-medium flex items-center justify-between">
+                  <span>Sân 1</span><i class="fa-solid fa-check text-[10px]"></i>
+                </div>
+                <div class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-lg font-medium flex items-center justify-between">
+                  <span>Sân 2</span><i class="fa-solid fa-check text-[10px]"></i>
+                </div>
+                <div class="bg-rose-500/15 border border-rose-500/30 text-rose-300 p-2.5 rounded-lg font-medium flex items-center justify-between">
+                  <span>Sân 3 (Đã đặt)</span><i class="fa-solid fa-user-check text-[10px]"></i>
+                </div>
+                <div class="hidden sm:flex bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-lg font-medium items-center justify-between">
+                  <span>Sân 4</span><i class="fa-solid fa-check text-[10px]"></i>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- Active Courts List -->
-  <section class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-      <h2 class="text-lg font-bold text-white flex items-center gap-2">
-        <i class="fa-solid fa-location-dot text-blue-400"></i> Các Sân Cầu Lông Đang Hoạt Động
-      </h2>
+  <!-- Features Section -->
+  <section id="features" class="py-16 md:py-24 px-4 max-w-7xl mx-auto z-10 w-full">
+    <div class="text-center max-w-3xl mx-auto space-y-3 mb-16">
+      <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">Tính Năng Vượt Trội</span>
+      <h2 class="text-2xl sm:text-4xl font-black text-white">Tại Sao Chủ Sân Chọn Chúng Tôi?</h2>
+      <p class="text-slate-400 text-sm sm:text-base">Mọi công cụ bạn cần để vận hành sân hiệu quả, gia tăng doanh thu và tiết kiệm tối đa thời gian.</p>
     </div>
 
-    <div id="courtsGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="col-span-full text-center py-12 text-slate-500 text-sm">
-        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-        <p>Đang tải danh sách sân...</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Card 1 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-xl font-bold">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Tự Động Chống Trùng Lịch</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Hệ thống khóa ô giờ ngay khi khách hàng bấm đặt. Đảm bảo 100% không bao giờ xảy ra tình trạng 2 nhóm khách trùng khung giờ.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl font-bold">
+          <i class="fa-solid fa-link"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Tạo URL Đặt Sân Riêng</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Mỗi sân sở hữu đường dẫn đẹp cá nhân hóa (ví dụ: <code>.../ten-san</code>). Dễ dàng gắn lên Fanpage Facebook, Zalo hay bản đồ Google Maps.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl font-bold">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Giao Diện Chuẩn Mobile</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Thiết kế tối ưu hoàn hảo cho điện thoại di động (Android, iPhone). Quản lý lịch và xem danh sách đặt sân mọi lúc mọi nơi.
+        </p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl font-bold">
+          <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Phân Quyền Chủ & Nhân Viên</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Hỗ trợ vai trò Chủ Sân (Admin) toàn quyền và Nhân Viên Quản Lý (Manager) xem lịch & duyệt đơn mà không lo bị can thiệp cài đặt gốc.
+        </p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl font-bold">
+          <i class="fa-solid fa-phone-volume"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Tích Hợp Liên Hệ 1-Click</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Khách hàng dễ dàng gọi điện trực tiếp hoặc mở trò chuyện Zalo với chủ sân ngay khi xem lịch đặt sân trực tuyến.
+        </p>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="glass-card p-6 rounded-2xl glass-card-hover space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl font-bold">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <h3 class="font-bold text-lg text-white">Cấu Hình Giá Linh Hoạt</h3>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          Tùy chỉnh giá giờ thường, giá giờ cao điểm (Peak Hours), số lượng sân, khung giờ mở/đóng cửa nhanh chóng theo thực tế.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-16 md:py-24 px-4 bg-slate-900/40 border-y border-white/5 z-10 w-full">
+    <div class="max-w-6xl mx-auto space-y-16">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Quy Trình Đơn Giản</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">3 Bước Mở Trang Đặt Sân</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 relative">
+        
+        <!-- Step 1 -->
+        <div class="glass-card p-8 rounded-2xl space-y-4 relative">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-black text-base flex items-center justify-center">1</div>
+          <h3 class="font-bold text-lg text-white">Đăng Nhập Google</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Nhấn nút Đăng ký và kết nối bằng tài khoản Google của bạn nhanh chóng chỉ trong 1 cú nhấp chuột.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="glass-card p-8 rounded-2xl space-y-4 relative">
+          <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-black text-base flex items-center justify-center">2</div>
+          <h3 class="font-bold text-lg text-white">Điền Thông Tin Sân</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Nhập tên sân, số điện thoại liên hệ và chọn tên đường dẫn URL riêng (slug) theo mong muốn.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="glass-card p-8 rounded-2xl space-y-4 relative">
+          <div class="w-10 h-10 rounded-full bg-emerald-600 text-white font-black text-base flex items-center justify-center">3</div>
+          <h3 class="font-bold text-lg text-white">Duyệt & Vận Hành</h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Ban quản trị kích hoạt sân ➔ Bạn nhận ngay trang đặt sân và trang quản lý để gửi cho người chơi!
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Banner CTA -->
+      <div class="glass-card p-8 rounded-3xl bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-slate-900 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center md:text-left">
+          <h3 class="text-xl font-bold text-white">Sẵn sàng nâng tầm quản lý sân cầu lông của bạn?</h3>
+          <p class="text-xs sm:text-sm text-slate-300">Đăng ký hoàn toàn miễn phí và bắt đầu tự động hóa ngay hôm nay.</p>
+        </div>
+        <a href="register.html" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 text-xs sm:text-sm whitespace-nowrap">
+          Đăng Ký Mở Sân Ngay →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Active Courts List Section -->
+  <section id="courts-section" class="py-16 md:py-24 px-4 max-w-7xl mx-auto z-10 w-full space-y-8">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-4">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Danh Sách Hoạt Động</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white mt-1">Các Sân Cầu Lông Đang Mở Đặt</h2>
+      </div>
+    </div>
+
+    <!-- Grid items loaded via JS -->
+    <div id="courtsGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="col-span-full text-center py-16 text-slate-500 text-sm">
+        <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-3 text-blue-500"></i>
+        <p>Đang kết nối danh sách sân...</p>
       </div>
     </div>
   </section>
 
+  <!-- FAQ Section -->
+  <section id="faq" class="py-16 md:py-20 px-4 max-w-4xl mx-auto z-10 w-full space-y-8">
+    <div class="text-center space-y-3">
+      <h2 class="text-2xl sm:text-3xl font-black text-white">Câu Hỏi Thường Gặp</h2>
+      <p class="text-xs sm:text-sm text-slate-400">Giải đáp các thắc mắc phổ biến của chủ sân khi bắt đầu sử dụng</p>
+    </div>
+
+    <div class="space-y-4">
+      
+      <div class="glass-card p-5 rounded-2xl space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center gap-2">
+          <i class="fa-solid fa-circle-question text-blue-400"></i> Tôi cần những gì để đăng ký mở trang đặt sân?
+        </h4>
+        <p class="text-xs text-slate-400 leading-relaxed pl-6">
+          Bạn chỉ cần tài khoản Google (Gmail) và mất chưa tới 1 phút để điền thông tin tên sân, số điện thoại. Sau khi ban quản trị kích hoạt, bạn sẽ có ngay link riêng để quản lý.
+        </p>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center gap-2">
+          <i class="fa-solid fa-circle-question text-blue-400"></i> Khách hàng của tôi có cần tải ứng dụng không?
+        </h4>
+        <p class="text-xs text-slate-400 leading-relaxed pl-6">
+          Không cần! Khách hàng chỉ cần bấm vào đường dẫn (URL) của sân bạn trên web/trình duyệt di động là có thể xem lịch trống và bấm đặt sân ngay lập tức.
+        </p>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center gap-2">
+          <i class="fa-solid fa-circle-question text-blue-400"></i> Tôi có thể phân quyền cho nhân viên quản lý không?
+        </h4>
+        <p class="text-xs text-slate-400 leading-relaxed pl-6">
+          Có! Bạn có thể thêm nhân viên (Manager). Nhân viên chỉ xem được bảng lịch đặt và xác nhận/duyệt đơn của khách, không thể thay đổi thông tin cài đặt giá hay cấu hình sân của bạn.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
   <!-- Footer -->
-  <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center text-xs text-slate-500">
-    <p>© 2026 DatSanCauLong Platform. Hỗ trợ kỹ thuật & phát triển.</p>
+  <footer class="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500 z-10 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center text-white text-xs font-bold">🏸</div>
+        <span class="font-bold text-slate-300">DatSanCauLong Platform</span>
+      </div>
+      <p>© 2026 DatSanCauLong Platform. Tất cả quyền được bảo lưu.</p>
+    </div>
   </footer>
 
   <script type="module">
@@ -72,33 +399,57 @@
       const container = document.getElementById('courtsGrid');
       try {
         const courts = await getAllActiveCourts();
-        if (courts.length === 0) {
+        if (!courts || courts.length === 0) {
           container.innerHTML = `
-            <div class="col-span-full text-center py-12 bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
-              <p class="text-slate-400 text-sm">Chưa có sân nào trên hệ thống.</p>
-              <a href="/register" class="inline-block mt-3 text-xs text-blue-400 font-semibold hover:underline">Hãy là chủ sân đầu tiên đăng ký →</a>
+            <div class="col-span-full text-center py-12 glass-card rounded-2xl p-8 space-y-3">
+              <div class="text-3xl">🏸</div>
+              <p class="text-slate-300 font-semibold text-sm">Chưa có sân nào trên hệ thống.</p>
+              <p class="text-slate-500 text-xs">Hãy là chủ sân đầu tiên đăng ký tạo trang đặt sân ngay!</p>
+              <a href="register.html" class="inline-block mt-2 text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-xl transition-all">Đăng ký mở sân ngay →</a>
             </div>`;
           return;
         }
 
-        container.innerHTML = courts.map(c => `
-          <a href="/${c.slug}" class="group bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 p-5 rounded-2xl transition-all shadow-lg flex flex-col justify-between space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-start justify-between gap-2">
-                <h3 class="font-bold text-base text-white group-hover:text-blue-400 transition-colors">${c.name}</h3>
-                <span class="text-[11px] font-mono bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20">/${c.slug}</span>
+        const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        container.innerHTML = courts.map(c => {
+          const courtUrl = isLocal ? "court.html?slug=" + c.slug : "/" + c.slug;
+          const addr = c.address ? "<p class='line-clamp-1'><i class='fa-solid fa-location-dot text-slate-500 w-4'></i>" + c.address + "</p>" : "<p class='text-slate-600'><i class='fa-solid fa-location-dot w-4'></i>Chưa cập nhật địa chỉ</p>";
+          const ph = c.phone ? "<p><i class='fa-solid fa-phone text-slate-500 w-4'></i>" + c.phone + "</p>" : "";
+
+          return `
+          <a href="${courtUrl}" class="group glass-card p-6 rounded-2xl glass-card-hover flex flex-col justify-between space-y-5">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-3">
+                <div class="space-y-1">
+                  <h3 class="font-bold text-base text-white group-hover:text-blue-400 transition-colors">${c.name}</h3>
+                  <span class="inline-block text-[11px] font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">/${c.slug}</span>
+                </div>
+                <span class="flex-shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ● Đang mở
+                </span>
               </div>
-              ${c.address ? `<p class="text-xs text-slate-400 line-clamp-1"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${c.address}</p>` : ''}
-              ${c.phone ? `<p class="text-xs text-slate-400"><i class="fa-solid fa-phone text-slate-500 mr-1"></i>${c.phone}</p>` : ''}
+              
+              <div class="space-y-1.5 pt-1 text-xs text-slate-400">
+                ${addr}
+                ${ph}
+              </div>
             </div>
-            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs text-blue-400 font-semibold">
-              <span>Xem lịch & Đặt sân</span>
+
+            <div class="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-blue-400 font-bold group-hover:text-blue-300">
+              <span>Xem lịch & Đặt sân ngay</span>
               <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
             </div>
           </a>
-        `).join('');
+        `;}).join('');
       } catch(err) {
-        container.innerHTML = `<div class="col-span-full text-center py-8 text-red-400 text-sm">Lỗi tải dữ liệu: ${err.message}</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-8 text-red-400 text-sm">Lỗi kết nối danh sách sân: ${err.message}</div>`;
+      }
+    }
+
+    loadCourts();
+  </script>
+</body>
+</html>="col-span-full text-center py-8 text-red-400 text-sm">Lỗi tải dữ liệu: ${err.message}</div>`;
       }
     }
 

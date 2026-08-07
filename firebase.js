@@ -1,4 +1,4 @@
-﻿// ===== firebase.js =====
+// ===== firebase.js =====
 // Multi-tenant Firebase API for Badminton Court Platform
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -38,10 +38,21 @@ export function setCurrentCourt(slug) {
   currentCourtSlug = slug;
 }
 
-/** Lấy court slug từ URL path */
+/** Lấy court slug từ URL path hoặc query parameter */
 export function getCourtSlug() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramSlug = urlParams.get('slug') || urlParams.get('court');
+  if (paramSlug) return paramSlug;
+
   const parts = window.location.pathname.split('/').filter(Boolean);
-  return parts[0] || null;
+  const first = parts[0] ? parts[0].replace('.html', '') : null;
+  
+  // Tránh nhầm lẫn các trang tĩnh hệ thống làm court slug khi mở local file HTML
+  const systemPages = ['index', 'register', 'super-admin', 'manage', 'court', 'login', 'migrate'];
+  if (first && !systemPages.includes(first)) {
+    return first;
+  }
+  return null;
 }
 
 /** Lấy đường dẫn collection bookings */
