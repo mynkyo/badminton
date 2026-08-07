@@ -285,13 +285,24 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, reci
     return;
   }
 
-  const date = newBookings[0] ? newBookings[0].date : '';
+  // Gom tất cả ngày duy nhất trong đơn đặt
+  const uniqueDates = [...new Set(newBookings.map(b => b.date).filter(Boolean))];
+  const dateDisplay = uniqueDates.join(', ');
+
   const courtName = (typeof window !== 'undefined' && window.CONFIG && window.CONFIG.name) ? window.CONFIG.name : (courtSlug || 'Sân Cầu Lông');
 
-  const itemsSummary = newBookings.map(b => {
+  // Gom slot theo từng ngày để hiển thị rõ ràng
+  const groupedByDate = {};
+  newBookings.forEach(b => {
+    const key = b.date || 'Không rõ ngày';
+    if (!groupedByDate[key]) groupedByDate[key] = [];
     const courtTitle = (typeof window !== 'undefined' && window.CONFIG && window.CONFIG.courts && window.CONFIG.courts[b.court]) ? window.CONFIG.courts[b.court] : `Sân ${b.court + 1}`;
-    return `${courtTitle}: ${String(b.hour).padStart(2, '0')}:00„${String(b.hour + 1).padStart(2, '0')}:00 (${String(b.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ)`;
-  }).join(' | ');
+    groupedByDate[key].push(`${courtTitle} ${String(b.hour).padStart(2, '0')}:00-${String(b.hour + 1).padStart(2, '0')}:00 (${String(b.amount).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}đ)`);
+  });
+
+  const itemsSummary = Object.entries(groupedByDate)
+    .map(([date, slots]) => `[${date}] ${slots.join(' | ')}`)
+    .join(' || ');
 
   const manageUrl = (typeof window !== 'undefined') ? `${window.location.protocol}//${window.location.host}/${courtSlug}/manage` : `https://dat-san-cau-long.web.app/${courtSlug}/manage`;
 
@@ -299,9 +310,9 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, reci
     'Tên Sân Cầu Lông': courtName,
     'Họ Và Tên Khách': guestName,
     'Số Điện Thoại Khách': guestPhone,
-    'Ngày Đặt Sân': date,
+    'Ngày Đặt Sân': dateDisplay,
     'Chi Tiết Khung Giờ': itemsSummary,
-    'Tổng Tiền Đơn Đặt': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VNĐ',
+    'Tổng Tiền Đơn Đặt': String(totalAmount).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ',
     'Trạng Thái Đơn': 'Chờ xác nhận',
     'Đường Dẫn Quản Lý': manageUrl
   };
