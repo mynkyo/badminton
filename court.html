@@ -443,7 +443,7 @@
       </div>
 
       <!-- 2 Main Cards -->
-      <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="grid md:grid-cols-2 gap-6 mb-8" id="pricingCardsGrid">
         <!-- Card 1: Giờ Thường -->
         <div
           class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center hover:shadow-lg transition-all">
@@ -457,7 +457,7 @@
         </div>
 
         <!-- Card 2: Giờ Cao Điểm -->
-        <div
+        <div id="peakPriceCard"
           class="bg-white border-2 border-amber-400 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center shadow-sm hover:shadow-xl transition-all">
           <div
             class="absolute top-4 right-4 bg-amber-400 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
@@ -1196,7 +1196,7 @@
         const floatCall = document.getElementById('uiFloatCallBtn');
         floatCall.href = `tel:${phoneClean}`;
         if (document.getElementById('uiFloatCallText')) {
-          document.getElementById('uiFloatCallText').textContent = phoneFormatted;
+          floatCallText.textContent = phoneFormatted;
         }
       }
 
@@ -1318,20 +1318,24 @@
       // Stats & Prices
       if (document.getElementById('uiStatCourtsCount')) document.getElementById('uiStatCourtsCount').textContent = (CONFIG.courts || []).length;
       if (document.getElementById('uiStatPriceNormal')) document.getElementById('uiStatPriceNormal').textContent = CONFIG.priceNormal.toLocaleString('vi-VN') + 'đ/h';
-      if (document.getElementById('uiStatPriceNormalLabel')) document.getElementById('uiStatPriceNormalLabel').textContent = `Từ ${CONFIG.priceNormal.toLocaleString('vi-VN')}đ/h`;
-      if (document.getElementById('uiStatHoursTotal')) document.getElementById('uiStatHoursTotal').textContent = (CONFIG.endHour - CONFIG.startHour);
-
-      // Schedule Header Prices & Peak Hours
-      if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = CONFIG.pricePeak.toLocaleString('vi-VN') + 'đ/h';
-      if (document.getElementById('uiHeaderPeakHours')) {
-        document.getElementById('uiHeaderPeakHours').textContent = `${String(CONFIG.peakStart).padStart(2, '0')}:00 - ${String(CONFIG.peakEnd).padStart(2, '0')}:00`;
+        // Pricing Cards — chỉ hiển thị peak card khi peakEnabled
+      const peakEnabled = CONFIG.peakEnabled !== false;
+      const peakCard = document.getElementById('peakPriceCard');
+      const pricingGrid = document.getElementById('pricingCardsGrid');
+      if (peakCard) peakCard.style.display = peakEnabled ? '' : 'none';
+      if (pricingGrid && !peakEnabled) {
+        pricingGrid.classList.remove('md:grid-cols-2');
+        pricingGrid.classList.add('md:grid-cols-1', 'max-w-sm', 'mx-auto');
       }
 
-      // Pricing Cards
       if (document.getElementById('uiPriceNormalHours')) {
-        const norm1 = `${String(CONFIG.startHour).padStart(2, '0')}:00 – ${String(CONFIG.peakStart).padStart(2, '0')}:00`;
-        const norm2 = `${String(CONFIG.peakEnd).padStart(2, '0')}:00 – ${String(CONFIG.endHour).padStart(2, '0')}:00`;
-        document.getElementById('uiPriceNormalHours').innerHTML = `${norm1} &nbsp;|&nbsp; ${norm2}`;
+        if (peakEnabled) {
+          const norm1 = `${String(CONFIG.startHour).padStart(2, '0')}:00 – ${String(CONFIG.peakStart).padStart(2, '0')}:00`;
+          const norm2 = `${String(CONFIG.peakEnd).padStart(2, '0')}:00 – ${String(CONFIG.endHour).padStart(2, '0')}:00`;
+          document.getElementById('uiPriceNormalHours').innerHTML = `${norm1} &nbsp;|&nbsp; ${norm2}`;
+        } else {
+          document.getElementById('uiPriceNormalHours').textContent = `${String(CONFIG.startHour).padStart(2, '0')}:00 – ${String(CONFIG.endHour).padStart(2, '0')}:00 hàng ngày`;
+        }
       }
       if (document.getElementById('uiPriceNormalVal')) document.getElementById('uiPriceNormalVal').textContent = (CONFIG.priceNormal / 1000) + 'K';
 
@@ -1409,7 +1413,7 @@
       if (errEl) errEl.classList.add('hidden');
     };
 
-    function isPeak(h) { return h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
+    function isPeak(h) { return CONFIG.peakEnabled !== false && h >= CONFIG.peakStart && h < CONFIG.peakEnd; }
     function slotPrice(h) { return isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal; }
     function fmtMoney(n) { return n.toLocaleString('vi-VN') + 'đ'; }
     function fmtDate(d) { return d.format('YYYY-MM-DD'); }
