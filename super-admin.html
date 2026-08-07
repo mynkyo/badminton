@@ -305,7 +305,8 @@
     onAuthChange(async (user) => {
       loadingView.classList.add('hidden');
       if (user) {
-        if (user.uid === SUPER_ADMIN_UID) {
+        const userRoleData = await getUserRole(user.uid, user.email);
+        if (userRoleData && userRoleData.role === 'super_admin') {
           unauthView.classList.add('hidden');
           mainContainer.style.display = 'flex';
           

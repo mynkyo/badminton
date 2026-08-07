@@ -304,22 +304,14 @@ export async function sendBookingEmailNotification({ courtSlug, ownerEmail, reci
 
 // ===== USER ROLE API =====
 
-/** Lấy thông tin role của user (tự động đồng bộ quyền theo email, đơn đăng ký hoặc thông tin sân nếu UID bị thay đổi) */
+/** Lấy thông tin role của user (đọc trực tiếp từ Firebase Firestore Server) */
 export async function getUserRole(uid, email) {
   if (!uid) return null;
-
-  if (uid === SUPER_ADMIN_UID) {
-    return {
-      role: 'super_admin',
-      email: email || (auth.currentUser ? auth.currentUser.email : 'namtv95.it@gmail.com')
-    };
-  }
-
   const userRef = doc(db, 'users', uid);
   
   let snap;
   try {
-    // Đọc trực tiếp từ Server để bỏ qua Cache cũ của trình duyệt
+    // Luôn đọc dữ liệu mới nhất 100% từ Firebase Server
     snap = await getDocFromServer(userRef);
   } catch (e) {
     snap = await getDoc(userRef);
@@ -327,7 +319,7 @@ export async function getUserRole(uid, email) {
 
   let userData = snap.exists() ? snap.data() : null;
 
-  if (userData && userData.role && userData.courtId) {
+  if (userData && userData.role) {
     return userData;
   }
 
@@ -335,15 +327,15 @@ export async function getUserRole(uid, email) {
   if (!userEmail) return userData;
 
   try {
-    // Fallback 1: Dò tìm trong collection 'users' xem email này đã từng có quyền ở UID khác chưa
+    // Fallback 1: Dò tìm trong collection 'users' theo email
     const qUser = query(collection(db, 'users'), where('email', '==', userEmail));
     const uSnap = await getDocs(qUser);
     if (!uSnap.empty) {
       const existingUser = uSnap.docs[0].data();
-      if (existingUser.role && existingUser.courtId) {
+      if (existingUser && existingUser.role) {
         const roleInfo = {
           role: existingUser.role,
-          courtId: existingUser.courtId,
+          courtId: existingUser.courtId || null,
           email: userEmail
         };
         await setDoc(userRef, roleInfo, { merge: true });
@@ -391,10 +383,10 @@ export async function updateUserRole(uid, roleData) {
 /** Kiểm tra user có quyền quản lý sân hiện tại không */
 export async function checkStaffAccess(uid, email) {
   if (!uid || !currentCourtSlug) return false;
-  if (uid === SUPER_ADMIN_UID) return true;
   const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
   const userData = await getUserRole(uid, userEmail);
   if (!userData) return false;
+  if (userData.role === 'super_admin') return true;
   return (userData.role === 'admin' || userData.role === 'manager')
     && userData.courtId === currentCourtSlug;
 }
