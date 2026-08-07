@@ -1464,6 +1464,13 @@
       localStorage.setItem('userPhone', phone);
       localStorage.setItem('userPhoneRaw', phoneRaw);
 
+      // Zalo
+      const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
+      const zaloOption = zaloOptionEl ? zaloOptionEl.value : 'same';
+      let zalo = '';
+      if (zaloOption === 'same') zalo = phoneRaw;
+      else if (zaloOption === 'other') zalo = (document.getElementById('guestZalo')?.value || '').trim();
+
       // Save/update user profile info into Firestore if user is logged in
       if (currentUser && !currentUser.isAnonymous) {
         currentUser.displayName = name;
@@ -1477,13 +1484,6 @@
           email: currentUser.email || ''
         }).catch(e => console.error("Error saving user profile to Firestore:", e));
       }
-
-      // Zalo
-      const zaloOptionEl = document.querySelector('input[name="zaloOption"]:checked');
-      const zaloOption = zaloOptionEl ? zaloOptionEl.value : 'same';
-      let zalo = '';
-      if (zaloOption === 'same') zalo = phoneRaw;
-      else if (zaloOption === 'other') zalo = (document.getElementById('guestZalo').value || '').trim();
       // 'none' => zalo stays ''
 
       const submitBtn = document.getElementById('submitBtn');
