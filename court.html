@@ -973,6 +973,9 @@
           if (badge) badge.classList.add('hidden');
           if (icon) icon.classList.remove('hidden');
           if (avatar) avatar.classList.add('hidden');
+          Object.keys(sessionStorage).forEach(k => {
+            if (k.startsWith('adminRedirectPrompted_')) sessionStorage.removeItem(k);
+          });
         }
 
         if (!user) {
@@ -1177,8 +1180,21 @@
           });
 
           if (res.isConfirmed && isAnon) {
-            Swal.fire({ title: 'Đăng nhập thành công!', icon: 'success', timer: 1500, showConfirmButton: false });
+            const user = auth.currentUser;
+            let isUserAdmin = false;
+            if (user && !user.isAnonymous) {
+              const uDoc = await getUserRole(user.uid, user.email);
+              if (user.uid === SUPER_ADMIN_UID || (uDoc && (uDoc.role === 'super_admin' || uDoc.role === 'admin' || uDoc.role === 'manager'))) {
+                isUserAdmin = true;
+              }
+            }
+            if (!isUserAdmin) {
+              Swal.fire({ title: 'Đăng nhập thành công!', icon: 'success', timer: 1500, showConfirmButton: false });
+            }
           } else if (res.isDenied && !isAnon) {
+            if (currentUser && currentUser.uid) {
+              sessionStorage.removeItem('adminRedirectPrompted_' + currentUser.uid);
+            }
             await logoutUser();
           }
         } catch (e) {

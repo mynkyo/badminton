@@ -129,7 +129,15 @@
 
     // Super admin → luôn đến super-admin panel
     if (user.uid === SUPER_ADMIN_UID) {
-      window.location.href = redirectParam || '/super-admin';
+      Swal.fire({
+        icon: 'success',
+        title: 'Phát Hiện Tài Khoản Super Admin!',
+        html: `Xin chào <b>${user.displayName || user.email}</b>,<br/>Đang chuyển hướng đến trang Super Admin...`,
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = redirectParam || '/super-admin';
+      });
       return;
     }
 
@@ -137,7 +145,16 @@
     const userData = await getUserRole(user.uid, user.email);
 
     if (userData && (userData.role === 'admin' || userData.role === 'manager') && userData.courtId) {
-      window.location.href = redirectParam || `/${userData.courtId}/manage`;
+      const roleName = userData.role === 'admin' ? 'Chủ Sân (Admin)' : 'Nhân Viên (Manager)';
+      Swal.fire({
+        icon: 'success',
+        title: 'Phát Hiện Tài Khoản Quản Lý!',
+        html: `Xin chào <b>${user.displayName || user.email}</b>,<br/>Tài khoản của bạn có quyền <b>${roleName}</b>.<br/>Đang chuyển hướng tới Trang Quản Lý...`,
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = redirectParam || `/${userData.courtId}/manage`;
+      });
       return;
     }
 
