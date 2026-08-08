@@ -949,15 +949,31 @@
 
                 setTimeout(() => {
                   Swal.fire({
-                    title: 'Phát Hiện Tài Khoản Quản Lý!',
-                    html: `Xin chào <b>${user.displayName || user.email}</b>,<br/>Tài khoản của bạn có quyền <b>${roleTitle}</b>.<br/><br/>Bạn có muốn chuyển đến <b>Trang Quản Lý</b> không?`,
-                    icon: 'question',
+                    html: `
+                      <div class="flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/30 mb-4 ring-4 ring-blue-50">
+                          <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight mb-2">Tài Khoản Quản Lý</h3>
+                        <div class="bg-blue-50 border border-blue-100 text-primary text-xs font-bold px-3 py-1 rounded-full mb-3 inline-flex items-center gap-1.5 shadow-2xs">
+                          <i class="fa-solid fa-crown text-[11px]"></i> ${roleTitle}
+                        </div>
+                        <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xs mb-1">
+                          Xin chào <span class="font-bold text-slate-900">${user.displayName || user.email}</span>
+                        </p>
+                        <p class="text-xs text-slate-500 leading-normal mt-1">Bạn có muốn chuyển tới <b>Trang Quản Lý</b> ngay bây giờ không?</p>
+                      </div>
+                    `,
                     showCancelButton: true,
-                    confirmButtonText: '<i class="fa-solid fa-gauge-high mr-1.5"></i>Chuyển đến Quản Lý',
-                    cancelButtonText: 'Ở lại trang này',
-                    confirmButtonColor: '#1d4ed8',
-                    cancelButtonColor: '#64748b',
-                    reverseButtons: true
+                    confirmButtonText: '<i class="fa-solid fa-gauge-high text-xs"></i><span>Chuyển đến Quản Lý</span>',
+                    cancelButtonText: '<span>Ở lại trang này</span>',
+                    buttonsStyling: false,
+                    customClass: {
+                      popup: 'rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-2xl bg-white/95 backdrop-blur-md max-w-md w-[92%] mx-auto',
+                      actions: 'flex flex-col sm:flex-row-reverse gap-2.5 w-full mt-6',
+                      confirmButton: 'w-full sm:w-auto flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-5 rounded-2xl text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer',
+                      cancelButton: 'w-full sm:w-auto flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-5 rounded-2xl text-xs sm:text-sm transition-all transform active:scale-95 flex items-center justify-center cursor-pointer'
+                    }
                   }).then((res) => {
                     if (res.isConfirmed) {
                       window.location.href = targetUrl;
