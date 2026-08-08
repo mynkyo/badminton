@@ -2120,14 +2120,6 @@
         );
       }
 
-      window.scrollScheduleTable = function (direction) {
-        const wrapper = document.getElementById('uiScheduleTableWrapper');
-        if (wrapper) {
-          wrapper.scrollBy({ left: direction, behavior: 'smooth' });
-        }
-      };
-
-      let showPastState = false;
 
       window.toggleShowPast = function () {
         showPastState = !showPastState;
