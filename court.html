@@ -388,7 +388,7 @@
         </div>
 
         <!-- Bottom Bar: Price Info (Separate Row, Clean 2-Column Responsive Card) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6">
+        <div id="uiHeaderPriceGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6">
           <!-- Card 1: Giá Thường -->
           <div
             class="bg-blue-50/70 border border-blue-100/90 rounded-2xl px-4 py-3 flex items-center justify-between shadow-2xs">
@@ -1637,7 +1637,15 @@
 
         // Schedule Header Peak Info Box
         const peakHeaderBox = document.getElementById('uiHeaderPeakBox');
+        const headerPriceGrid = document.getElementById('uiHeaderPriceGrid');
         if (peakHeaderBox) peakHeaderBox.style.display = peakEnabled ? '' : 'none';
+        if (headerPriceGrid) {
+          if (!peakEnabled) {
+            headerPriceGrid.className = 'max-w-sm mx-auto mb-6';
+          } else {
+            headerPriceGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6';
+          }
+        }
         if (peakEnabled) {
           if (document.getElementById('uiLegendPeakPrice')) document.getElementById('uiLegendPeakPrice').textContent = CONFIG.pricePeak.toLocaleString('vi-VN') + 'đ/h';
           if (document.getElementById('uiHeaderPeakHours')) {
