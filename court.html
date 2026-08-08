@@ -1756,24 +1756,33 @@
         const total = cartTotal();
         const bar = document.getElementById('cartBar');
         const floatContainer = document.getElementById('uiFloatContactContainer');
+        const mainBadgeEl = document.getElementById('uiMainCartBadge');
+
+        if (mainBadgeEl) {
+          mainBadgeEl.textContent = `${count} slot`;
+          if (count > 0) mainBadgeEl.classList.remove('hidden');
+          else mainBadgeEl.classList.add('hidden');
+        }
 
         if (count === 0) {
-          bar.classList.add('cart-hidden');
-          document.getElementById('navCartCount').classList.add('hidden');
+          if (bar) bar.classList.add('cart-hidden');
+          if (document.getElementById('navCartCount')) document.getElementById('navCartCount').classList.add('hidden');
           if (floatContainer) {
             floatContainer.style.bottom = '1.5rem';
           }
           return;
         }
 
-        bar.classList.remove('cart-hidden');
-        document.getElementById('navCartCount').classList.remove('hidden');
-        document.getElementById('navCartCount').textContent = count;
-        document.getElementById('cartCountLabel').textContent = count;
+        if (bar) bar.classList.remove('cart-hidden');
+        if (document.getElementById('navCartCount')) {
+          document.getElementById('navCartCount').classList.remove('hidden');
+          document.getElementById('navCartCount').textContent = count;
+        }
+        if (document.getElementById('cartCountLabel')) document.getElementById('cartCountLabel').textContent = count;
         if (document.getElementById('cartCountSubLabel')) {
           document.getElementById('cartCountSubLabel').textContent = count;
         }
-        document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
+        if (document.getElementById('cartTotalLabel')) document.getElementById('cartTotalLabel').textContent = fmtMoney(total);
 
         if (floatContainer) {
           floatContainer.style.bottom = '6.5rem';
@@ -2118,22 +2127,6 @@
           Swal.fire({ icon: 'info', title: 'Liên kết sân', text: window.location.href });
         }
       };
-
-      function updateCartUI() {
-        const count = cart.length;
-        const cartCountEl = document.getElementById('navCartCount');
-        const mainBadgeEl = document.getElementById('uiMainCartBadge');
-        if (cartCountEl) {
-          cartCountEl.textContent = count;
-          if (count > 0) cartCountEl.classList.remove('hidden');
-          else cartCountEl.classList.add('hidden');
-        }
-        if (mainBadgeEl) {
-          mainBadgeEl.textContent = `${count} slot`;
-          if (count > 0) mainBadgeEl.classList.remove('hidden');
-          else mainBadgeEl.classList.add('hidden');
-        }
-      }
 
       function renderSchedule() {
         const container = document.getElementById('uiScheduleContainer');
