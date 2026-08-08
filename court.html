@@ -445,7 +445,7 @@
         <!-- 2 Main Cards -->
         <div class="grid md:grid-cols-2 gap-6 mb-8" id="pricingCardsGrid">
           <!-- Card 1: Giờ Thường -->
-          <div
+          <div id="normalPriceCard"
             class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center hover:shadow-lg transition-all">
             <div
               class="w-14 h-14 bg-blue-100/60 rounded-2xl flex items-center justify-center text-primary text-2xl mb-4">
@@ -1648,10 +1648,20 @@
         // Pricing Cards — chỉ hiển thị peak card khi peakEnabled
         const peakCard = document.getElementById('peakPriceCard');
         const pricingGrid = document.getElementById('pricingCardsGrid');
+        const normalCard = document.getElementById('normalPriceCard');
         if (peakCard) peakCard.style.display = peakEnabled ? '' : 'none';
-        if (pricingGrid && !peakEnabled) {
-          pricingGrid.classList.remove('md:grid-cols-2');
-          pricingGrid.classList.add('md:grid-cols-1', 'max-w-sm', 'mx-auto');
+        if (pricingGrid) {
+          if (!peakEnabled) {
+            pricingGrid.className = 'grid md:grid-cols-1 max-w-sm mx-auto gap-6 mb-8';
+            if (normalCard) {
+              normalCard.className = 'bg-white border-2 border-primary rounded-3xl p-8 text-center relative flex flex-col items-center justify-center shadow-sm hover:shadow-xl transition-all';
+            }
+          } else {
+            pricingGrid.className = 'grid md:grid-cols-2 gap-6 mb-8';
+            if (normalCard) {
+              normalCard.className = 'bg-slate-50/80 border border-slate-200/80 rounded-3xl p-8 text-center relative flex flex-col items-center justify-center hover:shadow-lg transition-all';
+            }
+          }
         }
 
         if (document.getElementById('uiPriceNormalHours')) {
