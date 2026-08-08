@@ -1113,28 +1113,52 @@
 
           const orders = groupUserOrders(bookings);
 
+          let headerBadgeHtml = '';
+          if (!isAnon) {
+            if (canManage) {
+              headerBadgeHtml = `
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/30 ring-4 ring-blue-50 mb-3">
+                  <i class="fa-solid fa-user-shield"></i>
+                </div>`;
+            } else {
+              headerBadgeHtml = `
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-50 mb-3">
+                  <i class="fa-solid fa-user-check"></i>
+                </div>`;
+            }
+          } else {
+            headerBadgeHtml = `
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-slate-600 to-slate-800 text-white flex items-center justify-center text-2xl shadow-lg shadow-slate-500/20 ring-4 ring-slate-100 mb-3">
+                <i class="fa-solid fa-user-secret"></i>
+              </div>`;
+          }
+
           let bookingsHtml = '';
           if (orders.length === 0) {
-            bookingsHtml = `<div class="py-6 text-slate-400 text-xs text-center"><i class="fa-regular fa-calendar-xmark text-2xl mb-2 block opacity-40"></i>Chưa có lịch sử đặt sân nào trên thiết bị này.</div>`;
+            bookingsHtml = `
+              <div class="py-6 px-4 bg-slate-50/70 border border-dashed border-slate-200/80 rounded-2xl text-slate-400 text-xs text-center my-3">
+                <i class="fa-regular fa-calendar-xmark text-3xl mb-2 text-slate-300 block"></i>
+                Chưa có lịch sử đặt sân nào trên thiết bị này.
+              </div>`;
           } else {
             orders.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
             bookingsHtml = `
             <div class="max-h-60 overflow-y-auto space-y-2 text-left pr-1 my-3 scroll-smooth">
               ${orders.map(order => {
-              let badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200';
+              let badgeClass = 'bg-amber-50 text-amber-700 border border-amber-200/80';
               let badgeText = 'Chờ xác nhận';
-              if (order.status === 'confirmed') { badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-200'; badgeText = 'Đã xác nhận'; }
-              if (order.status === 'paid') { badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200'; badgeText = 'Đã thanh toán'; }
+              if (order.status === 'confirmed') { badgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'; badgeText = 'Đã xác nhận'; }
+              if (order.status === 'paid') { badgeClass = 'bg-blue-50 text-blue-700 border border-blue-200/80'; badgeText = 'Đã thanh toán'; }
               return `
-                  <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs flex flex-col gap-1.5 shadow-2xs">
+                  <div class="p-3 bg-slate-50/90 border border-slate-200/80 rounded-2xl text-xs flex flex-col gap-1.5 shadow-2xs hover:border-slate-300 transition-all">
                     <div class="flex items-center justify-between gap-2">
-                      <div class="font-bold text-navy text-xs flex items-center gap-1.5">
+                      <div class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-receipt text-primary"></i>
                         <span>Đơn đặt (${order.date})</span>
                       </div>
-                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${badgeClass}">${badgeText}</span>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${badgeText}</span>
                     </div>
-                    <div class="text-[11px] text-slate-700 font-semibold bg-white border border-slate-100 rounded-lg p-2 flex items-center justify-between gap-2">
+                    <div class="text-[11px] text-slate-700 font-semibold bg-white border border-slate-100 rounded-xl p-2 flex items-center justify-between gap-2">
                       <span><i class="fa-solid fa-calendar-day text-slate-400 mr-1"></i>${order.slotSummary}</span>
                       <span class="text-slate-400 text-[10px] flex-shrink-0">(${order.totalSlots} slot)</span>
                     </div>
@@ -1150,34 +1174,54 @@
           }
 
           const res = await Swal.fire({
-            title: '<div class="flex items-center justify-center gap-2 text-navy text-lg font-extrabold"><i class="fa-solid fa-user-gear text-primary"></i>Thông Tin Tài Khoản</div>',
             html: `
-            <div class="text-xs text-slate-500 mb-3 bg-blue-50/70 border border-blue-100 rounded-xl p-2.5 text-center">
-              Trạng thái: <b class="${isAnon ? 'text-amber-600' : 'text-emerald-600'}">${isAnon ? '🔒 Khách (Ẩn danh)' : '✅ Đã xác thực Google'}</b> 
-              ${!isAnon ? `<br/><span class="text-slate-700 font-semibold mt-0.5 inline-block">${userEmail}</span>` : '<br/><span class="text-slate-400 text-[11px]">Dữ liệu tự động lưu theo thiết bị của bạn</span>'}
-            </div>
-            ${canManage ? `
-              <div class="mb-3">
-                <a href="${manageTargetUrl}" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5">
-                  <i class="fa-solid fa-gauge-high text-sm"></i>
-                  <span>Trang Quản Lý (${roleLabel})</span>
-                  <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </a>
+              <div class="flex flex-col items-center text-center">
+                ${headerBadgeHtml}
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight mb-2">Thông Tin Tài Khoản</h3>
+                
+                <div class="w-full text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-3 text-center mb-3">
+                  <div class="flex items-center justify-center gap-1.5 font-bold mb-0.5">
+                    <span>Trạng thái:</span>
+                    <span class="inline-flex items-center gap-1 ${isAnon ? 'text-amber-600' : 'text-emerald-600'}">
+                      ${isAnon ? '<i class="fa-solid fa-lock text-[11px]"></i> Khách (Ẩn danh)' : '<i class="fa-solid fa-circle-check text-[11px]"></i> Đã xác thực Google'}
+                    </span>
+                  </div>
+                  ${!isAnon ? `<div class="text-slate-900 font-bold text-xs mt-0.5">${userEmail}</div>` : '<div class="text-slate-400 text-[11px]">Dữ liệu tự động lưu theo thiết bị của bạn</div>'}
+                </div>
+
+                ${canManage ? `
+                  <a href="${manageTargetUrl}" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm shadow-md shadow-blue-500/25 flex items-center justify-between transition-all transform active:scale-95 my-1">
+                    <div class="flex items-center gap-2">
+                      <i class="fa-solid fa-gauge-high text-sm"></i>
+                      <span>Trang Quản Lý (${roleLabel})</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-75"></i>
+                  </a>
+                ` : ''}
+
+                <div class="w-full text-left mt-3">
+                  <div class="flex items-center justify-between text-xs font-bold text-slate-700 border-b border-slate-100 pb-2">
+                    <span><i class="fa-solid fa-receipt text-primary mr-1"></i>Lịch sử đặt sân</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-extrabold">${orders.length} đơn</span>
+                  </div>
+                  ${bookingsHtml}
+                </div>
               </div>
-            ` : ''}
-            <div class="text-xs font-bold text-slate-700 text-left border-b border-slate-100 pb-1">Lịch sử đặt sân (${orders.length} đơn):</div>
-            ${bookingsHtml}
-          `,
+            `,
             showConfirmButton: isAnon,
-            confirmButtonText: '<i class="fa-brands fa-google mr-1.5"></i>Đăng Nhập Google',
+            confirmButtonText: '<i class="fa-brands fa-google text-sm"></i><span>Đăng Nhập Google</span>',
             showDenyButton: !isAnon,
-            denyButtonText: '<i class="fa-solid fa-right-from-bracket mr-1.5"></i>Đăng xuất',
+            denyButtonText: '<i class="fa-solid fa-right-from-bracket text-xs"></i><span>Đăng xuất</span>',
             showCancelButton: true,
-            cancelButtonText: 'Đóng',
-            confirmButtonColor: '#1d4ed8',
-            denyButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            reverseButtons: true,
+            cancelButtonText: '<span>Đóng</span>',
+            buttonsStyling: false,
+            customClass: {
+              popup: 'rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-2xl bg-white/95 backdrop-blur-md max-w-md w-[92%] mx-auto',
+              actions: 'flex flex-col sm:flex-row-reverse gap-2.5 w-full mt-5',
+              confirmButton: 'w-full sm:w-auto flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap',
+              denyButton: 'w-full sm:w-auto flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/80 font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap',
+              cancelButton: 'w-full sm:w-auto flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-4 rounded-2xl text-xs sm:text-sm transition-all transform active:scale-95 flex items-center justify-center cursor-pointer whitespace-nowrap'
+            },
             showLoaderOnConfirm: isAnon,
             preConfirm: async () => {
               if (!isAnon) return true;
