@@ -202,6 +202,7 @@
               </div>
               <p class="text-[11px] text-slate-400 mt-1">Viết liền không dấu, dùng dấu gạch nối (Hệ thống tự động tạo
                 theo tên sân)</p>
+              <div id="slugStatusContainer" class="mt-1"></div>
             </div>
 
             <!-- Field 3: Address (Textarea) -->
@@ -239,9 +240,11 @@
   </footer>
 
   <script type="module">
-    import { loginWithGoogle, logoutUser, onAuthChange, submitRegistration, getUserRole, SUPER_ADMIN_UID } from "/firebase.js";
+    import { loginWithGoogle, logoutUser, onAuthChange, submitRegistration, getUserRole, checkSlugAvailability, SUPER_ADMIN_UID } from "/firebase.js";
 
     let currentUser = null;
+    let isSlugAvailable = true;
+    let slugCheckTimer = null;
     const authSection = document.getElementById('authSection');
     const regForm = document.getElementById('regForm');
 
@@ -277,6 +280,38 @@
 
     document.getElementById('btnLogout').addEventListener('click', () => logoutUser());
 
+    async function validateSlugRealtime() {
+      const slugInput = document.getElementById('slug');
+      const statusEl = document.getElementById('slugStatusContainer');
+      const slugVal = slugInput.value.trim();
+
+      if (!slugVal) {
+        if (statusEl) statusEl.innerHTML = '';
+        isSlugAvailable = false;
+        return;
+      }
+
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-[11px] text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Đang kiểm tra độ khả dụng...</span>';
+      }
+
+      const result = await checkSlugAvailability(slugVal);
+      isSlugAvailable = result.available;
+
+      if (statusEl) {
+        if (result.available) {
+          statusEl.innerHTML = `<span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i>Đường dẫn khả dụng: dat-san-cau-long.web.app/${slugVal}</span>`;
+        } else {
+          statusEl.innerHTML = `<span class="text-[11px] text-rose-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i>${result.reason}</span>`;
+        }
+      }
+    }
+
+    function triggerSlugCheckDebounced() {
+      clearTimeout(slugCheckTimer);
+      slugCheckTimer = setTimeout(validateSlugRealtime, 400);
+    }
+
     // Auto slugify court name
     document.getElementById('courtName').addEventListener('input', (e) => {
       const slugInput = document.getElementById('slug');
@@ -288,12 +323,14 @@
           .replace(/[^a-z0-9\s-]/g, '')
           .trim()
           .replace(/\s+/g, '-');
+        triggerSlugCheckDebounced();
       }
     });
 
     document.getElementById('slug').addEventListener('input', (e) => {
       e.target.dataset.manual = "true";
       e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      triggerSlugCheckDebounced();
     });
 
     regForm.addEventListener('submit', async (e) => {
@@ -307,6 +344,13 @@
 
       if (!slug || !courtName || !phone || !address) {
         Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ Tên sân, Số điện thoại, Slug URL và Địa chỉ chi tiết!' });
+        return;
+      }
+
+      // Check slug availability one final time before submitting
+      const slugCheck = await checkSlugAvailability(slug);
+      if (!slugCheck.available) {
+        Swal.fire({ icon: 'error', title: 'Mã đường dẫn trùng lặp', text: slugCheck.reason });
         return;
       }
 

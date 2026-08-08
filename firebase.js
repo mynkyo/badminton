@@ -689,10 +689,59 @@ export async function checkAdminAccess(uid, email) {
 
 // ===== REGISTRATION API =====
 
+export const RESERVED_SLUGS = ['index', 'register', 'super-admin', 'manage', 'court', 'login', 'migrate', 'admin', 'api', 'assets', 'public'];
+
+/** Kiểm tra xem mã sân (slug) có khả dụng hay không */
+export async function checkSlugAvailability(slug) {
+  if (!slug || !slug.trim()) {
+    return { available: false, reason: 'Mã đường dẫn (slug) không được để trống.' };
+  }
+
+  const cleanSlug = slug.toLowerCase().trim();
+
+  // 1. Kiểm tra trùng với trang hệ thống
+  if (RESERVED_SLUGS.includes(cleanSlug)) {
+    return { available: false, reason: `Mã "${cleanSlug}" trùng với trang cố định của hệ thống. Vui lòng chọn mã khác.` };
+  }
+
+  // 2. Kiểm tra trùng với sân đã hoạt động (collection 'courts')
+  try {
+    const courtSnap = await getDoc(doc(db, 'courts', cleanSlug));
+    if (courtSnap.exists()) {
+      return { available: false, reason: `Mã sân "${cleanSlug}" đã tồn tại trên hệ thống. Vui lòng chọn mã khác.` };
+    }
+  } catch (e) {
+    console.warn('Check court doc error:', e);
+  }
+
+  // 3. Kiểm tra trùng với đơn đăng ký đang chờ duyệt (collection 'registrations')
+  try {
+    const qReg = query(collection(db, 'registrations'), where('slug', '==', cleanSlug));
+    const regSnap = await getDocs(qReg);
+    const hasConflict = regSnap.docs.some(d => {
+      const st = d.data().status;
+      return st === 'pending' || st === 'approved';
+    });
+    if (hasConflict) {
+      return { available: false, reason: `Mã sân "${cleanSlug}" đã có người gửi yêu cầu đăng ký và đang chờ duyệt.` };
+    }
+  } catch (e) {
+    console.warn('Check reg docs error:', e);
+  }
+
+  return { available: true };
+}
+
 /** Nộp đơn đăng ký sân mới */
 export async function submitRegistration(data) {
+  const check = await checkSlugAvailability(data.slug);
+  if (!check.available) {
+    throw new Error(check.reason);
+  }
+
   const regRef = await addDoc(collection(db, 'registrations'), {
     ...data,
+    slug: data.slug.toLowerCase().trim(),
     status: 'pending',
     createdAt: serverTimestamp()
   });
@@ -716,8 +765,22 @@ export async function getAllRegistrations(status) {
 /** Duyệt đơn đăng ký: tạo court + set role admin */
 export async function approveRegistration(regId, regData) {
   const { slug, uid, email, displayName, courtName, phone, address, description } = regData;
+  const cleanSlug = (slug || '').toLowerCase().trim();
+
+  if (RESERVED_SLUGS.includes(cleanSlug)) {
+    throw new Error(`Không thể duyệt: Mã sân "${cleanSlug}" trùng với trang hệ thống!`);
+  }
+
+  const courtSnap = await getDoc(doc(db, 'courts', cleanSlug));
+  if (courtSnap.exists()) {
+    const existingData = courtSnap.data();
+    if (existingData.adminUid && existingData.adminUid !== uid) {
+      throw new Error(`Không thể duyệt: Mã sân "${cleanSlug}" đã tồn tại và thuộc sở hữu của chủ sân khác!`);
+    }
+  }
+
   const adminEmail = email || '';
-  await createCourt(slug, {
+  await createCourt(cleanSlug, {
     name: courtName || '',
     adminUid: uid,
     adminEmail: adminEmail,
@@ -745,7 +808,7 @@ export async function approveRegistration(regId, regData) {
   });
   await setUserRole(uid, {
     role: 'admin',
-    courtId: slug,
+    courtId: cleanSlug,
     email: email || '',
     displayName: displayName || '',
     updatedAt: serverTimestamp()
