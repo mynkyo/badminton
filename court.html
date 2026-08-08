@@ -965,14 +965,14 @@
                       </div>
                     `,
                     showCancelButton: true,
-                    confirmButtonText: '<i class="fa-solid fa-gauge-high text-xs"></i><span>Chuyển đến Quản Lý</span>',
+                    confirmButtonText: '<i class="fa-solid fa-gauge-high text-xs"></i><span>Chuyển tới Quản Lý</span>',
                     cancelButtonText: '<span>Ở lại trang này</span>',
                     buttonsStyling: false,
                     customClass: {
                       popup: 'rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-2xl bg-white/95 backdrop-blur-md max-w-md w-[92%] mx-auto',
                       actions: 'flex flex-col sm:flex-row-reverse gap-2.5 w-full mt-6',
-                      confirmButton: 'w-full sm:w-auto flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-5 rounded-2xl text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer',
-                      cancelButton: 'w-full sm:w-auto flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-5 rounded-2xl text-xs sm:text-sm transition-all transform active:scale-95 flex items-center justify-center cursor-pointer'
+                      confirmButton: 'w-full sm:w-auto flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap',
+                      cancelButton: 'w-full sm:w-auto flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-4 rounded-2xl text-xs sm:text-sm transition-all transform active:scale-95 flex items-center justify-center cursor-pointer whitespace-nowrap'
                     }
                   }).then((res) => {
                     if (res.isConfirmed) {
