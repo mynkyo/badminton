@@ -230,9 +230,18 @@ export async function getAllActiveCourts() {
 
 /** Tạo sân mới (super_admin dùng khi duyệt đơn) */
 export async function createCourt(slug, courtData) {
-  return await setDoc(doc(db, 'courts', slug), {
+  const cleanSlug = (slug || '').toLowerCase().trim();
+  if (!cleanSlug) throw new Error('Mã sân (slug) không hợp lệ.');
+
+  const courtRef = doc(db, 'courts', cleanSlug);
+  const snap = await getDoc(courtRef);
+  if (snap.exists()) {
+    throw new Error(`Sân với mã "${cleanSlug}" đã tồn tại trên hệ thống. Không thể tạo đè dữ liệu!`);
+  }
+
+  return await setDoc(courtRef, {
     ...courtData,
-    slug,
+    slug: cleanSlug,
     status: 'active',
     createdAt: serverTimestamp()
   });
@@ -773,10 +782,7 @@ export async function approveRegistration(regId, regData) {
 
   const courtSnap = await getDoc(doc(db, 'courts', cleanSlug));
   if (courtSnap.exists()) {
-    const existingData = courtSnap.data();
-    if (existingData.adminUid && existingData.adminUid !== uid) {
-      throw new Error(`Không thể duyệt: Mã sân "${cleanSlug}" đã tồn tại và thuộc sở hữu của chủ sân khác!`);
-    }
+    throw new Error(`Không thể duyệt: Mã sân "${cleanSlug}" đã tồn tại trên hệ thống! Vui lòng yêu cầu chủ sân thay đổi mã đường dẫn khác.`);
   }
 
   const adminEmail = email || '';
