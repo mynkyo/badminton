@@ -14,7 +14,13 @@ service cloud.firestore {
     function isStaffOf(courtId) {
       return request.auth != null && (
         isSuperAdmin() ||
-        (getUserData().courtId == courtId && (getUserData().role == 'admin' || getUserData().role == 'manager'))
+        (
+          (getUserData().role == 'admin' || getUserData().role == 'manager') &&
+          (
+            getUserData().courtId == courtId ||
+            (getUserData().managedCourts != null && courtId in getUserData().managedCourts)
+          )
+        )
       );
     }
 
@@ -46,6 +52,12 @@ service cloud.firestore {
         allow read: if true;
         allow create: if true;
         allow update, delete: if isStaffOf(courtSlug);
+      }
+
+      // Lịch cố định (recurring schedules)
+      match /recurringSchedules/{scheduleId} {
+        allow read: if true;
+        allow create, update, delete: if isStaffOf(courtSlug);
       }
 
       match /schedule/{docId} {

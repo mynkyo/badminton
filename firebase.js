@@ -61,7 +61,6 @@ function bookingsCol() {
   return collection(db, 'courts', currentCourtSlug, 'bookings');
 }
 
-// ===== BOOKINGS API =====
 
 /** Lấy lịch đặt theo ngày */
 export async function getBookingsByDate(date) {
@@ -211,6 +210,15 @@ export async function deleteRecurringSchedule(id, courtSlug) {
   return await deleteDoc(doc(db, 'courts', slug, 'recurringSchedules', id));
 }
 
+/** Cập nhật lịch cố định (dùng cho exceptions hoặc sửa toàn chuỗi) */
+export async function updateRecurringSchedule(id, data, courtSlug) {
+  const slug = courtSlug || currentCourtSlug;
+  if (!slug || !id) throw new Error('Thiếu tham số');
+  return await updateDoc(doc(db, 'courts', slug, 'recurringSchedules', id), {
+    ...data,
+    updatedAt: serverTimestamp()
+  });
+}
 
 
 /** Lấy thông tin sân */

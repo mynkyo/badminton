@@ -35,7 +35,40 @@
           }
         }
       }
-    }
+    };
+    window.sidebarOpen = false;
+    window.toggleSidebar = function(force) {
+      window.sidebarOpen = force !== undefined ? force : !window.sidebarOpen;
+      const sb = document.getElementById('sidebar');
+      const so = document.getElementById('sidebarOverlay');
+      if (sb) sb.classList.toggle('-translate-x-full', !window.sidebarOpen);
+      if (so) so.classList.toggle('hidden', !window.sidebarOpen);
+      if (window.innerWidth < 1024) {
+        document.body.style.overflow = window.sidebarOpen ? 'hidden' : '';
+        document.body.style.position = window.sidebarOpen ? 'fixed' : '';
+        document.body.style.width = window.sidebarOpen ? '100%' : '';
+      }
+    };
+    window._pendingSection = null;
+    window.showSection = function(name) {
+      const sections = ['dashboard', 'schedule', 'recurring', 'bookings', 'staff', 'settings'];
+      sections.forEach(s => {
+        document.getElementById('section-' + s)?.classList.add('hidden');
+        document.getElementById('nav-' + s)?.classList.remove('active');
+      });
+      document.getElementById('section-' + name)?.classList.remove('hidden');
+      document.getElementById('nav-' + name)?.classList.add('active');
+      const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', recurring: 'Quản lý Lịch Cố Định', bookings: 'Danh sách đơn đặt', staff: 'Nhân viên & Khách hàng', settings: 'Cài đặt thông tin sân' };
+      if (document.getElementById('pageTitle')) {
+        document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
+      }
+      if (name === 'schedule' && typeof window.renderAdminSchedule === 'function') window.renderAdminSchedule();
+      if (name === 'recurring' && typeof window.renderRecurringSectionList === 'function') window.renderRecurringSectionList();
+      if (name === 'bookings' && typeof window.renderAllBookings === 'function') window.renderAllBookings();
+      if (name === 'dashboard' && typeof window.renderDashboard === 'function') window.renderDashboard();
+      if (name === 'staff' && typeof window.loadStaff === 'function') { window.loadStaff(); window.loadCustomers(); }
+      if (window.innerWidth < 1024 && typeof window.toggleSidebar === 'function') window.toggleSidebar(false);
+    };
   </script>
   <style>
     * { font-family: 'Be Vietnam Pro', sans-serif; }
@@ -277,8 +310,37 @@
         </div>
       </section>
 
+      <!-- ======= RECURRING SCHEDULE SECTION ======= -->
+      <section id="section-recurring" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-4 sm:px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-gray-800 text-base flex items-center gap-2">
+                <i class="fa-solid fa-rotate text-purple-600"></i> Quản lý Lịch Cố Định
+              </h3>
+              <p class="text-xs text-gray-500 mt-0.5">Danh sách lịch đặt cố định tái diễn hàng tuần của khách hàng</p>
+            </div>
+            <button onclick="openRecurringModal()" class="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer">
+              <i class="fa-solid fa-plus"></i> Tạo Lịch Cố Định Mới
+            </button>
+          </div>
 
+          <div class="px-5 py-3 bg-purple-50/50 border-b border-purple-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-purple-900">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-purple-600"></i>
+              <span>Lịch cố định sẽ tự động hiển thị trên bảng lịch hàng ngày của sân.</span>
+            </div>
+            <input id="searchRecurringInput" oninput="renderRecurringSectionList()" type="text" placeholder="Tìm theo tên khách, SĐT..." class="w-full sm:w-64 border border-purple-200 rounded-xl px-3 py-1.5 bg-white outline-none focus:ring-2 focus:ring-purple-400" />
+          </div>
 
+          <div id="recurringListContainer" class="p-4 sm:p-5">
+            <div class="text-center py-10 text-gray-400 text-sm">
+              <i class="fa-solid fa-spinner fa-spin text-purple-600 text-xl mb-2"></i>
+              <p>Đang tải danh sách lịch cố định...</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ======= BOOKINGS LIST ======= -->
       <section id="section-bookings" class="hidden space-y-6">
@@ -798,7 +860,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
           <i class="fa-solid fa-rotate text-purple-600 text-sm"></i>
         </div>
         <div>
-          <h3 class="font-bold text-gray-800 text-sm">Tạo Lịch Cố Định</h3>
+          <h3 class="font-bold text-gray-800 text-sm" id="rcModalTitle">Tạo Lịch Cố Định</h3>
           <p class="text-xs text-gray-500">Đặt lịch tái diễn hàng tuần cho khách</p>
         </div>
       </div>
@@ -818,8 +880,8 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
         </div>
       </div>
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Sân</label>
-        <select id="rcCourt" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"></select>
+        <label class="block text-xs font-semibold text-gray-700 mb-2">Sân <span class="text-gray-400 font-normal">(chọn nhiều)</span></label>
+        <div id="rcCourtPicker" class="flex flex-wrap gap-2"></div>
       </div>
       <div>
         <label class="block text-xs font-semibold text-gray-700 mb-2">Ngày trong tuần</label>
@@ -853,16 +915,16 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
           <input id="rcEndDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
         </div>
       </div>
-      <div id="rcPreview" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600"></div>
     </div>
     <div class="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
       <button onclick="closeRecurringModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all">Hủy</button>
       <button onclick="saveRecurringSchedule()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-1.5">
-        <i class="fa-solid fa-rotate"></i> Tạo lịch cố định
+        <i class="fa-solid fa-rotate"></i> <span id="rcSaveBtnText">Tạo lịch cố định</span>
       </button>
     </div>
   </div>
 </div>
+
 
 <!-- ===== MODAL ===== -->
 <div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 modal-overlay">
@@ -1028,7 +1090,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     setCurrentCourt, getCourtSlug, checkStaffAccess, checkAdminAccess,
     getCourtInfo, SUPER_ADMIN_UID,
     getCourtStaff, getCourtCustomers, addManagerByEmail, removeManagerByUid, sendManagerInviteEmail, getUserRole,
-    getRecurringSchedules, addRecurringSchedule, deleteRecurringSchedule
+    getRecurringSchedules, addRecurringSchedule, updateRecurringSchedule, deleteRecurringSchedule
   } from "/firebase.js";
 
   // ===== MULTI-TENANT: Detect court slug =====
@@ -1106,6 +1168,10 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       const btnViewCust = document.getElementById('btnViewCustomerPage');
       if (btnViewCust) btnViewCust.href = custUrl;
     }
+
+    // Nạp cấu hình & dữ liệu bảng điều khiển sau khi người dùng xác thực thành công
+    await loadConfig();
+    await renderDashboard();
   });
 
   let CONFIG = {
@@ -1649,38 +1715,6 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   window.adminGoToday = function() { setAdminDate(dayjs()); };
   if (adminDP) adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
 
-  const sections = ['dashboard', 'schedule', 'recurring', 'bookings', 'staff', 'settings'];
-  window.showSection = function(name) {
-    sections.forEach(s => {
-      document.getElementById('section-' + s)?.classList.add('hidden');
-      document.getElementById('nav-' + s)?.classList.remove('active');
-    });
-    document.getElementById('section-' + name)?.classList.remove('hidden');
-    document.getElementById('nav-' + name)?.classList.add('active');
-    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', recurring: 'Quản lý Lịch Cố Định', bookings: 'Danh sách đơn đặt', staff: 'Nhân viên & Khách hàng', settings: 'Cài đặt thông tin sân' };
-    if (document.getElementById('pageTitle')) {
-      document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
-    }
-    if (name === 'schedule' && typeof renderAdminSchedule === 'function') renderAdminSchedule();
-    if (name === 'recurring' && typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
-    if (name === 'bookings' && typeof renderAllBookings === 'function') renderAllBookings();
-    if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
-    if (name === 'staff') { loadStaff(); loadCustomers(); }
-    if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') toggleSidebar(false);
-  };
-
-  let sidebarOpen = false;
-  window.toggleSidebar = function(force) {
-    sidebarOpen = force !== undefined ? force : !sidebarOpen;
-    document.getElementById('sidebar').classList.toggle('-translate-x-full', !sidebarOpen);
-    document.getElementById('sidebarOverlay').classList.toggle('hidden', !sidebarOpen);
-    // Lock body scroll on mobile when sidebar is open to keep fixed/sticky positioning working
-    if (window.innerWidth < 1024) {
-      document.body.style.overflow = sidebarOpen ? 'hidden' : '';
-      document.body.style.position = sidebarOpen ? 'fixed' : '';
-      document.body.style.width = sidebarOpen ? '100%' : '';
-    }
-  };
 
   window.logout = function() {
     Swal.fire({
@@ -1872,42 +1906,13 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     bar.classList.remove('hidden');
     document.getElementById('adminCartCount').textContent = count;
     document.getElementById('adminCartCountText').textContent = count;
-    document.getElementById('adminCartTotalText').textContent = formatMoney(adminCartTotal());
+document.getElementById('adminCartTotalText').textContent = formatMoney(adminCartTotal());
   }
 
   window.openAddModalFromCart = function() {
     if (adminCart.length === 0) return;
     openAddModal(null, null, null);
   };
-
-  function renderModalCartList() {
-    const slotsContainer = document.getElementById('orderSlotsContainer');
-    const slotsList = document.getElementById('orderSlotsList');
-    if (adminCart.length === 0) {
-      closeModal();
-      return;
-    }
-    slotsContainer.classList.remove('hidden');
-    document.getElementById('modalSlotInfo').textContent = `Đã chọn ${adminCart.length} khung giờ đặt sân`;
-    document.getElementById('fieldAmount').value = adminCartTotal();
-
-    const sorted = [...adminCart].sort((a, b) => a.date.localeCompare(b.date) || a.court - b.court || a.hour - b.hour);
-    slotsList.innerHTML = sorted.map(s => `
-      <div class="flex items-center justify-between bg-indigo-50/80 border border-indigo-100 rounded-xl px-3 py-2 text-xs">
-        <div class="flex items-center gap-2 min-w-0">
-          <i class="fa-solid fa-circle-check text-primary"></i>
-          <span class="font-bold text-gray-800">${(CONFIG.courts && CONFIG.courts[s.court]) || ('Sân ' + (s.court+1))}</span>
-          <span class="text-gray-600 font-medium">${String(s.hour).padStart(2,'0')}:00–${String(s.hour+1).padStart(2,'0')}:00</span>
-          <span class="text-gray-400">(${dayjs(s.date).format('DD/MM')})</span>
-          ${isPeak(s.hour) ? '<span class="text-amber-500 font-semibold ml-1">⚡Cao điểm</span>' : ''}
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-primary">${formatMoney(s.price)}</span>
-          <button onclick="removeAdminCartItem('${s.key}')" class="text-gray-400 hover:text-red-500 p-1 rounded transition-colors" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </div>
-    `).join('');
-  }
 
   // ===== RECURRING SCHEDULE LOGIC =====
   const RC_DAYS = [
@@ -1916,36 +1921,112 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     { label: 'CN', val: 0 }
   ];
   let rcSelectedDays = [];
+  let rcSelectedCourts = [];
   let rcMode = 'same';
+  let editingRcId = null;
+  let cachedRecurringSchedules = [];
 
-  window.openRecurringModal = function() {
+  window.openRecurringModal = function(editDoc = null) {
     rcSelectedDays = [];
+    rcSelectedCourts = [];
     rcMode = 'same';
+    editingRcId = editDoc ? editDoc.id : null;
+
     const modal = document.getElementById('recurringModal');
     if (!modal) return;
     modal.style.display = 'flex';
-    const courtSel = document.getElementById('rcCourt');
-    if (courtSel) courtSel.innerHTML = (CONFIG.courts || ['Sân 1']).map((c, i) => `<option value="${i}">${c}</option>`).join('');
+
+    // Set title and button text
+    const titleEl = document.getElementById('rcModalTitle');
+    const btnTextEl = document.getElementById('rcSaveBtnText');
+    if (titleEl) titleEl.textContent = editingRcId ? 'Chỉnh Sửa Lịch Cố Định' : 'Tạo Lịch Cố Định';
+    if (btnTextEl) btnTextEl.textContent = editingRcId ? 'Lưu thay đổi' : 'Tạo lịch cố định';
+
+    // Render Court Checkboxes
+    const courtPicker = document.getElementById('rcCourtPicker');
+    const courtsList = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+    if (courtPicker) {
+      courtPicker.innerHTML = courtsList.map((c, i) => `
+        <button type="button" onclick="toggleRcCourt(${i})" id="rcCourt-${i}"
+          class="px-3 py-1.5 rounded-xl border-2 border-gray-200 text-xs font-bold text-gray-600 hover:border-purple-400 hover:text-purple-600 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-check text-[10px] hidden" id="rcCourtCheck-${i}"></i>
+          <span>${c}</span>
+        </button>
+      `).join('');
+    }
+
+    // Render Day Picker
     const dp = document.getElementById('rcDayPicker');
-    if (dp) dp.innerHTML = RC_DAYS.map(d =>
-      `<button type="button" onclick="toggleRcDay(${d.val})" id="rcDay-${d.val}" class="w-10 h-10 rounded-full border-2 border-gray-200 text-xs font-bold text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-all">${d.label}</button>`
-    ).join('');
+    if (dp) {
+      dp.innerHTML = RC_DAYS.map(d => `
+        <button type="button" onclick="toggleRcDay(${d.val})" id="rcDay-${d.val}"
+          class="w-10 h-10 rounded-full border-2 border-gray-200 text-xs font-bold text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-all">${d.label}</button>
+      `).join('');
+    }
+
     const today = dayjs();
     const rcSD = document.getElementById('rcStartDate');
     const rcED = document.getElementById('rcEndDate');
-    if (rcSD) rcSD.value = today.format('YYYY-MM-DD');
-    if (rcED) rcED.value = today.add(3, 'month').format('YYYY-MM-DD');
-    ['rcName', 'rcPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    const rcSS = document.getElementById('rcSameStart'); if (rcSS) rcSS.value = 17;
-    const rcSE = document.getElementById('rcSameEnd'); if (rcSE) rcSE.value = 19;
-    setRcMode('same');
-    const preview = document.getElementById('rcPreview');
-    if (preview) preview.classList.add('hidden');
+
+    if (editDoc) {
+      document.getElementById('rcName').value = editDoc.name || '';
+      document.getElementById('rcPhone').value = editDoc.phone || '';
+      (editDoc.courts || []).forEach(c => toggleRcCourt(c));
+      (editDoc.days || []).forEach(d => toggleRcDay(d));
+      if (rcSD) rcSD.value = editDoc.startDate || today.format('YYYY-MM-DD');
+      if (rcED) rcED.value = editDoc.endDate || today.add(3, 'month').format('YYYY-MM-DD');
+      if (editDoc.dayHours) {
+        setRcMode('diff');
+        setTimeout(() => {
+          Object.entries(editDoc.dayHours).forEach(([d, h]) => {
+            const sEl = document.getElementById(`rcDiff-${d}-start`);
+            const eEl = document.getElementById(`rcDiff-${d}-end`);
+            if (sEl) sEl.value = h.start;
+            if (eEl) eEl.value = h.end;
+          });
+        }, 50);
+      } else {
+        setRcMode('same');
+        const rcSS = document.getElementById('rcSameStart'); if (rcSS) rcSS.value = editDoc.startHour || 17;
+        const rcSE = document.getElementById('rcSameEnd'); if (rcSE) rcSE.value = editDoc.endHour || 19;
+      }
+    } else {
+      ['rcName', 'rcPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      if (rcSD) rcSD.value = today.format('YYYY-MM-DD');
+      if (rcED) rcED.value = today.add(3, 'month').format('YYYY-MM-DD');
+      const rcSS = document.getElementById('rcSameStart'); if (rcSS) rcSS.value = 17;
+      const rcSE = document.getElementById('rcSameEnd'); if (rcSE) rcSE.value = 19;
+      toggleRcCourt(0); // Chọn mặc định sân đầu tiên
+      setRcMode('same');
+    }
   };
 
   window.closeRecurringModal = function() {
     const modal = document.getElementById('recurringModal');
     if (modal) modal.style.display = 'none';
+    editingRcId = null;
+  };
+
+  window.toggleRcCourt = function(idx) {
+    const i = rcSelectedCourts.indexOf(idx);
+    if (i !== -1) rcSelectedCourts.splice(i, 1);
+    else rcSelectedCourts.push(idx);
+
+    const courtsList = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+    courtsList.forEach((_, cIdx) => {
+      const btn = document.getElementById('rcCourt-' + cIdx);
+      const check = document.getElementById('rcCourtCheck-' + cIdx);
+      if (!btn) return;
+      if (rcSelectedCourts.includes(cIdx)) {
+        btn.classList.remove('border-gray-200', 'text-gray-600', 'hover:text-purple-600');
+        btn.classList.add('border-purple-500', 'bg-purple-600', 'text-white');
+        if (check) check.classList.remove('hidden');
+      } else {
+        btn.classList.remove('border-purple-500', 'bg-purple-600', 'text-white');
+        btn.classList.add('border-gray-200', 'text-gray-600', 'hover:text-purple-600');
+        if (check) check.classList.add('hidden');
+      }
+    });
   };
 
   window.toggleRcDay = function(val) {
@@ -1956,11 +2037,11 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       const btn = document.getElementById('rcDay-' + d.val);
       if (!btn) return;
       if (rcSelectedDays.includes(d.val)) {
-        btn.classList.remove('border-gray-200', 'text-gray-500');
+        btn.classList.remove('border-gray-200', 'text-gray-500', 'hover:text-purple-600');
         btn.classList.add('border-purple-500', 'bg-purple-600', 'text-white');
       } else {
         btn.classList.remove('border-purple-500', 'bg-purple-600', 'text-white');
-        btn.classList.add('border-gray-200', 'text-gray-500');
+        btn.classList.add('border-gray-200', 'text-gray-500', 'hover:text-purple-600');
       }
     });
     if (rcMode === 'diff') renderRcDiffPanel();
@@ -2008,91 +2089,61 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   window.saveRecurringSchedule = async function() {
     const name = document.getElementById('rcName') ? document.getElementById('rcName').value.trim() : '';
     const phone = document.getElementById('rcPhone') ? document.getElementById('rcPhone').value.trim() : '';
-    const courtIdx = parseInt((document.getElementById('rcCourt') || {}).value || 0);
     const startDateStr = document.getElementById('rcStartDate') ? document.getElementById('rcStartDate').value : '';
     const endDateStr = document.getElementById('rcEndDate') ? document.getElementById('rcEndDate').value : '';
+
     if (!name) { Swal.fire({ icon: 'warning', title: 'Thiếu tên khách hàng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
-    if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày nào', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!rcSelectedCourts.length) { Swal.fire({ icon: 'warning', title: 'Chưa chọn sân nào', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày nào trong tuần', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
     if (!startDateStr || !endDateStr) { Swal.fire({ icon: 'warning', title: 'Vui lòng chọn ngày bắt đầu và kết thúc', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+    
     const startDate = dayjs(startDateStr);
     const endDate = dayjs(endDateStr);
     if (endDate.diff(startDate, 'month') > 6) { Swal.fire({ icon: 'warning', title: 'Khoảng thời gian tối đa 6 tháng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
     if (endDate.isBefore(startDate)) { Swal.fire({ icon: 'warning', title: 'Ngày kết thúc phải sau ngày bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
 
-    let dayHours = {};
+    const payload = {
+      name,
+      phone,
+      courts: [...rcSelectedCourts].sort(),
+      days: [...rcSelectedDays].sort(),
+      startDate: startDateStr,
+      endDate: endDateStr,
+      active: true
+    };
+
     if (rcMode === 'same') {
       const s = parseInt((document.getElementById('rcSameStart') || {}).value || 17);
       const e = parseInt((document.getElementById('rcSameEnd') || {}).value || 19);
       if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
-      rcSelectedDays.forEach(d => { dayHours[d] = { start: s, end: e }; });
+      payload.startHour = s;
+      payload.endHour = e;
     } else {
+      let dayHours = {};
       for (const d of rcSelectedDays) {
         const s = parseInt((document.getElementById('rcDiff-' + d + '-start') || {}).value || 17);
         const e = parseInt((document.getElementById('rcDiff-' + d + '-end') || {}).value || 19);
         if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
         dayHours[d] = { start: s, end: e };
       }
+      payload.dayHours = dayHours;
     }
-
-    // Load all bookings for date range to check conflicts
-    let existingBookings = [];
-    try { existingBookings = await (typeof getAllBookings === 'function' ? getAllBookings() : Promise.resolve([])); } catch(e) {}
-
-    const bookingsToCreate = [];
-    const conflicts = [];
-    let cur = startDate.clone();
-    while (!cur.isAfter(endDate)) {
-      const dow = cur.day(); // JS: 0=Sun,1=Mon,...,6=Sat
-      if (rcSelectedDays.includes(dow)) {
-        const h = dayHours[dow];
-        const dateStr2 = cur.format('YYYY-MM-DD');
-        const existing = existingBookings.filter(b => b.date === dateStr2 && b.court === courtIdx);
-        const conflict = existing.some(b => h.start < b.hour + (b.duration || 1) && h.end > b.hour);
-        if (conflict) {
-          conflicts.push(dateStr2);
-        } else {
-          const duration = h.end - h.start;
-          bookingsToCreate.push({
-            name, phone, court: courtIdx,
-            date: dateStr2, hour: h.start, duration,
-            amount: calcPrice(h.start, duration),
-            status: 'confirmed', isPaid: false,
-            type: 'recurring',
-            note: 'Lịch cố định'
-          });
-        }
-      }
-      cur = cur.add(1, 'day');
-    }
-
-    if (bookingsToCreate.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Không có slot nào khả dụng', text: conflicts.length ? (conflicts.length + ' ngày bị trùng lịch') : 'Kiểm tra lại ngày', confirmButtonColor: '#7c3aed' }); return;
-    }
-
-    const result = await Swal.fire({
-      title: 'Xác nhận tạo lịch cố định?',
-      html: 'Tạo <b>' + bookingsToCreate.length + ' slot</b> cho <b>' + name + '</b>' + (conflicts.length ? '<br><span style="color:#d97706">Bỏ qua ' + conflicts.length + ' ngày đã bị trùng lịch</span>' : ''),
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#7c3aed',
-      confirmButtonText: 'Tạo ' + bookingsToCreate.length + ' slot',
-      cancelButtonText: 'Hủy'
-    });
-    if (!result.isConfirmed) return;
 
     try {
-      const batchBase = 'RC_' + Date.now();
-      for (const b of bookingsToCreate) {
-        await addBookings([{ ...b, batchId: batchBase + '_' + b.date }]);
+      Swal.showLoading();
+      if (editingRcId) {
+        await updateRecurringSchedule(editingRcId, payload);
+        Swal.fire({ icon: 'success', title: 'Cập nhật lịch cố định thành công!', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
+      } else {
+        await addRecurringSchedule(payload);
+        Swal.fire({ icon: 'success', title: 'Tạo lịch cố định thành công!', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
       }
       closeRecurringModal();
-      Swal.fire({ icon: 'success', title: 'Đã tạo ' + bookingsToCreate.length + ' lịch cố định!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
-      allBookingsList = await getAllBookings();
       renderAdminSchedule();
-      if (typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
+      renderRecurringSectionList();
     } catch(err) {
       console.error(err);
-      Swal.fire({ icon: 'error', title: 'Lỗi khi tạo lịch', text: err.message });
+      Swal.fire({ icon: 'error', title: 'Lỗi khi lưu lịch cố định', text: err.message });
     }
   };
 
@@ -2101,46 +2152,34 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     const container = document.getElementById('recurringListContainer');
     if (!container) return;
 
-    if (!allBookingsList || allBookingsList.length === 0) {
-      try {
-        allBookingsList = await getAllBookings();
-      } catch(e) {
-        allBookingsList = [];
-      }
+    container.innerHTML = `
+      <div class="text-center py-10 text-gray-400 text-sm">
+        <i class="fa-solid fa-spinner fa-spin text-purple-600 text-xl mb-2 block"></i>
+        <p>Đang tải danh sách lịch cố định...</p>
+      </div>
+    `;
+
+    try {
+      cachedRecurringSchedules = await getRecurringSchedules();
+    } catch(e) {
+      container.innerHTML = `
+        <div class="text-center py-10 text-red-400 text-sm">
+          <i class="fa-solid fa-triangle-exclamation text-xl mb-2 block"></i>
+          <p>Lỗi tải dữ liệu: ${e.message}</p>
+        </div>
+      `;
+      return;
     }
 
-    const recBookings = (allBookingsList || []).filter(b => 
-      b.type === 'recurring' || 
-      (b.batchId && (b.batchId.startsWith('RC_') || b.batchId.startsWith('RC_CLIENT_'))) ||
-      (b.note && b.note.toLowerCase().includes('cố định'))
-    );
-
-    // Group by batchId or by (name + phone + court + duration + startHour)
-    const groups = {};
-    recBookings.forEach(b => {
-      let key = b.batchId ? b.batchId.split('_').slice(0, 2).join('_') : `GRP_${b.name}_${b.phone}_${b.court}`;
-      if (!groups[key]) {
-        groups[key] = {
-          batchPrefix: key,
-          name: b.name || 'Chưa tên',
-          phone: b.phone || 'N/A',
-          court: b.court,
-          courtName: (CONFIG.courts || [])[b.court] || `Sân ${b.court + 1}`,
-          hour: b.hour,
-          duration: b.duration || 1,
-          items: []
-        };
-      }
-      groups[key].items.push(b);
-    });
-
-    const groupList = Object.values(groups);
     const searchVal = (document.getElementById('searchRecurringInput')?.value || '').toLowerCase().trim();
-    const filtered = groupList.filter(g => 
-      g.name.toLowerCase().includes(searchVal) || 
-      g.phone.toLowerCase().includes(searchVal) ||
-      g.courtName.toLowerCase().includes(searchVal)
-    );
+    const courtsList = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+
+    const filtered = cachedRecurringSchedules.filter(item => {
+      const cNames = (item.courts || []).map(c => courtsList[c] || `Sân ${c+1}`).join(' ');
+      return (item.name || '').toLowerCase().includes(searchVal) ||
+             (item.phone || '').toLowerCase().includes(searchVal) ||
+             cNames.toLowerCase().includes(searchVal);
+    });
 
     if (filtered.length === 0) {
       container.innerHTML = `
@@ -2162,16 +2201,18 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        ${filtered.map(g => {
-          g.items.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-          const dates = g.items.map(i => i.date).filter(Boolean);
-          const firstDate = dates[0] ? dayjs(dates[0]).format('DD/MM/YYYY') : '---';
-          const lastDate = dates[dates.length - 1] ? dayjs(dates[dates.length - 1]).format('DD/MM/YYYY') : '---';
-          const totalAmount = g.items.reduce((sum, i) => sum + (i.price || 0), 0);
-          
-          // Identify unique weekdays
-          const weekDaysSet = new Set(g.items.map(i => dayjs(i.date).day()));
-          const weekDaysText = Array.from(weekDaysSet).map(d => dayNames[d]).join(', ');
+        ${filtered.map(item => {
+          const cNames = (item.courts || []).map(c => courtsList[c] || `Sân ${c+1}`).join(', ');
+          const weekDaysText = (item.days || []).map(d => dayNames[d]).join(', ');
+          const firstDate = item.startDate ? dayjs(item.startDate).format('DD/MM/YYYY') : '---';
+          const lastDate = item.endDate ? dayjs(item.endDate).format('DD/MM/YYYY') : '---';
+
+          let hourText = '';
+          if (item.dayHours) {
+            hourText = 'Khung giờ riêng theo thứ';
+          } else {
+            hourText = `${String(item.startHour).padStart(2,'0')}:00 - ${String(item.endHour).padStart(2,'0')}:00 (${item.endHour - item.startHour}h)`;
+          }
 
           return `
             <div class="bg-white border border-gray-200 hover:border-purple-300 rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
@@ -2182,23 +2223,23 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                       <i class="fa-solid fa-rotate"></i>
                     </div>
                     <div>
-                      <h4 class="font-bold text-gray-800 text-sm">${g.name}</h4>
-                      <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-phone text-[10px] mr-1 text-gray-400"></i>${g.phone}</p>
+                      <h4 class="font-bold text-gray-800 text-sm">${item.name || 'Khách cố định'}</h4>
+                      <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-phone text-[10px] mr-1 text-gray-400"></i>${item.phone || '---'}</p>
                     </div>
                   </div>
-                  <span class="text-[11px] bg-purple-100 text-purple-700 font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-                    ${g.items.length} buổi
+                  <span class="text-[11px] ${item.active !== false ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500'} font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                    ${item.active !== false ? 'Hoạt động' : 'Tạm dừng'}
                   </span>
                 </div>
 
                 <div class="space-y-1.5 text-xs text-gray-600 border-t border-gray-100 pt-3 mb-3">
                   <div class="flex justify-between">
-                    <span class="text-gray-400">Sân đặt:</span>
-                    <span class="font-bold text-gray-800">${g.courtName}</span>
+                    <span class="text-gray-400">Các sân:</span>
+                    <span class="font-bold text-gray-800">${cNames}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Khung giờ:</span>
-                    <span class="font-bold text-purple-700">${String(g.hour).padStart(2,'0')}:00 - ${String(g.hour + g.duration).padStart(2,'0')}:00 (${g.duration}h)</span>
+                    <span class="font-bold text-purple-700">${hourText}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Lịch tuần:</span>
@@ -2208,16 +2249,15 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
                     <span class="text-gray-400">Thời gian áp dụng:</span>
                     <span class="font-medium text-gray-700">${firstDate} ➔ ${lastDate}</span>
                   </div>
-                  <div class="flex justify-between pt-1 border-t border-dashed border-gray-100">
-                    <span class="text-gray-400">Tổng tiền dự tính:</span>
-                    <span class="font-extrabold text-emerald-600">${totalAmount.toLocaleString('vi-VN')}đ</span>
-                  </div>
                 </div>
               </div>
 
               <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-                <button onclick="deleteRecurringBatch('${g.batchPrefix}', '${g.name}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
-                  <i class="fa-solid fa-trash-can text-xs"></i> Hủy chuỗi lịch cố định
+                <button onclick="editRecurringSchedule('${item.id}')" class="flex-1 py-2 bg-purple-50 hover:bg-purple-100 text-purple-600 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i> Chỉnh sửa
+                </button>
+                <button onclick="deleteRecurringScheduleDoc('${item.id}', '${item.name || 'Khách cố định'}')" class="flex-1 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-trash-can text-xs"></i> Xóa lịch
                 </button>
               </div>
             </div>
@@ -2264,12 +2304,30 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     const isPastDate = adminDate.isBefore(dayjs().startOf('day'));
     const isToday = dateStr === todayStr;
     const nowHour = dayjs().hour();
+    const dayOfWeek = adminDate.day(); // 0: CN, 1: T2...
 
     try {
       dayBookingsList = await getBookingsByDate(dateStr);
     } catch(e) {
       dayBookingsList = [];
     }
+
+    // Đọc recurringSchedules (nếu chưa có cache)
+    if (!cachedRecurringSchedules || cachedRecurringSchedules.length === 0) {
+      try {
+        cachedRecurringSchedules = await getRecurringSchedules();
+      } catch(e) {
+        cachedRecurringSchedules = [];
+      }
+    }
+
+    // Tính toán ô lịch cố định cho ngày hiện tại (dateStr)
+    const activeRcList = (cachedRecurringSchedules || []).filter(rc => {
+      if (rc.active === false) return false;
+      if (rc.startDate && dateStr < rc.startDate) return false;
+      if (rc.endDate && dateStr > rc.endDate) return false;
+      return (rc.days || []).includes(dayOfWeek);
+    });
 
     const tbody = document.getElementById('adminScheduleBody');
     const pastContainer = document.getElementById('adminPastToggleContainer');
@@ -2311,7 +2369,42 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       </td>`;
 
       for (let c = 0; c < (CONFIG.courts || []).length; c++) {
+        // 1. Kiểm tra đơn đặt vãng lai thực tế trước
         const booking = dayBookingsList.find(b => b.court === c && h >= b.hour && h < b.hour + (b.duration || 1));
+        
+        // 2. Kiểm tra lịch cố định cho sân c và giờ h
+        let rcMatch = null;
+        let rcStart = 0;
+        let rcEnd = 0;
+        if (!booking) {
+          for (const rc of activeRcList) {
+            if (!(rc.courts || []).includes(c)) continue;
+
+            const excKey = `${dateStr}_${c}`;
+            const exc = rc.exceptions ? rc.exceptions[excKey] : undefined;
+
+            if (exc === null) continue; // Khách báo nghỉ buổi này
+
+            let startH = rc.startHour;
+            let endH = rc.endHour;
+            if (rc.dayHours && rc.dayHours[dayOfWeek]) {
+              startH = rc.dayHours[dayOfWeek].start;
+              endH = rc.dayHours[dayOfWeek].end;
+            }
+            if (exc && typeof exc === 'object') {
+              startH = exc.start;
+              endH = exc.end;
+            }
+
+            if (h >= startH && h < endH) {
+              rcMatch = rc;
+              rcStart = startH;
+              rcEnd = endH;
+              break;
+            }
+          }
+        }
+
         if (booking) {
           const isStart = booking.hour === h;
           const dur = booking.duration || 1;
@@ -2342,6 +2435,26 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
           } else {
             rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
               <div class="${isRecurring ? 'bg-purple-50/60 border border-purple-200' : 'slot-cont bg-red-50/50 border border-red-100'} rounded-lg h-[60px] text-xs ${isRecurring ? 'text-purple-300' : 'text-red-300'} flex items-center justify-center cursor-pointer hover:opacity-80 transition-all" onclick="openOrderModal('${batchId}')">
+                <i class="fa-solid fa-grip-lines"></i>
+              </div>
+            </td>`;
+          }
+        } else if (rcMatch) {
+          const isStart = h === rcStart;
+          const dur = rcEnd - rcStart;
+          if (isStart) {
+            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="bg-purple-50 border border-purple-300 hover:border-purple-500 rounded-lg h-[60px] py-1 px-1 text-xs cursor-pointer hover:shadow-xs transition-all overflow-hidden flex flex-col justify-center items-center active:scale-95" onclick="handleRecurringSlotClick('${rcMatch.id}', ${c}, '${dateStr}', ${rcStart}, ${rcEnd})">
+                <div class="font-semibold text-purple-700 truncate text-xs w-full text-center" title="${rcMatch.name}"><i class="fa-solid fa-rotate mr-1 text-[10px]"></i>${rcMatch.name}</div>
+                <div class="flex items-center justify-center gap-1 mt-0.5">
+                  <span class="text-[10px] bg-purple-100 text-purple-600 px-1.5 rounded-full font-medium whitespace-nowrap">Cố định</span>
+                  ${dur > 1 ? `<span class="text-[10px] text-purple-400 font-bold">${dur}h</span>` : ''}
+                </div>
+              </div>
+            </td>`;
+          } else {
+            rowCells += `<td class="py-2 px-1 border-b border-gray-100 text-center w-28 min-w-28 max-w-28">
+              <div class="bg-purple-50/60 border border-purple-200 rounded-lg h-[60px] text-xs text-purple-400 flex items-center justify-center cursor-pointer hover:opacity-80 transition-all active:scale-95" onclick="handleRecurringSlotClick('${rcMatch.id}', ${c}, '${dateStr}', ${rcStart}, ${rcEnd})">
                 <i class="fa-solid fa-grip-lines"></i>
               </div>
             </td>`;
@@ -2417,21 +2530,16 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   window.quickApproveOrder = async function(batchId) {
     const orderItems = allBookingsList.filter(b => (b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`) === batchId);
     if (!orderItems.length) return;
-    const firstDate = orderItems[0].date;
-    if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
-      Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể duyệt hay chỉnh sửa!' });
-      return;
-    }
     try {
       for (const item of orderItems) {
-        await updateBooking(item.id, { status: 'confirmed' });
+        if (item.id) await updateBooking(item.id, { status: 'confirmed' });
       }
       Swal.fire({ icon: 'success', title: 'Đã duyệt đơn hàng thành công!', timer: 1200, showConfirmButton: false, toast: true, position: 'top-end' });
       renderAllBookings();
       renderDashboard();
     } catch(e) {
       console.error(e);
-      Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể duyệt đơn hàng' });
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message || 'Không thể duyệt đơn hàng' });
     }
   };
 
@@ -2527,19 +2635,21 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       return;
     }
 
-    el.innerHTML = filtered.map(order => {
+    el.innerHTML = `<div class="p-4 space-y-3.5 bg-gray-50/50">` + filtered.map(order => {
       const dateInfo = formatOrderDate(order);
       const isPending = order.status === 'pending';
+      const isSelected = selectedOrderBatchIds.includes(order.batchId);
+      const shortBatchId = (order.batchId || '').slice(-6).toUpperCase() || 'DEF';
 
       const slotsBadgeHtml = order.items.map(s => {
         const cName = CONFIG.courts[s.court] || ('Sân ' + (s.court + 1));
         const dateFormatted = dayjs(s.date).format('DD/MM');
         const timeFormatted = `${String(s.hour).padStart(2, '0')}:00 – ${String(s.hour + (s.duration || 1)).padStart(2, '0')}:00`;
         return `
-          <span class="inline-flex items-center gap-1.5 bg-slate-100/80 border border-slate-200/60 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700">
+          <span class="inline-flex items-center gap-1.5 bg-slate-100/90 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700">
             <i class="fa-solid fa-shuttlecock text-primary text-[10px]"></i>
             <span>${cName}</span>
-            <span class="text-gray-400 font-normal">|</span>
+            <span class="text-gray-300 font-normal">|</span>
             <span class="text-primary font-bold">${dateFormatted}</span>
             <span class="text-gray-500">(${timeFormatted})</span>
           </span>
@@ -2547,48 +2657,165 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       }).join(' ');
 
       return `
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 hover:bg-slate-50/80 transition-all border-b border-gray-100 cursor-pointer ${isPending ? 'bg-amber-50/30' : ''}" onclick="openOrderModal('${order.batchId}')">
-          <!-- Left Info: Date Badge + Customer Name + Slots -->
-          <div class="flex items-start gap-4 flex-1">
-            <div class="w-12 h-12 rounded-2xl ${isPending ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600 border border-slate-200/80'} flex flex-col items-center justify-center font-extrabold text-xs flex-shrink-0 leading-none shadow-2xs">
-              <span class="text-sm">${dateInfo.day}</span>
-              <span class="text-[10px] font-semibold text-gray-500 mt-0.5">${dateInfo.monthYear}</span>
-            </div>
-            
-            <div class="space-y-1.5 flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-extrabold text-navy text-base hover:text-primary transition-colors">${order.name}</span>
-                <a href="tel:${order.phone}" onclick="event.stopPropagation()" class="text-xs font-bold text-slate-500 bg-slate-100 hover:bg-primary hover:text-white px-2 py-0.5 rounded-md transition-all flex items-center gap-1">
-                  <i class="fa-solid fa-phone text-[10px]"></i>${order.phone}
-                </a>
-                <a href="https://zalo.me/${order.phone.replace(/[\s\-.()]/g,'')}" target="_blank" onclick="event.stopPropagation()" class="text-[11px] font-semibold text-blue-600 hover:underline">
-                  Zalo
-                </a>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200/80 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${isSelected ? 'ring-2 ring-purple-500 bg-purple-50/30' : ''}" onclick="openOrderModal('${order.batchId}')">
+          <!-- Top Row: Checkbox + Batch Code + Date + Status -->
+          <div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div onclick="event.stopPropagation()">
+                <input type="checkbox" onchange="toggleSelectOrder('${order.batchId}', this.checked)" ${isSelected ? 'checked' : ''} class="w-4 h-4 text-purple-600 rounded cursor-pointer accent-purple-600" />
               </div>
-
-              <!-- Slots details badges -->
-              <div class="flex flex-wrap gap-1.5 pt-0.5">
-                ${slotsBadgeHtml}
-              </div>
-
-              ${order.note ? `<div class="text-xs text-gray-500 italic flex items-center gap-1 pt-1"><i class="fa-regular fa-note-sticky text-amber-500"></i> ${order.note}</div>` : ''}
-            </div>
-          </div>
-
-          <!-- Right Info: Amount + Status + Action Buttons -->
-          <div class="flex items-center justify-between lg:justify-end gap-4 pt-3 lg:pt-0 border-t lg:border-t-0 border-gray-100 flex-shrink-0">
-            <div class="text-left lg:text-right">
-              <div class="text-base font-extrabold text-primary">${formatMoney(order.totalAmount)}</div>
-              <div class="text-[11px] text-gray-400 font-medium">${order.items.length} slot đã chọn</div>
+              <span class="bg-gray-100 text-gray-600 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md tracking-wider">#${shortBatchId}</span>
+              <span class="text-xs text-gray-400 font-medium hidden sm:inline"><i class="fa-regular fa-calendar-check mr-1"></i>${dateInfo.day}/${dateInfo.monthYear}</span>
             </div>
 
             <div class="flex items-center gap-2">
               ${statusBadge(order)}
             </div>
           </div>
+
+          <!-- Middle Row: Customer Info + Slots -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1.5 flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-extrabold text-navy text-base hover:text-primary transition-colors">${order.name}</span>
+                <a href="tel:${order.phone}" onclick="event.stopPropagation()" class="text-xs font-bold text-slate-600 bg-slate-100 hover:bg-primary hover:text-white px-2 py-0.5 rounded-md transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-phone text-[10px]"></i>${order.phone}
+                </a>
+                <a href="https://zalo.me/${order.phone.replace(/[\s\-.()]/g,'')}" target="_blank" onclick="event.stopPropagation()" class="text-[11px] font-bold text-blue-600 hover:underline bg-blue-50 px-2 py-0.5 rounded-md">
+                  Zalo
+                </a>
+              </div>
+
+              <!-- Slots details badges -->
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                ${slotsBadgeHtml}
+              </div>
+
+              ${order.note ? `<div class="text-xs text-gray-500 italic flex items-center gap-1 pt-1"><i class="fa-regular fa-note-sticky text-amber-500"></i> ${order.note}</div>` : ''}
+            </div>
+
+            <!-- Price & Item count -->
+            <div class="sm:text-right flex sm:flex-col justify-between items-center sm:items-end pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 flex-shrink-0">
+              <div class="text-base font-extrabold text-primary">${formatMoney(order.totalAmount)}</div>
+              <div class="text-[11px] text-gray-400 font-semibold bg-gray-50 px-2 py-0.5 rounded-md">${order.items.length} slot đã chọn</div>
+            </div>
+          </div>
         </div>
       `;
-    }).join('');
+    }).join('') + `</div>`;
+
+    updateBatchBarUI(filtered);
+  };
+
+  // ===== BATCH SELECTION & ACTIONS FOR ORDERS =====
+  let selectedOrderBatchIds = [];
+
+  window.toggleSelectOrder = function(batchId, checked) {
+    if (checked) {
+      if (!selectedOrderBatchIds.includes(batchId)) selectedOrderBatchIds.push(batchId);
+    } else {
+      selectedOrderBatchIds = selectedOrderBatchIds.filter(id => id !== batchId);
+    }
+    filterBookings();
+  };
+
+  window.toggleSelectAllOrders = function(checked) {
+    const orders = groupOrders(allBookingsList);
+    if (checked) {
+      selectedOrderBatchIds = orders.map(o => o.batchId);
+    } else {
+      selectedOrderBatchIds = [];
+    }
+    filterBookings();
+  };
+
+  window.clearSelectedOrders = function() {
+    selectedOrderBatchIds = [];
+    filterBookings();
+  };
+
+  function updateBatchBarUI(currentFilteredOrders) {
+    const bar = document.getElementById('bkBatchActionBar');
+    const countEl = document.getElementById('bkSelectedCount');
+    const selectAllCb = document.getElementById('bkSelectAllCheckbox');
+
+    if (!bar) return;
+
+    if (selectedOrderBatchIds.length > 0) {
+      bar.classList.remove('hidden');
+      if (countEl) countEl.textContent = selectedOrderBatchIds.length;
+      if (selectAllCb && currentFilteredOrders) {
+        selectAllCb.checked = currentFilteredOrders.length > 0 && currentFilteredOrders.every(o => selectedOrderBatchIds.includes(o.batchId));
+      }
+    } else {
+      bar.classList.add('hidden');
+      if (selectAllCb) selectAllCb.checked = false;
+    }
+  }
+
+  window.batchUpdateOrders = async function(newStatus) {
+    if (selectedOrderBatchIds.length === 0) return;
+    const actionText = newStatus === 'paid' ? 'xác nhận & đánh dấu đã thanh toán' : 'duyệt';
+    const res = await Swal.fire({
+      title: `Cập nhật ${selectedOrderBatchIds.length} đơn hàng?`,
+      text: `Sẽ ${actionText} cho tất cả các đơn hàng đã được chọn.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý cập nhật',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (!res.isConfirmed) return;
+
+    try {
+      Swal.showLoading();
+      const updateData = newStatus === 'paid' ? { status: 'confirmed', isPaid: true } : { status: newStatus };
+      const itemsToUpdate = allBookingsList.filter(b => selectedOrderBatchIds.includes(b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`));
+      
+      for (const item of itemsToUpdate) {
+        if (item.id) await updateBooking(item.id, updateData);
+      }
+
+      Swal.fire({ icon: 'success', title: `Đã cập nhật ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+      selectedOrderBatchIds = [];
+      await renderAllBookings();
+      await renderDashboard();
+    } catch(err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Lỗi cập nhật hàng loạt', text: err.message || 'Không thể cập nhật các đơn đã chọn' });
+    }
+  };
+
+  window.batchDeleteOrders = async function() {
+    if (selectedOrderBatchIds.length === 0) return;
+    const res = await Swal.fire({
+      title: `Xóa ${selectedOrderBatchIds.length} đơn hàng?`,
+      text: `Hành động này sẽ xóa vĩnh viễn tất cả các slot trong ${selectedOrderBatchIds.length} đơn đã chọn. Không thể khôi phục!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Xóa các đơn đã chọn',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (!res.isConfirmed) return;
+
+    try {
+      Swal.showLoading();
+      const itemsToDelete = allBookingsList.filter(b => selectedOrderBatchIds.includes(b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`));
+      
+      for (const item of itemsToDelete) {
+        if (item.id) await deleteBooking(item.id);
+      }
+
+      Swal.fire({ icon: 'success', title: `Đã xóa ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+      selectedOrderBatchIds = [];
+      await renderAllBookings();
+      await renderDashboard();
+    } catch(err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Lỗi xóa hàng loạt', text: err.message || 'Không thể xóa các đơn đã chọn' });
+    }
   };
 
   let editingBatchId = null;
@@ -2758,13 +2985,8 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     editingOrderItems = order.items;
     pendingSlot = null;
 
-    const firstItemDate = order.items && order.items[0] && order.items[0].date;
-    const isPastOrder = firstItemDate ? dayjs(firstItemDate).isBefore(dayjs().startOf('day')) : false;
-
-    document.getElementById('modalTitle').innerHTML = isPastOrder 
-      ? '<i class="fa-solid fa-lock text-amber-500 mr-2"></i>Chi Tiết Đơn Đặt (Quá khứ - Chỉ xem)' 
-      : '<i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt';
-    document.getElementById('modalSlotInfo').textContent = `Đơn gồm ${order.items.length} slot ${isPastOrder ? '· 🔒 Không thể sửa/xóa' : ''}`;
+    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-receipt mr-2"></i>Chi Tiết Đơn Đặt';
+    document.getElementById('modalSlotInfo').textContent = `Đơn gồm ${order.items.length} slot`;
 
     document.getElementById('slotSelectors').classList.add('hidden');
     document.getElementById('durationSection').classList.add('hidden');
@@ -2783,7 +3005,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
         </div>
         <div class="flex items-center gap-2">
           <span class="font-semibold text-gray-700">${formatMoney(s.amount)}</span>
-          ${(!isPastOrder && order.items.length > 1) ? `<button onclick="deleteSingleItemInOrder('${s.id}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>` : ''}
+          ${(order.items.length > 1) ? `<button onclick="deleteSingleItemInOrder('${s.id}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
       </div>
     `).join('');
@@ -2809,7 +3031,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     setRadioStatus(order.isPaid ? 'paid' : (order.status || 'pending'));
     document.getElementById('fieldAmount').value = order.totalAmount;
 
-    // Lock controls if past order
+    // Enable controls
     const fieldName = document.getElementById('fieldName');
     const fieldPhone = document.getElementById('fieldPhone');
     const fieldNote = document.getElementById('fieldNote');
@@ -2817,34 +3039,18 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     const saveBtn = document.getElementById('saveBtn');
     const radios = document.querySelectorAll('input[name="orderActionStatus"]');
 
-    if (isPastOrder) {
-      fieldName.disabled = true;
-      fieldPhone.disabled = true;
-      fieldNote.disabled = true;
-      fieldAmount.disabled = true;
-      radios.forEach(r => r.disabled = true);
-      saveBtn.classList.add('hidden');
-    } else {
-      fieldName.disabled = false;
-      fieldPhone.disabled = false;
-      fieldNote.disabled = false;
-      fieldAmount.disabled = false;
-      radios.forEach(r => r.disabled = false);
-      saveBtn.classList.remove('hidden');
-    }
+    fieldName.disabled = false;
+    fieldPhone.disabled = false;
+    fieldNote.disabled = false;
+    fieldAmount.disabled = false;
+    radios.forEach(r => r.disabled = false);
+    saveBtn.classList.remove('hidden');
 
     document.getElementById('bookingModal').classList.remove('hidden');
     document.getElementById('bookingModal').classList.add('flex');
   };
 
   window.deleteSingleItemInOrder = async function(id) {
-    if (editingOrderItems && editingOrderItems.length > 0) {
-      const firstDate = editingOrderItems[0].date;
-      if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
-        Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể xóa slot!' });
-        return;
-      }
-    }
     try {
       await deleteBooking(id);
       editingOrderItems = editingOrderItems.filter(x => x.id !== id);
@@ -2871,14 +3077,6 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
   window.saveBooking = async function() {
-    if (editingOrderItems && editingOrderItems.length > 0) {
-      const firstDate = editingOrderItems[0].date;
-      if (firstDate && dayjs(firstDate).isBefore(dayjs().startOf('day'))) {
-        Swal.fire({ icon: 'warning', title: 'Lịch quá khứ', text: 'Đơn hàng thuộc ngày quá khứ chỉ cho phép xem, không thể thay đổi thông tin!' });
-        closeModal();
-        return;
-      }
-    }
 
     const selectedAction = getRadioStatus();
 
@@ -3001,7 +3199,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       Swal.fire({ icon: 'success', title: 'Đã cập nhật đơn đặt!', timer: 1500, showConfirmButton: false, position: 'top-end', toast: true });
     } catch(err) {
       console.error(err);
-      Swal.fire({ icon: 'error', title: 'Lỗi xử lý', text: 'Không thể xử lý yêu cầu, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
+      Swal.fire({ icon: 'error', title: 'Lỗi xử lý', text: err.message || 'Không thể xử lý yêu cầu, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
     } finally {
       saveBtn.disabled = false;
       saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu thay đổi';
@@ -3024,7 +3222,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     if (result.isConfirmed) {
       try {
         for (const item of itemsToDelete) {
-          await deleteBooking(item.id);
+          if (item.id) await deleteBooking(item.id);
         }
         closeModal();
         const activeSection = sections.find(s => !document.getElementById('section-' + s).classList.contains('hidden'));
@@ -3033,10 +3231,17 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
         else await renderDashboard();
         Swal.fire({ icon: 'success', title: 'Đã xóa đơn đặt!', timer: 1200, showConfirmButton: false, position: 'top-end', toast: true });
       } catch(err) {
-        Swal.fire({ icon: 'error', title: 'Lỗi xóa đơn', text: 'Không thể xóa đơn, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Lỗi xóa đơn', text: err.message || 'Không thể xóa đơn, vui lòng thử lại sau!', confirmButtonColor: '#ef4444' });
       }
     }
   }
+
+  window.renderDashboard = renderDashboard;
+  window.renderAdminSchedule = renderAdminSchedule;
+  window.renderAllBookings = renderAllBookings;
+  window.loadStaff = loadStaff;
+  window.loadCustomers = loadCustomers;
 
   adminDP.value = formatDate(adminDate);
   document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
