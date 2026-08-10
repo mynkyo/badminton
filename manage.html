@@ -149,6 +149,23 @@
       margin-bottom: 0.5rem !important;
       transform: scale(0.9);
     }
+
+    /* Custom Toast Styling (Thông báo nhỏ ở trên) */
+    .swal2-popup.swal2-toast {
+      border-radius: 1.5rem !important;
+      padding: 1rem 1.25rem !important;
+      box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.18) !important;
+      border: 1px solid rgba(226, 232, 240, 0.9) !important;
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    .swal2-popup.swal2-toast .swal2-title {
+      font-size: 0.95rem !important;
+      font-weight: 800 !important;
+      color: #1e293b !important;
+      padding-top: 0 !important;
+      margin: 0 0 0 0.5rem !important;
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 overflow-x-hidden">
@@ -1232,7 +1249,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 </div>
 
 <!-- ===== MODAL QUẢN LÝ LỊCH CỐ ĐỊNH & ĐỔI LỊCH BUỔI ===== -->
-<div id="rcManageModal" class="fixed inset-0 bg-navy/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+<div id="rcManageModal" class="fixed inset-0 bg-navy/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col animate-slideUp">
     <!-- Header -->
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-purple-50/80">
