@@ -180,6 +180,10 @@
           class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
           <i class="fa-regular fa-calendar w-5 text-center"></i> Quản lý lịch
         </button>
+        <button onclick="showSection('recurring')" id="nav-recurring"
+          class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
+          <i class="fa-solid fa-rotate w-5 text-center"></i> Lịch cố định
+        </button>
         <button onclick="showSection('bookings')" id="nav-bookings"
           class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
           <i class="fa-solid fa-list-check w-5 text-center"></i> Danh sách đơn đặt
@@ -387,7 +391,35 @@
           </div>
         </section>
 
-        <!-- ======= BOOKINGS LIST ======= -->
+        <!-- ======= RECURRING SCHEDULE SECTION ======= -->
+        <section id="section-recurring" class="hidden space-y-4">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-4 sm:px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-gray-800 text-base flex items-center gap-2">
+                  <i class="fa-solid fa-rotate text-purple-600"></i> Quản lý Lịch Cố Định
+                </h3>
+                <p class="text-xs text-gray-500 mt-0.5">Danh sách lịch đặt cố định tái diễn hàng tuần của khách hàng</p>
+              </div>
+              <button onclick="openRecurringModal()" class="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
+                <i class="fa-solid fa-plus"></i> Tạo Lịch Cố Định Mới
+              </button>
+            </div>
+            <div class="px-5 py-3 bg-purple-50/50 border-b border-purple-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-purple-900">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-purple-600"></i>
+                <span>Lịch cố định sẽ tự động hiển thị trên bảng lịch hàng ngày của sân.</span>
+              </div>
+              <input id="searchRecurringInput" oninput="renderRecurringSectionList()" type="text" placeholder="Tìm theo tên khách, SĐT..." class="w-full sm:w-64 border border-purple-200 rounded-xl px-3 py-1.5 bg-white outline-none focus:ring-2 focus:ring-purple-400" />
+            </div>
+            <div id="recurringListContainer" class="p-4 sm:p-5">
+              <div class="text-center py-10 text-gray-400 text-sm">
+                <i class="fa-solid fa-spinner fa-spin text-purple-600 text-xl mb-2"></i>
+                <p>Đang tải danh sách lịch cố định...</p>
+              </div>
+            </div>
+          </div>
+        </section>
         <section id="section-bookings" class="hidden space-y-6">
 
           <!-- Summary KPI Cards -->
@@ -903,6 +935,82 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   <div id="sidebarOverlay" class="fixed top-0 left-0 w-screen h-screen bg-black/50 z-45 hidden lg:hidden"
     onclick="toggleSidebar()"></div>
 
+  <!-- ======= RECURRING SCHEDULE MODAL ======= -->
+  <div id="recurringModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="display:none!important">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRecurringModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-rotate text-purple-600 text-sm"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800 text-sm">Tạo Lịch Cố Định</h3>
+            <p class="text-xs text-gray-500">Đặt lịch tái diễn hàng tuần cho khách</p>
+          </div>
+        </div>
+        <button onclick="closeRecurringModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
+          <i class="fa-solid fa-xmark text-gray-500"></i>
+        </button>
+      </div>
+      <div class="overflow-y-auto flex-1 px-6 py-4 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Tên khách hàng</label>
+            <input id="rcName" type="text" placeholder="Nguyễn Văn A" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Số điện thoại</label>
+            <input id="rcPhone" type="tel" placeholder="0901234567" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Sân</label>
+          <select id="rcCourt" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-2">Ngày trong tuần</label>
+          <div class="flex gap-2 flex-wrap" id="rcDayPicker"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-2">Khung giờ</label>
+          <div class="flex gap-2 mb-3">
+            <button id="rcModeBtn-same" onclick="setRcMode('same')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 transition-all">⏱️ Giống nhau</button>
+            <button id="rcModeBtn-diff" onclick="setRcMode('diff')" class="flex-1 py-2 text-xs font-bold rounded-lg border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-all">🔀 Khác nhau</button>
+          </div>
+          <div id="rcPanelSame" class="grid grid-cols-2 gap-3 p-3 bg-purple-50 border border-purple-200 rounded-xl">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Giờ bắt đầu</label>
+              <input id="rcSameStart" type="number" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Giờ kết thúc</label>
+              <input id="rcSameEnd" type="number" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+            </div>
+          </div>
+          <div id="rcPanelDiff" class="hidden space-y-2"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Ngày bắt đầu</label>
+            <input id="rcStartDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Ngày kết thúc <span class="text-gray-400 font-normal">(≤ 6 tháng)</span></label>
+            <input id="rcEndDate" type="date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+        </div>
+        <div id="rcPreview" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600"></div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
+        <button onclick="closeRecurringModal()" class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all">Hủy</button>
+        <button onclick="saveRecurringSchedule()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-rotate"></i> Tạo lịch cố định
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== MODAL ===== -->
   <div id="bookingModal"
     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 modal-overlay">
@@ -1110,7 +1218,8 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     import {
       getBookingsByDate, getAllBookings, addBookings,
       updateBooking, deleteBooking, getSettings, saveSettings,
-      logoutUser, onAuthChange
+      logoutUser, onAuthChange,
+      getRecurringSchedules, addRecurringSchedule, deleteRecurringSchedule
     } from "./firebase.js";
 
     let CONFIG = {
@@ -1609,17 +1718,18 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     window.adminGoToday = function () { setAdminDate(dayjs()); };
     adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
 
-    const sections = ['dashboard', 'schedule', 'bookings', 'settings'];
+    const sections = ['dashboard', 'schedule', 'recurring', 'bookings', 'settings'];
     window.showSection = function (name) {
       sections.forEach(s => {
-        document.getElementById('section-' + s).classList.add('hidden');
+        document.getElementById('section-' + s)?.classList.add('hidden');
         document.getElementById('nav-' + s)?.classList.remove('active');
       });
-      document.getElementById('section-' + name).classList.remove('hidden');
+      document.getElementById('section-' + name)?.classList.remove('hidden');
       document.getElementById('nav-' + name)?.classList.add('active');
-      const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', settings: 'Cài đặt thông tin sân' };
-      document.getElementById('pageTitle').textContent = titles[name];
+      const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', recurring: 'Quản lý Lịch Cố Định', bookings: 'Danh sách đơn đặt', settings: 'Cài đặt thông tin sân' };
+      document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
       if (name === 'schedule') renderAdminSchedule();
+      if (name === 'recurring' && typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
       if (name === 'bookings') renderAllBookings();
       if (name === 'dashboard') renderDashboard();
       if (window.innerWidth < 1024) toggleSidebar(false);
@@ -2634,6 +2744,350 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
         }
       }
     }
+
+    // ===== RECURRING SCHEDULE LOGIC =====
+    const RC_DAYS = [
+      { label: 'T2', val: 1 }, { label: 'T3', val: 2 }, { label: 'T4', val: 3 },
+      { label: 'T5', val: 4 }, { label: 'T6', val: 5 }, { label: 'T7', val: 6 },
+      { label: 'CN', val: 0 }
+    ];
+    let rcSelectedDays = [];
+    let rcMode = 'same';
+
+    window.openRecurringModal = function() {
+      rcSelectedDays = [];
+      rcMode = 'same';
+      const modal = document.getElementById('recurringModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      const courtSel = document.getElementById('rcCourt');
+      if (courtSel) courtSel.innerHTML = (CONFIG.courts || ['Sân 1']).map((c, i) => `<option value="${i}">${c}</option>`).join('');
+      const dp = document.getElementById('rcDayPicker');
+      if (dp) dp.innerHTML = RC_DAYS.map(d =>
+        `<button type="button" onclick="toggleRcDay(${d.val})" id="rcDay-${d.val}" class="w-10 h-10 rounded-full border-2 border-gray-200 text-xs font-bold text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-all">${d.label}</button>`
+      ).join('');
+      const today = dayjs();
+      const rcSD = document.getElementById('rcStartDate');
+      const rcED = document.getElementById('rcEndDate');
+      if (rcSD) rcSD.value = today.format('YYYY-MM-DD');
+      if (rcED) rcED.value = today.add(3, 'month').format('YYYY-MM-DD');
+      ['rcName', 'rcPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      const rcSS = document.getElementById('rcSameStart'); if (rcSS) rcSS.value = 17;
+      const rcSE = document.getElementById('rcSameEnd'); if (rcSE) rcSE.value = 19;
+      setRcMode('same');
+      const preview = document.getElementById('rcPreview');
+      if (preview) preview.classList.add('hidden');
+    };
+
+    window.closeRecurringModal = function() {
+      const modal = document.getElementById('recurringModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.toggleRcDay = function(val) {
+      const idx = rcSelectedDays.indexOf(val);
+      if (idx !== -1) rcSelectedDays.splice(idx, 1);
+      else rcSelectedDays.push(val);
+      RC_DAYS.forEach(d => {
+        const btn = document.getElementById('rcDay-' + d.val);
+        if (!btn) return;
+        if (rcSelectedDays.includes(d.val)) {
+          btn.classList.remove('border-gray-200', 'text-gray-500');
+          btn.classList.add('border-purple-500', 'bg-purple-600', 'text-white');
+        } else {
+          btn.classList.remove('border-purple-500', 'bg-purple-600', 'text-white');
+          btn.classList.add('border-gray-200', 'text-gray-500');
+        }
+      });
+      if (rcMode === 'diff') renderRcDiffPanel();
+    };
+
+    window.setRcMode = function(mode) {
+      rcMode = mode;
+      const btnSame = document.getElementById('rcModeBtn-same');
+      const btnDiff = document.getElementById('rcModeBtn-diff');
+      const panelSame = document.getElementById('rcPanelSame');
+      const panelDiff = document.getElementById('rcPanelDiff');
+      if (mode === 'same') {
+        if (btnSame) { btnSame.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnSame.classList.remove('border-gray-200', 'text-gray-500'); }
+        if (btnDiff) { btnDiff.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnDiff.classList.add('border-gray-200', 'text-gray-500'); }
+        if (panelSame) panelSame.classList.remove('hidden');
+        if (panelDiff) panelDiff.classList.add('hidden');
+      } else {
+        if (btnDiff) { btnDiff.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnDiff.classList.remove('border-gray-200', 'text-gray-500'); }
+        if (btnSame) { btnSame.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700'); btnSame.classList.add('border-gray-200', 'text-gray-500'); }
+        if (panelDiff) panelDiff.classList.remove('hidden');
+        if (panelSame) panelSame.classList.add('hidden');
+        renderRcDiffPanel();
+      }
+    };
+
+    function renderRcDiffPanel() {
+      const container = document.getElementById('rcPanelDiff');
+      if (!container) return;
+      const sorted = [...rcSelectedDays].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b));
+      container.innerHTML = sorted.map(v => {
+        const label = RC_DAYS.find(d => d.val === v) ? RC_DAYS.find(d => d.val === v).label : v;
+        return `<div class="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-xl">
+          <span class="w-8 h-8 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${label}</span>
+          <div class="flex-1 grid grid-cols-2 gap-2">
+            <div><label class="block text-[10px] text-gray-500 mb-1">Giờ bắt đầu</label>
+              <input type="number" id="rcDiff-${v}-start" min="0" max="23" value="17" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
+            <div><label class="block text-[10px] text-gray-500 mb-1">Giờ kết thúc</label>
+              <input type="number" id="rcDiff-${v}-end" min="1" max="24" value="19" class="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" /></div>
+          </div>
+        </div>`;
+      }).join('');
+      if (!sorted.length) container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Chọn ngày trong tuần trước</p>';
+    }
+
+    window.saveRecurringSchedule = async function() {
+      const name = document.getElementById('rcName') ? document.getElementById('rcName').value.trim() : '';
+      const phone = document.getElementById('rcPhone') ? document.getElementById('rcPhone').value.trim() : '';
+      const courtIdx = parseInt((document.getElementById('rcCourt') || {}).value || 0);
+      const startDateStr = document.getElementById('rcStartDate') ? document.getElementById('rcStartDate').value : '';
+      const endDateStr = document.getElementById('rcEndDate') ? document.getElementById('rcEndDate').value : '';
+      if (!name) { Swal.fire({ icon: 'warning', title: 'Thiếu tên khách hàng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      if (!rcSelectedDays.length) { Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày nào', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      if (!startDateStr || !endDateStr) { Swal.fire({ icon: 'warning', title: 'Vui lòng chọn ngày bắt đầu và kết thúc', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      const startDate = dayjs(startDateStr);
+      const endDate = dayjs(endDateStr);
+      if (endDate.diff(startDate, 'month') > 6) { Swal.fire({ icon: 'warning', title: 'Khoảng thời gian tối đa 6 tháng', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+      if (endDate.isBefore(startDate)) { Swal.fire({ icon: 'warning', title: 'Ngày kết thúc phải sau ngày bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+
+      let dayHours = {};
+      if (rcMode === 'same') {
+        const s = parseInt((document.getElementById('rcSameStart') || {}).value || 17);
+        const e = parseInt((document.getElementById('rcSameEnd') || {}).value || 19);
+        if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+        rcSelectedDays.forEach(d => { dayHours[d] = { start: s, end: e }; });
+      } else {
+        for (const d of rcSelectedDays) {
+          const s = parseInt((document.getElementById('rcDiff-' + d + '-start') || {}).value || 17);
+          const e = parseInt((document.getElementById('rcDiff-' + d + '-end') || {}).value || 19);
+          if (e <= s) { Swal.fire({ icon: 'warning', title: 'Giờ kết thúc phải sau giờ bắt đầu', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false }); return; }
+          dayHours[d] = { start: s, end: e };
+        }
+      }
+
+      let existingBookings = [];
+      try { existingBookings = await (typeof getAllBookings === 'function' ? getAllBookings() : Promise.resolve([])); } catch(e) {}
+
+      const bookingsToCreate = [];
+      const conflicts = [];
+      let cur = startDate.clone();
+      while (!cur.isAfter(endDate)) {
+        const dow = cur.day();
+        if (rcSelectedDays.includes(dow)) {
+          const h = dayHours[dow];
+          const dateStr2 = cur.format('YYYY-MM-DD');
+          const existing = existingBookings.filter(b => b.date === dateStr2 && b.court === courtIdx);
+          const conflict = existing.some(b => h.start < b.hour + (b.duration || 1) && h.end > b.hour);
+          if (conflict) {
+            conflicts.push(dateStr2);
+          } else {
+            const duration = h.end - h.start;
+            bookingsToCreate.push({
+              name, phone, court: courtIdx,
+              date: dateStr2, hour: h.start, duration,
+              amount: calcPrice(h.start, duration),
+              status: 'confirmed', isPaid: false,
+              type: 'recurring',
+              note: 'Lịch cố định'
+            });
+          }
+        }
+        cur = cur.add(1, 'day');
+      }
+
+      if (bookingsToCreate.length === 0) {
+        Swal.fire({ icon: 'warning', title: 'Không có slot nào khả dụng', text: conflicts.length ? (conflicts.length + ' ngày bị trùng lịch') : 'Kiểm tra lại ngày', confirmButtonColor: '#7c3aed' }); return;
+      }
+
+      const result = await Swal.fire({
+        title: 'Xác nhận tạo lịch cố định?',
+        html: 'Tạo <b>' + bookingsToCreate.length + ' slot</b> cho <b>' + name + '</b>' + (conflicts.length ? '<br><span style="color:#d97706">Bỏ qua ' + conflicts.length + ' ngày đã bị trùng lịch</span>' : ''),
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: 'Tạo ' + bookingsToCreate.length + ' slot',
+        cancelButtonText: 'Hủy'
+      });
+      if (!result.isConfirmed) return;
+
+      try {
+        const batchBase = 'RC_' + Date.now();
+        for (const b of bookingsToCreate) {
+          await addBookings([{ ...b, batchId: batchBase + '_' + b.date }]);
+        }
+        closeRecurringModal();
+        Swal.fire({ icon: 'success', title: 'Đã tạo ' + bookingsToCreate.length + ' lịch cố định!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+        allBookingsList = await getAllBookings();
+        renderAdminSchedule();
+        if (typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
+      } catch(err) {
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Lỗi khi tạo lịch', text: err.message });
+      }
+    };
+
+    window.renderRecurringSectionList = async function() {
+      const container = document.getElementById('recurringListContainer');
+      if (!container) return;
+
+      if (!allBookingsList || allBookingsList.length === 0) {
+        try {
+          allBookingsList = await getAllBookings();
+        } catch(e) {
+          allBookingsList = [];
+        }
+      }
+
+      const recBookings = (allBookingsList || []).filter(b => 
+        b.type === 'recurring' || 
+        (b.batchId && (b.batchId.startsWith('RC_') || b.batchId.startsWith('RC_CLIENT_'))) ||
+        (b.note && b.note.toLowerCase().includes('cố định'))
+      );
+
+      const groups = {};
+      recBookings.forEach(b => {
+        let key = b.batchId ? b.batchId.split('_').slice(0, 2).join('_') : `GRP_${b.name}_${b.phone}_${b.court}`;
+        if (!groups[key]) {
+          groups[key] = {
+            batchPrefix: key,
+            name: b.name || 'Chưa tên',
+            phone: b.phone || 'N/A',
+            court: b.court,
+            courtName: (CONFIG.courts || [])[b.court] || `Sân ${b.court + 1}`,
+            hour: b.hour,
+            duration: b.duration || 1,
+            items: []
+          };
+        }
+        groups[key].items.push(b);
+      });
+
+      const groupList = Object.values(groups);
+      const searchVal = (document.getElementById('searchRecurringInput')?.value || '').toLowerCase().trim();
+      const filtered = groupList.filter(g => 
+        g.name.toLowerCase().includes(searchVal) || 
+        g.phone.toLowerCase().includes(searchVal) ||
+        g.courtName.toLowerCase().includes(searchVal)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+            <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 text-lg">
+              <i class="fa-solid fa-rotate"></i>
+            </div>
+            <p class="font-bold text-gray-700 text-sm">Chưa có lịch đặt cố định nào</p>
+            <p class="text-xs text-gray-400 mt-1 mb-4">Bạn có thể tạo lịch tái diễn hàng tuần cho các khách quen/cố định</p>
+            <button onclick="openRecurringModal()" class="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm">
+              <i class="fa-solid fa-plus text-xs"></i> Tạo Lịch Cố Định Mới
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${filtered.map(g => {
+            g.items.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            const dates = g.items.map(i => i.date).filter(Boolean);
+            const firstDate = dates[0] ? dayjs(dates[0]).format('DD/MM/YYYY') : '---';
+            const lastDate = dates[dates.length - 1] ? dayjs(dates[dates.length - 1]).format('DD/MM/YYYY') : '---';
+            const totalAmount = g.items.reduce((sum, i) => sum + (i.price || 0), 0);
+            
+            const weekDaysSet = new Set(g.items.map(i => dayjs(i.date).day()));
+            const weekDaysText = Array.from(weekDaysSet).map(d => dayNames[d]).join(', ');
+
+            return `
+              <div class="bg-white border border-gray-200 hover:border-purple-300 rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                  <div class="flex items-start justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-purple-700 font-bold text-sm flex-shrink-0">
+                        <i class="fa-solid fa-rotate"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-gray-800 text-sm">${g.name}</h4>
+                        <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-phone text-[10px] mr-1 text-gray-400"></i>${g.phone}</p>
+                      </div>
+                    </div>
+                    <span class="text-[11px] bg-purple-100 text-purple-700 font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                      ${g.items.length} buổi
+                    </span>
+                  </div>
+
+                  <div class="space-y-1.5 text-xs text-gray-600 border-t border-gray-100 pt-3 mb-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-400">Sân đặt:</span>
+                      <span class="font-bold text-gray-800">${g.courtName}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-400">Khung giờ:</span>
+                      <span class="font-bold text-purple-700">${String(g.hour).padStart(2,'0')}:00 - ${String(g.hour + g.duration).padStart(2,'0')}:00 (${g.duration}h)</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-400">Lịch tuần:</span>
+                      <span class="font-bold text-indigo-600">Thứ (${weekDaysText})</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-400">Thời gian áp dụng:</span>
+                      <span class="font-medium text-gray-700">${firstDate} ➔ ${lastDate}</span>
+                    </div>
+                    <div class="flex justify-between pt-1 border-t border-dashed border-gray-100">
+                      <span class="text-gray-400">Tổng tiền dự tính:</span>
+                      <span class="font-extrabold text-emerald-600">${totalAmount.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                  <button onclick="deleteRecurringBatch('${g.batchPrefix}', '${g.name}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-trash-can text-xs"></i> Hủy chuỗi lịch cố định
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    };
+
+    window.deleteRecurringBatch = async function(batchPrefix, customerName) {
+      const res = await Swal.fire({
+        title: 'Hủy lịch cố định?',
+        html: `Bạn có chắc muốn xóa tất cả các buổi trong chuỗi lịch cố định của <b>${customerName}</b>? Hành động này không thể hoàn tác.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Xóa toàn bộ chuỗi lịch',
+        cancelButtonText: 'Hủy'
+      });
+
+      if (!res.isConfirmed) return;
+
+      try {
+        Swal.showLoading();
+        const toDelete = (allBookingsList || []).filter(b => b.batchId && b.batchId.startsWith(batchPrefix));
+        for (const b of toDelete) {
+          if (b.id) await deleteBooking(b.id);
+        }
+        Swal.fire({ icon: 'success', title: 'Đã xóa toàn bộ lịch cố định!', timer: 1500, showConfirmButton: false });
+        allBookingsList = await getAllBookings();
+        renderAdminSchedule();
+        renderRecurringSectionList();
+      } catch(err) {
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Lỗi khi xóa', text: err.message });
+      }
+    };
+    // ===== END RECURRING SCHEDULE LOGIC =====
 
     adminDP.value = formatDate(adminDate);
     document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');

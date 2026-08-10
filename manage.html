@@ -84,6 +84,9 @@
       <button onclick="showSection('schedule')" id="nav-schedule" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
         <i class="fa-regular fa-calendar w-5 text-center"></i> Quản lý lịch
       </button>
+      <button onclick="showSection('recurring')" id="nav-recurring" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
+        <i class="fa-solid fa-rotate w-5 text-center"></i> Lịch cố định
+      </button>
       <button onclick="showSection('bookings')" id="nav-bookings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-left text-gray-300">
         <i class="fa-solid fa-list-check w-5 text-center"></i> Danh sách đơn đặt
       </button>
@@ -199,9 +202,6 @@
           <div class="px-4 sm:px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-center sm:text-left">
             <div class="flex items-center gap-3">
               <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch</h3>
-              <button onclick="openRecurringModal()" class="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95">
-                <i class="fa-solid fa-rotate text-xs"></i> Lịch cố định
-              </button>
             </div>
             <div class="flex items-center justify-center gap-1.5 flex-wrap">
               <button onclick="adminChangeDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-left text-gray-500 text-xs"></i></button>
@@ -1649,7 +1649,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   window.adminGoToday = function() { setAdminDate(dayjs()); };
   if (adminDP) adminDP.addEventListener('change', () => setAdminDate(dayjs(adminDP.value)));
 
-  const sections = ['dashboard', 'schedule', 'bookings', 'staff', 'settings'];
+  const sections = ['dashboard', 'schedule', 'recurring', 'bookings', 'staff', 'settings'];
   window.showSection = function(name) {
     sections.forEach(s => {
       document.getElementById('section-' + s)?.classList.add('hidden');
@@ -1657,11 +1657,12 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
     });
     document.getElementById('section-' + name)?.classList.remove('hidden');
     document.getElementById('nav-' + name)?.classList.add('active');
-    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', bookings: 'Danh sách đơn đặt', staff: 'Nhân viên & Khách hàng', settings: 'Cài đặt thông tin sân' };
+    const titles = { dashboard: 'Tổng quan', schedule: 'Quản lý Lịch', recurring: 'Quản lý Lịch Cố Định', bookings: 'Danh sách đơn đặt', staff: 'Nhân viên & Khách hàng', settings: 'Cài đặt thông tin sân' };
     if (document.getElementById('pageTitle')) {
       document.getElementById('pageTitle').textContent = titles[name] || 'Quản lý sân';
     }
     if (name === 'schedule' && typeof renderAdminSchedule === 'function') renderAdminSchedule();
+    if (name === 'recurring' && typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
     if (name === 'bookings' && typeof renderAllBookings === 'function') renderAllBookings();
     if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
     if (name === 'staff') { loadStaff(); loadCustomers(); }
@@ -2088,12 +2089,174 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       Swal.fire({ icon: 'success', title: 'Đã tạo ' + bookingsToCreate.length + ' lịch cố định!', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
       allBookingsList = await getAllBookings();
       renderAdminSchedule();
+      if (typeof renderRecurringSectionList === 'function') renderRecurringSectionList();
     } catch(err) {
       console.error(err);
       Swal.fire({ icon: 'error', title: 'Lỗi khi tạo lịch', text: err.message });
     }
   };
-  // ===== END RECURRING SCHEDULE LOGIC =====
+
+  // ===== RENDER RECURRING SCHEDULE LIST IN NEW SECTION =====
+  window.renderRecurringSectionList = async function() {
+    const container = document.getElementById('recurringListContainer');
+    if (!container) return;
+
+    if (!allBookingsList || allBookingsList.length === 0) {
+      try {
+        allBookingsList = await getAllBookings();
+      } catch(e) {
+        allBookingsList = [];
+      }
+    }
+
+    const recBookings = (allBookingsList || []).filter(b => 
+      b.type === 'recurring' || 
+      (b.batchId && (b.batchId.startsWith('RC_') || b.batchId.startsWith('RC_CLIENT_'))) ||
+      (b.note && b.note.toLowerCase().includes('cố định'))
+    );
+
+    // Group by batchId or by (name + phone + court + duration + startHour)
+    const groups = {};
+    recBookings.forEach(b => {
+      let key = b.batchId ? b.batchId.split('_').slice(0, 2).join('_') : `GRP_${b.name}_${b.phone}_${b.court}`;
+      if (!groups[key]) {
+        groups[key] = {
+          batchPrefix: key,
+          name: b.name || 'Chưa tên',
+          phone: b.phone || 'N/A',
+          court: b.court,
+          courtName: (CONFIG.courts || [])[b.court] || `Sân ${b.court + 1}`,
+          hour: b.hour,
+          duration: b.duration || 1,
+          items: []
+        };
+      }
+      groups[key].items.push(b);
+    });
+
+    const groupList = Object.values(groups);
+    const searchVal = (document.getElementById('searchRecurringInput')?.value || '').toLowerCase().trim();
+    const filtered = groupList.filter(g => 
+      g.name.toLowerCase().includes(searchVal) || 
+      g.phone.toLowerCase().includes(searchVal) ||
+      g.courtName.toLowerCase().includes(searchVal)
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+          <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 text-lg">
+            <i class="fa-solid fa-rotate"></i>
+          </div>
+          <p class="font-bold text-gray-700 text-sm">Chưa có lịch đặt cố định nào</p>
+          <p class="text-xs text-gray-400 mt-1 mb-4">Bạn có thể tạo lịch tái diễn hàng tuần cho các khách quen/cố định</p>
+          <button onclick="openRecurringModal()" class="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm">
+            <i class="fa-solid fa-plus text-xs"></i> Tạo Lịch Cố Định Mới
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+    container.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${filtered.map(g => {
+          g.items.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+          const dates = g.items.map(i => i.date).filter(Boolean);
+          const firstDate = dates[0] ? dayjs(dates[0]).format('DD/MM/YYYY') : '---';
+          const lastDate = dates[dates.length - 1] ? dayjs(dates[dates.length - 1]).format('DD/MM/YYYY') : '---';
+          const totalAmount = g.items.reduce((sum, i) => sum + (i.price || 0), 0);
+          
+          // Identify unique weekdays
+          const weekDaysSet = new Set(g.items.map(i => dayjs(i.date).day()));
+          const weekDaysText = Array.from(weekDaysSet).map(d => dayNames[d]).join(', ');
+
+          return `
+            <div class="bg-white border border-gray-200 hover:border-purple-300 rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div>
+                <div class="flex items-start justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-purple-700 font-bold text-sm flex-shrink-0">
+                      <i class="fa-solid fa-rotate"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-800 text-sm">${g.name}</h4>
+                      <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-phone text-[10px] mr-1 text-gray-400"></i>${g.phone}</p>
+                    </div>
+                  </div>
+                  <span class="text-[11px] bg-purple-100 text-purple-700 font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                    ${g.items.length} buổi
+                  </span>
+                </div>
+
+                <div class="space-y-1.5 text-xs text-gray-600 border-t border-gray-100 pt-3 mb-3">
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Sân đặt:</span>
+                    <span class="font-bold text-gray-800">${g.courtName}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Khung giờ:</span>
+                    <span class="font-bold text-purple-700">${String(g.hour).padStart(2,'0')}:00 - ${String(g.hour + g.duration).padStart(2,'0')}:00 (${g.duration}h)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Lịch tuần:</span>
+                    <span class="font-bold text-indigo-600">Thứ (${weekDaysText})</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Thời gian áp dụng:</span>
+                    <span class="font-medium text-gray-700">${firstDate} ➔ ${lastDate}</span>
+                  </div>
+                  <div class="flex justify-between pt-1 border-t border-dashed border-gray-100">
+                    <span class="text-gray-400">Tổng tiền dự tính:</span>
+                    <span class="font-extrabold text-emerald-600">${totalAmount.toLocaleString('vi-VN')}đ</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                <button onclick="deleteRecurringBatch('${g.batchPrefix}', '${g.name}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-trash-can text-xs"></i> Hủy chuỗi lịch cố định
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  };
+
+  window.deleteRecurringBatch = async function(batchPrefix, customerName) {
+    const res = await Swal.fire({
+      title: 'Hủy lịch cố định?',
+      html: `Bạn có chắc muốn xóa tất cả các buổi trong chuỗi lịch cố định của <b>${customerName}</b>? Hành động này không thể hoàn tác.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Xóa toàn bộ chuỗi lịch',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (!res.isConfirmed) return;
+
+    try {
+      Swal.showLoading();
+      const toDelete = (allBookingsList || []).filter(b => b.batchId && b.batchId.startsWith(batchPrefix));
+      for (const b of toDelete) {
+        if (b.id) await deleteBooking(b.id);
+      }
+      Swal.fire({ icon: 'success', title: 'Đã xóa toàn bộ lịch cố định!', timer: 1500, showConfirmButton: false });
+      allBookingsList = await getAllBookings();
+      renderAdminSchedule();
+      renderRecurringSectionList();
+    } catch(err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Lỗi khi xóa', text: err.message });
+    }
+  };
+  // ===== END RECURRING SCHEDULE LIST IN NEW SECTION =====
+
 
   async function renderAdminSchedule() {
     const dateStr = formatDate(adminDate);
