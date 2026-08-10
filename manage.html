@@ -151,13 +151,25 @@
     }
 
     /* Custom Toast Styling (Thông báo nhỏ ở trên) */
+    div.swal2-container.swal2-top,
+    div.swal2-container.swal2-top-start,
+    div.swal2-container.swal2-top-end {
+      width: 100% !important;
+      padding: 0.75rem 1rem !important;
+    }
     .swal2-popup.swal2-toast {
-      border-radius: 1.5rem !important;
-      padding: 1rem 1.25rem !important;
+      width: calc(100% - 1.5rem) !important;
+      max-width: 100% !important;
+      border-radius: 1.25rem !important;
+      padding: 0.875rem 1.25rem !important;
       box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.18) !important;
       border: 1px solid rgba(226, 232, 240, 0.9) !important;
       background: rgba(255, 255, 255, 0.98) !important;
       backdrop-filter: blur(8px) !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
     }
     .swal2-popup.swal2-toast .swal2-title {
       font-size: 0.95rem !important;
@@ -165,6 +177,8 @@
       color: #1e293b !important;
       padding-top: 0 !important;
       margin: 0 0 0 0.5rem !important;
+      flex: 1 !important;
+      text-align: left !important;
     }
   </style>
 </head>
