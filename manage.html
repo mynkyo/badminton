@@ -99,6 +99,56 @@
     input[type="date"] {
       -moz-appearance: textfield;
     }
+
+    /* Custom Modern SweetAlert2 UI */
+    div.swal2-container {
+      backdrop-filter: blur(4px);
+    }
+    div.swal2-popup {
+      border-radius: 1.75rem !important;
+      padding: 1.75rem 1.5rem !important;
+      font-family: 'Be Vietnam Pro', sans-serif !important;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+      border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    }
+    .swal2-title {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      padding-top: 0.5rem !important;
+    }
+    .swal2-html-container {
+      font-size: 0.875rem !important;
+      color: #475569 !important;
+      margin-top: 0.5rem !important;
+      line-height: 1.5 !important;
+    }
+    .swal2-actions {
+      gap: 0.75rem !important;
+      margin-top: 1.5rem !important;
+      width: 100% !important;
+    }
+    .swal2-styled {
+      border-radius: 0.875rem !important;
+      font-weight: 700 !important;
+      font-size: 0.875rem !important;
+      padding: 0.75rem 1.25rem !important;
+      transition: all 0.2s ease !important;
+      margin: 0 !important;
+    }
+    .swal2-styled:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    .swal2-styled:active {
+      transform: scale(0.97) !important;
+    }
+    .swal2-icon {
+      border-width: 3px !important;
+      margin-top: 0.5rem !important;
+      margin-bottom: 0.5rem !important;
+      transform: scale(0.9);
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 overflow-x-hidden">
@@ -425,18 +475,11 @@
           
           <!-- Header & Toolbar -->
           <div class="p-5 border-b border-gray-100 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
-                  <i class="fa-solid fa-list-check text-primary"></i>Danh sách đơn đặt sân
-                </h3>
-                <p class="text-xs text-gray-400 mt-0.5">Quản lý và tra cứu toàn bộ lịch đặt sân của khách hàng</p>
-              </div>
-              
-              <button onclick="openAddModal(null,null,null)"
-                class="bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-primary-dark transition-all shadow-xs flex items-center justify-center gap-2 flex-shrink-0">
-                <i class="fa-solid fa-plus"></i>Tạo đơn mới
-              </button>
+            <div>
+              <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-primary"></i>Danh sách đơn đặt sân
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">Quản lý và tra cứu toàn bộ lịch đặt sân của khách hàng</p>
             </div>
 
             <!-- Filter Controls Bar -->
@@ -1183,6 +1226,101 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
       <button type="button" id="batchModalConfirmBtn" onclick="executeBatchAction()" class="w-2/3 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
         <i class="fa-solid fa-check"></i>
         <span>Xác nhận thực hiện</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL QUẢN LÝ LỊCH CỐ ĐỊNH & ĐỔI LỊCH BUỔI ===== -->
+<div id="rcManageModal" class="fixed inset-0 bg-navy/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col animate-slideUp">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-purple-50/80">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-base font-bold shadow-md shadow-purple-200">
+          <i class="fa-solid fa-rotate"></i>
+        </div>
+        <div>
+          <h3 id="rcManageModalTitle" class="font-extrabold text-navy text-base">Quản Lý Buổi Cố Định</h3>
+          <p id="rcManageModalSubTitle" class="text-xs text-purple-600 font-semibold">Tùy chọn thao tác hoặc đổi lịch cho buổi này</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeRcManageModal()" class="w-8 h-8 rounded-full hover:bg-gray-200/60 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Body Info -->
+    <div class="p-6 space-y-4">
+      <!-- Card Info -->
+      <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400 font-medium">Tên khách hàng:</span>
+          <span id="rcManageCustomerName" class="font-extrabold text-purple-900 text-sm">---</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400 font-medium">Buổi đánh hiện tại:</span>
+          <span id="rcManageCurrentTime" class="font-bold text-gray-800">---</span>
+        </div>
+      </div>
+
+      <!-- Action Panel Toggle (Xem menu chính hay Xem panel đổi lịch) -->
+      <div id="rcManageMenuPanel" class="space-y-2.5 pt-1">
+        <button type="button" onclick="showRcRescheduleForm()" class="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-2xl transition-all shadow-md flex items-center justify-between group">
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-calendar-day text-sm"></i>
+            <span>Đổi lịch buổi này (Vào khung trống)</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
+        </button>
+
+        <button type="button" onclick="editRcFromManageModal()" class="w-full py-3 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-2xl transition-all flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-sm"></i>
+            <span>Chỉnh sửa toàn bộ chuỗi cố định</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+
+        <button type="button" onclick="executeRcSkipSession()" class="w-full py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-2xl transition-all flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-user-xmark text-sm"></i>
+            <span>Báo nghỉ buổi này (Mở trống sân)</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Form Đổi Lịch (Mở khi bấm Đổi lịch buổi này) -->
+      <div id="rcRescheduleForm" class="hidden space-y-3 pt-1 animate-fadeIn">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-100">
+          <span class="text-xs font-bold text-purple-900"><i class="fa-solid fa-arrow-right-arrow-left mr-1.5 text-purple-600"></i>Chọn khung giờ trống mới:</span>
+          <button type="button" onclick="hideRcRescheduleForm()" class="text-[11px] text-gray-400 hover:text-gray-600 font-bold"> Quay lại</button>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Chọn ngày chuyển đến:</label>
+          <input type="date" id="rcNewDatePicker" onchange="onRcNewDateChange()" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Các sân & khung giờ TRỐNG khả dụng:</label>
+          <select id="rcNewSlotSelect" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-purple-900 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none cursor-pointer bg-purple-50/30">
+            <option value="">-- Đang tải danh sách khung trống --</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="executeRcRescheduleSubmit()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl transition-all shadow-md flex items-center justify-center gap-1.5 mt-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Xác nhận chuyển lịch ngay</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Close -->
+    <div class="px-6 py-3.5 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+      <button type="button" onclick="closeRcManageModal()" class="px-5 py-2 border border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-100 transition-all">
+        Đóng
       </button>
     </div>
   </div>
@@ -2039,6 +2177,238 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
   let rcMode = 'same';
   let editingRcId = null;
   let cachedRecurringSchedules = [];
+
+  let currentRcContext = null; // { rcId, courtIdx, dateStr, startH, endH, rcDoc }
+
+  window.handleRecurringSlotClick = function(rcId, courtIdx, dateStr, startH, endH) {
+    const rcDoc = (cachedRecurringSchedules || []).find(r => r.id === rcId);
+    const rcName = rcDoc ? (rcDoc.name || 'Khách cố định') : 'Khách cố định';
+    const courtName = CONFIG.courts[courtIdx] || ('Sân ' + (courtIdx + 1));
+    const timeText = `${dayjs(dateStr).format('DD/MM/YYYY')} (${courtName}) · ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00`;
+
+    currentRcContext = { rcId, courtIdx, dateStr, startH, endH, rcDoc };
+
+    document.getElementById('rcManageCustomerName').textContent = rcName;
+    document.getElementById('rcManageCurrentTime').textContent = timeText;
+
+    hideRcRescheduleForm();
+
+    const modal = document.getElementById('rcManageModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  };
+
+  window.closeRcManageModal = function() {
+    const modal = document.getElementById('rcManageModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+    currentRcContext = null;
+  };
+
+  window.editRcFromManageModal = function() {
+    if (currentRcContext && currentRcContext.rcId) {
+      const id = currentRcContext.rcId;
+      closeRcManageModal();
+      editRecurringSchedule(id);
+    }
+  };
+
+  window.executeRcSkipSession = async function() {
+    if (!currentRcContext) return;
+    const { rcId, courtIdx, dateStr, rcDoc } = currentRcContext;
+    const rcName = rcDoc ? (rcDoc.name || 'Khách cố định') : 'Khách cố định';
+
+    const confirmNghi = await Swal.fire({
+      title: 'Xác nhận cho nghỉ buổi này?',
+      text: `Buổi đánh ngày ${dayjs(dateStr).format('DD/MM/YYYY')} của ${rcName} sẽ bị hủy và sân sẽ mở trống cho khách khác đặt.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Cho nghỉ & mở trống sân',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (!confirmNghi.isConfirmed) return;
+
+    try {
+      Swal.showLoading();
+      const excKey = `${dateStr}_${courtIdx}`;
+      const updatedExceptions = { ...(rcDoc.exceptions || {}), [excKey]: null };
+      await updateRecurringSchedule(rcId, { exceptions: updatedExceptions });
+      closeRcManageModal();
+      Swal.fire({ icon: 'success', title: 'Đã báo nghỉ buổi này thành công!', timer: 1500, showConfirmButton: false });
+      cachedRecurringSchedules = await getRecurringSchedules();
+      renderAdminSchedule();
+    } catch(e) {
+      console.error(e);
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: e.message });
+    }
+  };
+
+  window.showRcRescheduleForm = function() {
+    document.getElementById('rcManageMenuPanel').classList.add('hidden');
+    document.getElementById('rcRescheduleForm').classList.remove('hidden');
+
+    const picker = document.getElementById('rcNewDatePicker');
+    if (picker) {
+      picker.value = currentRcContext ? currentRcContext.dateStr : formatDate(dayjs());
+      onRcNewDateChange();
+    }
+  };
+
+  window.hideRcRescheduleForm = function() {
+    document.getElementById('rcManageMenuPanel').classList.remove('hidden');
+    document.getElementById('rcRescheduleForm').classList.add('hidden');
+  };
+
+  window.onRcNewDateChange = async function() {
+    if (!currentRcContext) return;
+    const newDateStr = document.getElementById('rcNewDatePicker').value;
+    const dur = currentRcContext.endH - currentRcContext.startH;
+    const selectEl = document.getElementById('rcNewSlotSelect');
+    if (!selectEl) return;
+
+    selectEl.innerHTML = '<option value="">-- Đang kiểm tra khung giờ trống --</option>';
+
+    let targetBookings = [];
+    try {
+      targetBookings = await getBookingsByDate(newDateStr);
+    } catch(e) { targetBookings = []; }
+
+    const courts = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+    const startH = CONFIG.startHour;
+    const endH = CONFIG.endHour;
+    const targetDayOfWeek = dayjs(newDateStr).day();
+
+    // Check active recurring schedules on target date
+    const targetActiveRc = (cachedRecurringSchedules || []).filter(rc => {
+      if (rc.active === false) return false;
+      if (rc.startDate && newDateStr < rc.startDate) return false;
+      if (rc.endDate && newDateStr > rc.endDate) return false;
+      return (rc.days || []).includes(targetDayOfWeek);
+    });
+
+    const availableOptions = [];
+
+    courts.forEach((cName, cIdx) => {
+      for (let h = startH; h <= endH - dur; h++) {
+        // Kiểm tra xem khung h -> h+dur của cIdx có trống hoàn toàn không
+        let isOccupied = false;
+        for (let checkH = h; checkH < h + dur; checkH++) {
+          // 1. Vãng lai
+          const hasBooking = targetBookings.some(b => b.court === cIdx && checkH >= b.hour && checkH < b.hour + (b.duration || 1));
+          if (hasBooking) { isOccupied = true; break; }
+
+          // 2. Cố định khác (trừ buổi hiện tại nếu cùng rcId và cùng ngày)
+          for (const rc of targetActiveRc) {
+            if (rc.id === currentRcContext.rcId && newDateStr === currentRcContext.dateStr && cIdx === currentRcContext.courtIdx) continue;
+            if (!(rc.courts || []).includes(cIdx)) continue;
+            const excKey = `${newDateStr}_${cIdx}`;
+            const exc = rc.exceptions ? rc.exceptions[excKey] : undefined;
+            if (exc === null) continue; // khách cố định đó nghỉ
+
+            let rStart = rc.startHour;
+            let rEnd = rc.endHour;
+            if (rc.dayHours && rc.dayHours[targetDayOfWeek]) {
+              rStart = rc.dayHours[targetDayOfWeek].start;
+              rEnd = rc.dayHours[targetDayOfWeek].end;
+            }
+            if (exc && typeof exc === 'object') {
+              rStart = exc.start; rEnd = exc.end;
+            }
+
+            if (checkH >= rStart && checkH < rEnd) { isOccupied = true; break; }
+          }
+          if (isOccupied) break;
+        }
+
+        if (!isOccupied) {
+          availableOptions.push({
+            court: cIdx,
+            courtName: cName,
+            start: h,
+            end: h + dur,
+            label: `${cName} · ${String(h).padStart(2,'0')}:00 – ${String(h+dur).padStart(2,'0')}:00`
+          });
+        }
+      }
+    });
+
+    if (availableOptions.length === 0) {
+      selectEl.innerHTML = '<option value="">⚠️ Không có khung giờ TRỐNG nào phù hợp trong ngày này</option>';
+    } else {
+      selectEl.innerHTML = availableOptions.map(opt => `
+        <option value="${opt.court}_${opt.start}_${opt.end}">✨ ${opt.label}</option>
+      `).join('');
+    }
+  };
+
+  window.executeRcRescheduleSubmit = async function() {
+    if (!currentRcContext) return;
+    const newDateStr = document.getElementById('rcNewDatePicker').value;
+    const selectVal = document.getElementById('rcNewSlotSelect').value;
+
+    if (!selectVal) {
+      Swal.fire({ icon: 'warning', title: 'Chưa chọn khung giờ', text: 'Vui lòng chọn 1 khung giờ trống khả dụng trong danh sách!' });
+      return;
+    }
+
+    const [cStr, sStr, eStr] = selectVal.split('_');
+    const newCourt = parseInt(cStr);
+    const newStart = parseInt(sStr);
+    const newEnd = parseInt(eStr);
+    const { rcId, courtIdx, dateStr, rcDoc } = currentRcContext;
+
+    const res = await Swal.fire({
+      title: 'Xác nhận chuyển lịch?',
+      html: `
+        Chuyển buổi cố định từ:<br/>
+        <b>${dayjs(dateStr).format('DD/MM/YYYY')} (${CONFIG.courts[courtIdx] || 'Sân '+(courtIdx+1)})</b><br/>
+        ➔ Sang buổi mới:<br/>
+        <b class="text-purple-700">${dayjs(newDateStr).format('DD/MM/YYYY')} (${CONFIG.courts[newCourt] || 'Sân '+(newCourt+1)}) · ${String(newStart).padStart(2,'0')}:00–${String(newEnd).padStart(2,'0')}:00</b>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý chuyển',
+      cancelButtonText: 'Hủy'
+    });
+
+    if (!res.isConfirmed) return;
+
+    try {
+      Swal.showLoading();
+      // 1. Ghi exception báo nghỉ/chuyển buổi cũ ở ngày dateStr
+      const excKeyOld = `${dateStr}_${courtIdx}`;
+      // 2. Ghi exception đổi sang giờ/sân mới ở ngày newDateStr
+      const excKeyNew = `${newDateStr}_${newCourt}`;
+
+      const updatedExceptions = {
+        ...(rcDoc.exceptions || {}),
+        [excKeyOld]: null, // Buổi cũ mở trống
+        [excKeyNew]: { start: newStart, end: newEnd, rescheduled: true } // Buổi mới được bù giờ này
+      };
+
+      await updateRecurringSchedule(rcId, { exceptions: updatedExceptions });
+      closeRcManageModal();
+      Swal.fire({ icon: 'success', title: 'Đã chuyển lịch buổi cố định thành công!', timer: 1500, showConfirmButton: false });
+      cachedRecurringSchedules = await getRecurringSchedules();
+      renderAdminSchedule();
+    } catch(e) {
+      console.error(e);
+      Swal.fire({ icon: 'error', title: 'Lỗi chuyển lịch', text: e.message });
+    }
+  };
+
+  window.editRecurringSchedule = function(rcId) {
+    const item = (cachedRecurringSchedules || []).find(r => r.id === rcId);
+    if (item) {
+      openRecurringModal(item);
+    }
+  };
 
   window.openRecurringModal = function(editDoc = null) {
     rcSelectedDays = [];
