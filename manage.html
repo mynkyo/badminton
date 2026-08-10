@@ -343,7 +343,7 @@
               <table class="w-max min-w-full text-sm border-collapse table-fixed">
                 <thead>
                   <tr id="adminTableHeaderRow" class="bg-gray-50 border-b border-gray-200">
-                    <th class="sticky left-0 bg-gray-50 z-5 py-3 px-2 text-left text-gray-500 font-semibold w-16 min-w-16 max-w-16 flex-shrink-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>
+                    <th class="sticky left-0 bg-gray-50 z-10 py-3 px-2 text-center text-gray-500 font-semibold w-16 min-w-16 max-w-16 flex-shrink-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">Giờ</th>
                   </tr>
                 </thead>
                 <tbody id="adminScheduleBody"></tbody>
@@ -1338,6 +1338,7 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   } from "/firebase.js";
 
   // ===== MULTI-TENANT: Detect court slug =====
+  const sections = ['dashboard', 'schedule', 'recurring', 'bookings', 'staff', 'settings'];
   const COURT_SLUG = getCourtSlug();
   if (!COURT_SLUG) { window.location.href = '/'; }
   else { setCurrentCourt(COURT_SLUG); }
@@ -2161,6 +2162,48 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
 document.getElementById('adminCartTotalText').textContent = formatMoney(adminCartTotal());
   }
 
+  window.renderModalCartList = function() {
+    const slotsContainer = document.getElementById('orderSlotsContainer');
+    const slotsList = document.getElementById('orderSlotsList');
+    if (!slotsContainer || !slotsList) return;
+
+    if (adminCart.length === 0) {
+      slotsContainer.classList.add('hidden');
+      return;
+    }
+
+    slotsContainer.classList.remove('hidden');
+    const courtsList = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+
+    slotsList.innerHTML = adminCart.map(s => {
+      const courtName = courtsList[s.court] || ('Sân ' + (s.court + 1));
+      const timeStr = `${String(s.hour).padStart(2,'0')}:00 – ${String(s.hour + 1).padStart(2,'0')}:00`;
+      const dateStr = dayjs(s.date).format('DD/MM/YYYY');
+      return `
+        <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-shuttlecock text-primary"></i>
+            <span class="font-extrabold text-slate-800">${courtName}</span>
+            <span class="text-slate-600 font-semibold">${timeStr}</span>
+            <span class="text-slate-400">(${dateStr})</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-700">${formatMoney(s.price)}</span>
+            <button type="button" onclick="removeAdminCartItem('${s.key}')" class="text-red-400 hover:text-red-600 p-1" title="Xóa slot này">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const total = adminCartTotal();
+    const fieldAmount = document.getElementById('fieldAmount');
+    if (fieldAmount) fieldAmount.value = total;
+    const modalSlotInfo = document.getElementById('modalSlotInfo');
+    if (modalSlotInfo) modalSlotInfo.textContent = `Đã chọn ${adminCart.length} slot · Tổng ${formatMoney(total)}`;
+  };
+
   window.openAddModalFromCart = function() {
     if (adminCart.length === 0) return;
     openAddModal(null, null, null);
@@ -2751,7 +2794,7 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
     `;
   };
 
-  window.deleteRecurringBatch = async function(batchPrefix, customerName) {
+  window.deleteRecurringScheduleDoc = async function(rcId, customerName) {
     const res = await Swal.fire({
       title: 'Hủy lịch cố định?',
       html: `Bạn có chắc muốn xóa tất cả các buổi trong chuỗi lịch cố định của <b>${customerName}</b>? Hành động này không thể hoàn tác.`,
@@ -2766,12 +2809,9 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
 
     try {
       Swal.showLoading();
-      const toDelete = (allBookingsList || []).filter(b => b.batchId && b.batchId.startsWith(batchPrefix));
-      for (const b of toDelete) {
-        if (b.id) await deleteBooking(b.id);
-      }
+      await deleteRecurringSchedule(rcId);
       Swal.fire({ icon: 'success', title: 'Đã xóa toàn bộ lịch cố định!', timer: 1500, showConfirmButton: false });
-      allBookingsList = await getAllBookings();
+      cachedRecurringSchedules = await getRecurringSchedules();
       renderAdminSchedule();
       renderRecurringSectionList();
     } catch(err) {
@@ -2848,7 +2888,7 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
       }
 
       const timeLabel = `${String(h).padStart(2,'0')}:00`;
-      let rowCells = `<td class="sticky left-0 bg-white z-5 py-2.5 px-2 border-b border-gray-100 text-xs text-slate-700 font-bold w-16 min-w-16 max-w-16 whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)]">
+      let rowCells = `<td class="sticky left-0 bg-white z-10 py-2.5 px-2 border-b border-gray-100 text-xs text-slate-700 font-bold w-16 min-w-16 max-w-16 whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.08)] text-center">
         ${timeLabel} ${peak ? '<span class="text-amber-500">⚡</span>' : ''}
       </td>`;
 
