@@ -3986,18 +3986,6 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
   document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
   loadConfig();
   renderDashboard();
-
-  // Bật Toast mẫu đứng yên để test giao diện
-  setTimeout(() => {
-    Swal.fire({
-      icon: 'success',
-      title: 'Đã cập nhật đơn đặt!',
-      timer: 0,
-      showConfirmButton: false,
-      position: 'top',
-      toast: true
-    });
-  }, 500);
   // ===== STAFF & CUSTOMER MANAGEMENT =====
 
   let allCustomersCache = [];
