@@ -596,10 +596,14 @@
         if (result.isConfirmed) {
           try {
             Swal.showLoading();
-            await updateUserRole(uid, {
-              role: result.value.role,
-              courtId: result.value.courtId
-            });
+            const roleValue = result.value.role;
+            const updatePayload = {
+              role: roleValue,
+              courtId: result.value.courtId,
+              // Đánh dấu thu hồi chủ đích để ngăn self-healing tự phục hồi
+              roleRevoked: !roleValue
+            };
+            await updateUserRole(uid, updatePayload);
             Swal.fire({icon: 'success', title: 'Cập nhật thành công', timer: 1500, showConfirmButton: false});
             loadUsers(); // Refresh
           } catch(e) {

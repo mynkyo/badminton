@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore, collection, addDoc, getDocs, getDoc, getDocFromServer, getDocsFromServer, doc,
   updateDoc, deleteDoc, query, where, orderBy, serverTimestamp,
-  setDoc, onSnapshot, arrayUnion
+  setDoc, onSnapshot, arrayUnion, deleteField
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
@@ -438,11 +438,17 @@ export async function getUserRole(uid, email) {
     return userData;
   }
 
+  // Nếu quyền đã bị super-admin thu hồi chủ đích → KHÔNG tự phục hồi
+  if (userData && userData.roleRevoked === true) {
+    return userData;
+  }
+
   const userEmail = email || (auth.currentUser && auth.currentUser.uid === uid ? auth.currentUser.email : null);
 
   try {
     // Fallback 1: Dò tìm trong collection 'courts' theo adminUid (bỏ qua nếu là Super Admin)
-    if (uid && uid !== SUPER_ADMIN_UID) {
+    // Bỏ qua nếu quyền đã bị thu hồi chủ đích bởi super-admin
+    if (uid && uid !== SUPER_ADMIN_UID && !(userData && userData.roleRevoked === true)) {
       const qCourt = query(collection(db, 'courts'), where('adminUid', '==', uid));
       const cSnap = await getDocs(qCourt);
       if (!cSnap.empty) {
@@ -458,13 +464,15 @@ export async function getUserRole(uid, email) {
       }
     }
 
-    if (userEmail) {
+    // Bỏ qua toàn bộ Fallback 2 & 3 nếu quyền đã bị thu hồi chủ đích bởi super-admin
+    if (userEmail && !(userData && userData.roleRevoked === true)) {
       // Fallback 2: Dò tìm trong collection 'users' theo email có chứa role
       const qUser = query(collection(db, 'users'), where('email', '==', userEmail.toLowerCase()));
       const uSnap = await getDocs(qUser);
       if (!uSnap.empty) {
         const existingUser = uSnap.docs[0].data();
-        if (existingUser && existingUser.role && existingUser.role !== 'super_admin') {
+        // Bỏ qua nếu user tìm được cũng đã bị thu hồi
+        if (existingUser && existingUser.role && existingUser.role !== 'super_admin' && !existingUser.roleRevoked) {
           const roleInfo = {
             role: existingUser.role,
             courtId: existingUser.courtId || null,
@@ -538,8 +546,56 @@ export async function getAllUsers() {
 
 /** Cập nhật quyền người dùng (Super Admin) */
 export async function updateUserRole(uid, roleData) {
-  return await updateDoc(doc(db, 'users', uid), roleData);
+  const courtId = roleData.courtId;
+
+  // === TRƯỜNG HỢP CẤP QUYỀN ADMIN (chủ sân mới) ===
+  if (roleData.role === 'admin' && courtId) {
+    try {
+      const courtRef = doc(db, 'courts', courtId);
+      const courtSnap = await getDoc(courtRef);
+
+      if (courtSnap.exists()) {
+        const oldAdminUid = courtSnap.data().adminUid;
+
+        // Hạ quyền chủ sân cũ xuống manager (nếu khác với user mới)
+        if (oldAdminUid && oldAdminUid !== uid) {
+          await updateDoc(doc(db, 'users', oldAdminUid), {
+            role: 'manager',
+            roleRevoked: false
+          });
+        }
+
+        // Cập nhật adminUid mới vào court document
+        await updateDoc(courtRef, { adminUid: uid });
+      }
+    } catch (e) {
+      console.error('updateUserRole: Lỗi khi cập nhật adminUid court:', e);
+    }
+  }
+
+  // === TRƯỜNG HỢP THU HỒI QUYỀN (role = null) ===
+  if (!roleData.role) {
+    try {
+      // Lấy courtId hiện tại từ user document (trước khi update)
+      const userSnap = await getDoc(doc(db, 'users', uid));
+      const oldCourtId = userSnap.exists() ? (userSnap.data().courtId || courtId) : courtId;
+      if (oldCourtId) {
+        const courtRef = doc(db, 'courts', oldCourtId);
+        const courtSnap = await getDoc(courtRef);
+        // Chỉ xóa adminUid nếu nó đang trỏ đúng user này
+        if (courtSnap.exists() && courtSnap.data().adminUid === uid) {
+          await updateDoc(courtRef, { adminUid: deleteField() });
+        }
+      }
+    } catch (e) {
+      console.error('updateUserRole: Lỗi khi xóa adminUid khỏi court:', e);
+    }
+  }
+
+  // Cập nhật document user (luôn thực hiện sau cùng)
+  await updateDoc(doc(db, 'users', uid), roleData);
 }
+
 
 /** Lấy danh sách nhân viên (admin + manager) của sân */
 export async function getCourtStaff(courtSlug) {
