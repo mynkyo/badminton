@@ -91,6 +91,14 @@
     .nav-item:hover { background: rgba(255,255,255,0.1); }
     .nav-item.active { background: var(--color-primary); color: white; }
     .bk-status-tab.active { background: white; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 700; }
+    /* Hide browser default calendar icon picker */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      display: none !important;
+      -webkit-appearance: none;
+    }
+    input[type="date"] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 overflow-x-hidden">
@@ -236,11 +244,25 @@
             <div class="flex items-center gap-3">
               <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa-regular fa-calendar text-primary mr-2"></i>Quản lý Lịch</h3>
             </div>
-            <div class="flex items-center justify-center gap-1.5 flex-wrap">
-              <button onclick="adminChangeDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-left text-gray-500 text-xs"></i></button>
-              <input type="date" id="adminDatePicker" class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary cursor-pointer" />
-              <button onclick="adminChangeDay(1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-right text-gray-500 text-xs"></i></button>
-              <button onclick="adminGoToday()" class="text-xs sm:text-sm text-primary font-semibold hover:underline px-1.5 py-1">Hôm nay</button>
+            <div class="flex flex-col items-center sm:items-end gap-2.5 w-full sm:w-auto">
+              <!-- Hàng 1: Nút chuyển đổi kiểu xem -->
+              <div class="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold text-gray-600">
+                <button type="button" onclick="setAdminScheduleViewMode('table')" id="adminViewBtnTable" class="px-3 py-1.5 rounded-lg bg-white text-primary shadow-xs transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-table-cells"></i> Bảng ma trận
+                </button>
+                <button type="button" onclick="setAdminScheduleViewMode('grid')" id="adminViewBtnGrid" class="px-3 py-1.5 rounded-lg hover:text-primary transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-border-all"></i> Theo từng sân
+                </button>
+              </div>
+
+              <!-- Hàng 2: Bộ chọn ngày (Nút Trái - Thứ - Ngày - Nút Phải - Hôm nay) -->
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="adminChangeDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-left text-gray-500 text-xs"></i></button>
+                <span id="adminDayOfWeekLabel" class="text-xs sm:text-sm font-bold text-primary bg-primary/10 px-2.5 py-1.5 rounded-lg whitespace-nowrap">Thứ ...</span>
+                <input type="date" id="adminDatePicker" class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs sm:text-sm font-bold text-navy focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary cursor-pointer bg-white w-[115px] sm:w-[130px] text-center" />
+                <button onclick="adminChangeDay(1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chevron-right text-gray-500 text-xs"></i></button>
+                <button onclick="adminGoToday()" class="text-xs sm:text-sm text-primary font-bold hover:underline px-2 py-1">Hôm nay</button>
+              </div>
             </div>
           </div>
 
@@ -252,8 +274,8 @@
           </div>
           <div id="adminPastToggleContainer"></div>
 
-          <!-- Table Wrapper with Left / Right Scroll Buttons -->
-          <div class="relative px-0 sm:px-3 group">
+          <!-- Table View Container -->
+          <div id="adminScheduleTableView" class="relative px-0 sm:px-3 group">
             <!-- Left Scroll Arrow -->
             <button onclick="scrollAdminScheduleTable(-300)" title="Cuộn sang trái"
               class="hidden sm:flex absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-primary hover:text-white text-navy border border-gray-200 rounded-full shadow-md items-center justify-center transition-all duration-200 z-30 hover:scale-110 active:scale-95">
@@ -278,6 +300,9 @@
               </table>
             </div>
           </div>
+
+          <!-- Grid View Container (Xem theo từng Sân giống trang Đặt sân của Khách) -->
+          <div id="adminScheduleGridView" class="hidden p-4 sm:p-5 space-y-6"></div>
         </div>
 
         <!-- Floating Admin Cart Bar -->
@@ -417,14 +442,21 @@
             <!-- Filter Controls Bar -->
             <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2">
               
-              <!-- Search Bar -->
-              <div class="relative flex-1 max-w-md">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="bkSearchInput" oninput="filterBookings()" placeholder="Tìm theo tên khách, SĐT, hoặc tên sân..."
-                  class="w-full pl-9 pr-8 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all bg-gray-50/50 focus:bg-white" />
-                <button onclick="clearBkSearch()" id="bkClearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
+              <!-- Left: Select All Checkbox + Search Bar -->
+              <div class="flex items-center gap-3 flex-1 max-w-lg">
+                <label class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 cursor-pointer transition-all flex-shrink-0">
+                  <input type="checkbox" id="bkSelectAllHeaderCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 text-purple-600 rounded cursor-pointer accent-purple-600" />
+                  <span class="hidden sm:inline">Chọn tất cả</span>
+                </label>
+
+                <div class="relative flex-1">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                  <input type="text" id="bkSearchInput" oninput="filterBookings()" placeholder="Tìm theo tên khách, SĐT, hoặc tên sân..."
+                    class="w-full pl-9 pr-8 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all bg-gray-50/50 focus:bg-white" />
+                  <button onclick="clearBkSearch()" id="bkClearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
               </div>
 
               <!-- Filter Options -->
@@ -452,6 +484,27 @@
 
           <!-- List Container -->
           <div id="allBookingList"></div>
+
+          <!-- FLOATING BATCH ACTION DOCK (Gọn gàng chỉ có 3 nút thao tác + nút Đóng) -->
+          <div id="bkBatchActionBar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/80 z-50 items-center gap-2.5 transition-all duration-300 animate-slideUp">
+            <button type="button" onclick="openBatchModal('confirmed')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+              <i class="fa-solid fa-check text-xs"></i> Duyệt đơn
+            </button>
+
+            <button type="button" onclick="openBatchModal('paid')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+              <i class="fa-solid fa-money-bill-wave text-xs"></i> Thanh toán
+            </button>
+
+            <button type="button" onclick="openBatchModal('delete')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+              <i class="fa-solid fa-trash-can text-xs"></i> Xóa
+            </button>
+
+            <div class="h-4 w-[1px] bg-slate-700 mx-0.5"></div>
+
+            <button type="button" onclick="clearSelectedOrders()" title="Hủy chọn" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all active:scale-95">
+              <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+          </div>
 
           <!-- Footer Count -->
           <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex items-center justify-between">
@@ -1082,6 +1135,59 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   </div>
 </div>
 
+<!-- ===== MODAL XÁC NHẬN HÀNG LOẠT (BATCH CONFIRMATION MODAL) ===== -->
+<div id="batchConfirmModal" class="fixed inset-0 bg-navy/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[85vh] animate-slideUp">
+    <!-- Header -->
+    <div id="batchModalHeader" class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
+      <div class="flex items-center gap-2.5">
+        <div id="batchModalIcon" class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-base font-bold">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <h3 id="batchModalTitle" class="font-bold text-gray-800 text-base">Xác nhận thao tác hàng loạt</h3>
+          <p id="batchModalSubTitle" class="text-xs text-gray-500">Xem danh sách đơn sẽ áp dụng bên dưới</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeBatchModal()" class="w-8 h-8 rounded-full hover:bg-gray-200/60 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Body / Order List Review -->
+    <div class="p-5 space-y-4 overflow-y-auto flex-1">
+      <!-- Summary stats bar -->
+      <div class="grid grid-cols-2 gap-3 bg-purple-50/60 border border-purple-100 rounded-2xl p-3.5 text-xs">
+        <div>
+          <span class="text-gray-500 block">Số đơn áp dụng:</span>
+          <span id="batchReviewCount" class="text-purple-700 font-extrabold text-base">0 đơn</span>
+        </div>
+        <div class="text-right">
+          <span class="text-gray-500 block">Tổng số tiền:</span>
+          <span id="batchReviewTotalMoney" class="text-emerald-600 font-extrabold text-base">0đ</span>
+        </div>
+      </div>
+
+      <!-- Detail list of orders -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Danh sách đơn được chọn:</label>
+        <div id="batchReviewOrdersList" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex gap-3">
+      <button type="button" onclick="closeBatchModal()" class="w-1/3 border border-gray-200 text-gray-600 py-2.5 rounded-xl font-bold text-xs hover:bg-gray-100 transition-all text-center">
+        Hủy bỏ
+      </button>
+      <button type="button" id="batchModalConfirmBtn" onclick="executeBatchAction()" class="w-2/3 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-check"></i>
+        <span>Xác nhận thực hiện</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import {
     getBookingsByDate, getAllBookings, addBookings,
@@ -1706,9 +1812,17 @@ Thay dây vợt" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 tex
   let adminDate = dayjs();
   const adminDP = document.getElementById('adminDatePicker');
   
+  const VIET_DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
   window.setAdminDate = function(d) {
     adminDate = d;
     if (adminDP) adminDP.value = formatDate(d);
+
+    const dowLabel = document.getElementById('adminDayOfWeekLabel');
+    if (dowLabel) {
+      dowLabel.textContent = VIET_DAYS[d.day()];
+    }
+
     renderAdminSchedule();
   };
   window.adminChangeDay = function(delta) { setAdminDate(adminDate.add(delta, 'day')); };
@@ -2484,7 +2598,136 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
       }
       html += `<tr class="${isPastHour ? 'opacity-40' : ''}">${rowCells}</tr>`;
     }
-    tbody.innerHTML = html;
+    if (tbody) tbody.innerHTML = html;
+
+    // 4. RENDER GRID VIEW (Xem theo từng Sân giống Khách)
+    renderAdminScheduleGridView(dateStr, isToday, nowHour, isPastDate, activeRcList);
+  }
+
+  let adminScheduleViewMode = 'table'; // 'table' | 'grid'
+
+  window.setAdminScheduleViewMode = function(mode) {
+    adminScheduleViewMode = mode;
+    const tableView = document.getElementById('adminScheduleTableView');
+    const gridView = document.getElementById('adminScheduleGridView');
+    const btnTable = document.getElementById('adminViewBtnTable');
+    const btnGrid = document.getElementById('adminViewBtnGrid');
+
+    if (mode === 'table') {
+      if (tableView) tableView.classList.remove('hidden');
+      if (gridView) gridView.classList.add('hidden');
+      if (btnTable) { btnTable.className = 'px-2.5 py-1 rounded-lg bg-white text-primary shadow-xs transition-all flex items-center gap-1'; }
+      if (btnGrid) { btnGrid.className = 'px-2.5 py-1 rounded-lg hover:text-primary transition-all flex items-center gap-1'; }
+    } else {
+      if (tableView) tableView.classList.add('hidden');
+      if (gridView) gridView.classList.remove('hidden');
+      if (btnTable) { btnTable.className = 'px-2.5 py-1 rounded-lg hover:text-primary transition-all flex items-center gap-1'; }
+      if (btnGrid) { btnGrid.className = 'px-2.5 py-1 rounded-lg bg-white text-primary shadow-xs transition-all flex items-center gap-1'; }
+    }
+  };
+
+  function renderAdminScheduleGridView(dateStr, isToday, nowHour, isPastDate, activeRcList) {
+    const gridContainer = document.getElementById('adminScheduleGridView');
+    if (!gridContainer) return;
+
+    const courts = CONFIG.courts || ['Sân 1', 'Sân 2', 'Sân 3'];
+    let gridHtml = '';
+
+    courts.forEach((cName, cIdx) => {
+      let slotsHtml = '';
+
+      for (let h = CONFIG.startHour; h < CONFIG.endHour; h++) {
+        const peak = isPeak(h);
+        const isPastHour = (isToday && h < nowHour) || isPastDate;
+
+        if (isToday && h < nowHour && !adminShowPastState) {
+          continue;
+        }
+
+        const timeLabel = `${String(h).padStart(2, '0')}:00`;
+
+        // Check đơn đặt
+        const booking = dayBookingsList.find(b => b.court === cIdx && h >= b.hour && h < b.hour + (b.duration || 1));
+        
+        // Check lịch cố định
+        let rcMatch = null;
+        let rcStart = 0;
+        let rcEnd = 0;
+        if (!booking) {
+          for (const rc of activeRcList) {
+            if (!(rc.courts || []).includes(cIdx)) continue;
+            const excKey = `${dateStr}_${cIdx}`;
+            const exc = rc.exceptions ? rc.exceptions[excKey] : undefined;
+            if (exc === null) continue;
+            let startH = rc.startHour;
+            let endH = rc.endHour;
+            if (rc.dayHours && rc.dayHours[adminDate.day()]) {
+              startH = rc.dayHours[adminDate.day()].start;
+              endH = rc.dayHours[adminDate.day()].end;
+            }
+            if (exc && typeof exc === 'object') {
+              startH = exc.start;
+              endH = exc.end;
+            }
+            if (h >= startH && h < endH) {
+              rcMatch = rc; rcStart = startH; rcEnd = endH;
+              break;
+            }
+          }
+        }
+
+        if (booking) {
+          const batchId = booking.batchId || `${booking.name}_${booking.phone}_${dayjs(booking.createdAt).format('YYYYMMDDHHmm')}`;
+          const isRecurring = booking.type === 'recurring';
+          slotsHtml += `
+            <div onclick="openOrderModal('${batchId}')" class="${isRecurring ? 'bg-purple-50 border-purple-300 text-purple-700' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl py-2.5 px-2 text-center text-xs font-bold cursor-pointer hover:shadow-md transition-all flex flex-col items-center justify-center min-h-[62px] active:scale-95">
+              <div class="font-extrabold text-sm sm:text-base">${timeLabel}</div>
+              <div class="text-[11px] font-bold truncate max-w-full"><i class="${isRecurring ? 'fa-solid fa-rotate' : 'fa-solid fa-user'} text-[10px] mr-1"></i>${booking.name}</div>
+            </div>`;
+        } else if (rcMatch) {
+          slotsHtml += `
+            <div onclick="handleRecurringSlotClick('${rcMatch.id}', ${cIdx}, '${dateStr}', ${rcStart}, ${rcEnd})" class="bg-purple-50 border border-purple-300 text-purple-700 rounded-xl py-2.5 px-2 text-center text-xs font-bold cursor-pointer hover:shadow-md transition-all flex flex-col items-center justify-center min-h-[62px] active:scale-95">
+              <div class="font-extrabold text-sm sm:text-base">${timeLabel}</div>
+              <div class="text-[11px] font-bold truncate max-w-full"><i class="fa-solid fa-rotate text-[10px] mr-1"></i>${rcMatch.name} (Cố định)</div>
+            </div>`;
+        } else if (isPastHour) {
+          slotsHtml += `
+            <div class="bg-slate-100 border border-slate-200 text-slate-400 rounded-xl py-2.5 px-2 text-center text-xs font-medium opacity-60 flex flex-col items-center justify-center min-h-[62px]">
+              <div class="font-extrabold text-sm sm:text-base">${timeLabel}</div>
+              <div class="text-[10px]">Đã qua</div>
+            </div>`;
+        } else {
+          const inCart = isInAdminCart(cIdx, h, dateStr);
+          if (inCart) {
+            slotsHtml += `
+              <div onclick="toggleAdminSlot(${cIdx}, ${h}, '${dateStr}')" class="bg-primary border-2 border-primary text-white rounded-xl py-2.5 px-2 text-center text-xs font-bold shadow-md transform scale-[1.02] transition-all flex flex-col items-center justify-center min-h-[62px] cursor-pointer">
+                <div class="font-black text-sm sm:text-base">${timeLabel}</div>
+                <div class="text-[10px] text-white/90 font-extrabold">✓ Đã chọn</div>
+              </div>`;
+          } else {
+            slotsHtml += `
+              <div onclick="toggleAdminSlot(${cIdx}, ${h}, '${dateStr}')" class="bg-white border ${peak ? 'border-amber-200 bg-amber-50/50 hover:border-amber-500' : 'border-slate-200 hover:border-primary'} text-slate-700 rounded-xl py-2.5 px-2 text-center text-xs font-bold transition-all shadow-2xs flex flex-col items-center justify-center min-h-[62px] cursor-pointer hover:shadow-sm active:scale-95">
+                <div class="font-extrabold text-sm sm:text-base">${timeLabel}</div>
+                <div class="text-[10px] ${peak ? 'text-amber-600 font-bold' : 'text-slate-400'} font-medium mt-0.5">${formatMoney(isPeak(h) ? CONFIG.pricePeak : CONFIG.priceNormal)}</div>
+              </div>`;
+          }
+        }
+      }
+
+      gridHtml += `
+        <div id="admin-court-card-${cIdx}" class="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4">
+          <h4 class="text-sm font-black text-slate-800 mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-shuttlecock text-primary"></i> ${cName}</span>
+            <span class="text-xs font-semibold text-slate-400">Khung giờ hoạt động: ${CONFIG.startHour}:00 - ${CONFIG.endHour}:00</span>
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            ${slotsHtml}
+          </div>
+        </div>
+      `;
+    });
+
+    gridContainer.innerHTML = gridHtml;
   }
 
   function formatOrderDate(order) {
@@ -2736,85 +2979,140 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
 
   function updateBatchBarUI(currentFilteredOrders) {
     const bar = document.getElementById('bkBatchActionBar');
-    const countEl = document.getElementById('bkSelectedCount');
-    const selectAllCb = document.getElementById('bkSelectAllCheckbox');
+    const selectAllHeaderCb = document.getElementById('bkSelectAllHeaderCheckbox');
 
     if (!bar) return;
 
     if (selectedOrderBatchIds.length > 0) {
       bar.classList.remove('hidden');
-      if (countEl) countEl.textContent = selectedOrderBatchIds.length;
-      if (selectAllCb && currentFilteredOrders) {
-        selectAllCb.checked = currentFilteredOrders.length > 0 && currentFilteredOrders.every(o => selectedOrderBatchIds.includes(o.batchId));
+      bar.classList.add('flex');
+      if (selectAllHeaderCb && currentFilteredOrders) {
+        selectAllHeaderCb.checked = currentFilteredOrders.length > 0 && currentFilteredOrders.every(o => selectedOrderBatchIds.includes(o.batchId));
       }
     } else {
       bar.classList.add('hidden');
-      if (selectAllCb) selectAllCb.checked = false;
+      bar.classList.remove('flex');
+      if (selectAllHeaderCb) selectAllHeaderCb.checked = false;
     }
   }
 
-  window.batchUpdateOrders = async function(newStatus) {
+  let currentBatchActionType = null; // 'confirmed', 'paid', 'delete'
+
+  window.openBatchModal = function(actionType) {
     if (selectedOrderBatchIds.length === 0) return;
-    const actionText = newStatus === 'paid' ? 'xác nhận & đánh dấu đã thanh toán' : 'duyệt';
-    const res = await Swal.fire({
-      title: `Cập nhật ${selectedOrderBatchIds.length} đơn hàng?`,
-      text: `Sẽ ${actionText} cho tất cả các đơn hàng đã được chọn.`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Đồng ý cập nhật',
-      cancelButtonText: 'Hủy'
-    });
+    currentBatchActionType = actionType;
 
-    if (!res.isConfirmed) return;
+    const orders = groupOrders(allBookingsList).filter(o => selectedOrderBatchIds.includes(o.batchId));
+    const countEl = document.getElementById('batchReviewCount');
+    const moneyEl = document.getElementById('batchReviewTotalMoney');
+    const listEl = document.getElementById('batchReviewOrdersList');
+    const titleEl = document.getElementById('batchModalTitle');
+    const subTitleEl = document.getElementById('batchModalSubTitle');
+    const iconEl = document.getElementById('batchModalIcon');
+    const confirmBtn = document.getElementById('batchModalConfirmBtn');
 
-    try {
-      Swal.showLoading();
-      const updateData = newStatus === 'paid' ? { status: 'confirmed', isPaid: true } : { status: newStatus };
-      const itemsToUpdate = allBookingsList.filter(b => selectedOrderBatchIds.includes(b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`));
-      
-      for (const item of itemsToUpdate) {
-        if (item.id) await updateBooking(item.id, updateData);
+    if (countEl) countEl.textContent = `${orders.length} đơn hàng`;
+    const totalMoney = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+    if (moneyEl) moneyEl.textContent = formatMoney(totalMoney);
+
+    if (actionType === 'confirmed') {
+      if (titleEl) titleEl.textContent = 'Xác nhận duyệt các đơn đã chọn';
+      if (subTitleEl) subTitleEl.textContent = 'Tất cả các đơn dưới đây sẽ chuyển sang trạng thái Đã xác nhận';
+      if (iconEl) iconEl.className = 'w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-base font-bold';
+      if (confirmBtn) {
+        confirmBtn.className = 'w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5';
+        confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Duyệt ' + orders.length + ' đơn ngay</span>';
       }
+    } else if (actionType === 'paid') {
+      if (titleEl) titleEl.textContent = 'Xác nhận thanh toán các đơn đã chọn';
+      if (subTitleEl) subTitleEl.textContent = 'Tất cả các đơn dưới đây sẽ được đánh dấu Đã xác nhận & Đã thanh toán 100%';
+      if (iconEl) iconEl.className = 'w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-base font-bold';
+      if (confirmBtn) {
+        confirmBtn.className = 'w-2/3 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5';
+        confirmBtn.innerHTML = '<i class="fa-solid fa-money-bill-wave"></i> <span>Xác nhận thanh toán</span>';
+      }
+    } else if (actionType === 'delete') {
+      if (titleEl) titleEl.textContent = 'Xác nhận xóa các đơn đã chọn';
+      if (subTitleEl) subTitleEl.textContent = 'Cảnh báo: Hành động này sẽ xóa vĩnh viễn các đơn đặt sân này khỏi hệ thống!';
+      if (iconEl) iconEl.className = 'w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-base font-bold';
+      if (confirmBtn) {
+        confirmBtn.className = 'w-2/3 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5';
+        confirmBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> <span>Xóa vĩnh viễn ' + orders.length + ' đơn</span>';
+      }
+    }
 
-      Swal.fire({ icon: 'success', title: `Đã cập nhật ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
-      selectedOrderBatchIds = [];
-      await renderAllBookings();
-      await renderDashboard();
-    } catch(err) {
-      console.error(err);
-      Swal.fire({ icon: 'error', title: 'Lỗi cập nhật hàng loạt', text: err.message || 'Không thể cập nhật các đơn đã chọn' });
+    if (listEl) {
+      listEl.innerHTML = orders.map(o => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs">
+          <div class="space-y-0.5">
+            <div class="font-bold text-gray-800 flex items-center gap-2">
+              <span>${o.name}</span>
+              <span class="text-[10px] text-gray-400">(${o.phone})</span>
+            </div>
+            <div class="text-[11px] text-gray-500 font-medium">
+              ${o.items.length} slot · ${CONFIG.courts[o.items[0]?.court] || 'Sân'} (${dayjs(o.items[0]?.date).format('DD/MM')})
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-extrabold text-primary">${formatMoney(o.totalAmount)}</div>
+            <button type="button" onclick="removeOrderFromBatchSelection('${o.batchId}')" class="text-[10px] text-rose-500 hover:underline">Bỏ chọn</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const modal = document.getElementById('batchConfirmModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
     }
   };
 
-  window.batchDeleteOrders = async function() {
-    if (selectedOrderBatchIds.length === 0) return;
-    const res = await Swal.fire({
-      title: `Xóa ${selectedOrderBatchIds.length} đơn hàng?`,
-      text: `Hành động này sẽ xóa vĩnh viễn tất cả các slot trong ${selectedOrderBatchIds.length} đơn đã chọn. Không thể khôi phục!`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      confirmButtonText: 'Xóa các đơn đã chọn',
-      cancelButtonText: 'Hủy'
-    });
+  window.closeBatchModal = function() {
+    const modal = document.getElementById('batchConfirmModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+    currentBatchActionType = null;
+  };
 
-    if (!res.isConfirmed) return;
+  window.removeOrderFromBatchSelection = function(batchId) {
+    toggleSelectOrder(batchId, false);
+    if (selectedOrderBatchIds.length === 0) {
+      closeBatchModal();
+    } else {
+      openBatchModal(currentBatchActionType);
+    }
+  };
 
+  window.executeBatchAction = async function() {
+    if (!currentBatchActionType || selectedOrderBatchIds.length === 0) return;
+    const actionType = currentBatchActionType;
     try {
       Swal.showLoading();
-      const itemsToDelete = allBookingsList.filter(b => selectedOrderBatchIds.includes(b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`));
+      const itemsToProcess = allBookingsList.filter(b => selectedOrderBatchIds.includes(b.batchId || `${b.name}_${b.phone}_${dayjs(b.createdAt).format('YYYYMMDDHHmm')}`));
       
-      for (const item of itemsToDelete) {
-        if (item.id) await deleteBooking(item.id);
+      if (actionType === 'delete') {
+        for (const item of itemsToProcess) {
+          if (item.id) await deleteBooking(item.id);
+        }
+        Swal.fire({ icon: 'success', title: `Đã xóa ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+      } else {
+        const updateData = actionType === 'paid' ? { status: 'confirmed', isPaid: true } : { status: actionType };
+        for (const item of itemsToProcess) {
+          if (item.id) await updateBooking(item.id, updateData);
+        }
+        Swal.fire({ icon: 'success', title: `Đã xử lý ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
       }
 
-      Swal.fire({ icon: 'success', title: `Đã xóa ${selectedOrderBatchIds.length} đơn hàng!`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+      closeBatchModal();
       selectedOrderBatchIds = [];
       await renderAllBookings();
       await renderDashboard();
     } catch(err) {
       console.error(err);
-      Swal.fire({ icon: 'error', title: 'Lỗi xóa hàng loạt', text: err.message || 'Không thể xóa các đơn đã chọn' });
+      Swal.fire({ icon: 'error', title: 'Lỗi thực hiện hàng loạt', text: err.message || 'Không thể xử lý các đơn đã chọn' });
     }
   };
 
@@ -3243,7 +3541,7 @@ document.getElementById('adminCartTotalText').textContent = formatMoney(adminCar
   window.loadStaff = loadStaff;
   window.loadCustomers = loadCustomers;
 
-  adminDP.value = formatDate(adminDate);
+  setAdminDate(adminDate);
   document.getElementById('todayDate').textContent = dayjs().format('DD/MM/YYYY');
   loadConfig();
   renderDashboard();

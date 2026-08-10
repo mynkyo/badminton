@@ -198,6 +198,15 @@
     .slot-pop {
       animation: selectPop .2s ease;
     }
+
+    /* Hide browser default calendar icon picker */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      display: none !important;
+      -webkit-appearance: none;
+    }
+    input[type="date"] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
 
@@ -373,9 +382,10 @@
                 onclick="changeDay(-1)">
                 <i class="fa-solid fa-chevron-left text-sm"></i>
               </button>
-              <div class="relative flex-1 flex items-center justify-center px-2">
+              <div class="relative flex-1 flex items-center justify-center gap-1.5 px-2">
+                <span id="dateDayOfWeekLabel" class="text-xs sm:text-sm font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg whitespace-nowrap">Thứ ...</span>
                 <input type="date" id="datePicker"
-                  class="w-full border-none font-extrabold text-base sm:text-lg text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10 py-1"
+                  class="w-[115px] sm:w-[130px] border-none font-extrabold text-base sm:text-lg text-navy focus:ring-0 cursor-pointer text-center bg-transparent z-10 py-1"
                   onclick="this.showPicker()" />
               </div>
               <button
@@ -2131,6 +2141,8 @@
       currentDate = dayjs();
       const datePicker = document.getElementById('datePicker');
 
+      const VIET_DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
       window.setDate = function (d) {
         const today = dayjs().startOf('day');
         if (d.startOf('day').isBefore(today)) {
@@ -2138,6 +2150,12 @@
         }
         currentDate = d;
         datePicker.value = fmtDate(d);
+
+        const dowLabel = document.getElementById('dateDayOfWeekLabel');
+        if (dowLabel) {
+          dowLabel.textContent = VIET_DAYS[d.day()];
+        }
+
         fetchBookingsAndRender();
       };
       window.changeDay = function (delta) { setDate(currentDate.add(delta, 'day')); };
@@ -2386,7 +2404,7 @@
       }
 
       // Init
-      datePicker.value = fmtDate(currentDate);
+      setDate(currentDate);
       datePicker.min = fmtDate(dayjs());
       datePicker.addEventListener('change', () => setDate(dayjs(datePicker.value)));
 
